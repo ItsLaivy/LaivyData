@@ -3,10 +3,14 @@ package codes.laivy.data.api.receptor;
 import codes.laivy.data.api.database.Database;
 import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.api.variable.VariableType;
+import codes.laivy.data.api.variable.container.ActiveVariableContainer;
+import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 public interface Receptor {
 
@@ -46,6 +50,14 @@ public interface Receptor {
      * @since 1.0
      */
     void load();
+
+    /**
+     * Save receptor variables and values into the database
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void save();
 
     /**
      * Unloads the receptor from the database and removes all data from the memory.
@@ -114,5 +126,23 @@ public interface Receptor {
      * @since 1.0
      */
     void set(@NotNull @Pattern(".") @Subst(".") String name, @Nullable Object object);
+
+    /**
+     * The unloaded variable containers
+     * @return a set containing all unloaded variable containers
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    @NotNull Set<@NotNull InactiveVariableContainer> getInactiveContainers();
+
+    /**
+     * The loaded variable containers
+     * @return a set containing all loaded variable containers
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    @NotNull Set<@NotNull ActiveVariableContainer> getActiveContainers();
 
 }

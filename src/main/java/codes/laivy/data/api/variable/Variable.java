@@ -3,6 +3,7 @@ package codes.laivy.data.api.variable;
 import codes.laivy.data.api.database.Database;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The variable will not be responsible for storing values directly; it will be responsible for creating the environment for them, acting as a container for the values, similar to a data storage engine.
@@ -10,6 +11,12 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 public interface Variable {
+
+    /**
+     * This will return the variable's default value, it could be anything :)
+     * @return the variable's default value
+     */
+    @Nullable Object getDefault();
 
     /**
      * The id of variables must follow the database regexes, be aware. Not all characters will be allowed here.

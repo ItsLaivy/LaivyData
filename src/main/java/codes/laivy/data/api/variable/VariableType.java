@@ -1,6 +1,7 @@
 package codes.laivy.data.api.variable;
 
 import codes.laivy.data.api.database.Database;
+import codes.laivy.data.sql.SqlVariable;
 import org.jetbrains.annotations.NotNull;
 
 /**

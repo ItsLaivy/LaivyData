@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLType;
 
-public interface SqlVariableType extends VariableType {
+public interface SqlVariableType<V extends SqlVariable> extends VariableType {
 
     @Override
     @Contract(pure = true)
@@ -43,6 +43,6 @@ public interface SqlVariableType extends VariableType {
      * Changes the variable type for the required type, changes variable configurations at the database, and everything it needs.
      * @param variable the sql variable
      */
-    void configure(@NotNull SqlVariable variable);
+    void configure(@NotNull V variable);
 
 }

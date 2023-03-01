@@ -23,7 +23,7 @@ import java.io.*;
  * @author ItsLaivy
  * @since 1.0
  */
-public interface SqlByteVariableType extends SqlVariableType {
+public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableType<V> {
 
     @Override
     @Contract(pure = true)
@@ -55,11 +55,6 @@ public interface SqlByteVariableType extends SqlVariableType {
         } else {
             throw new IllegalArgumentException("This object doesn't seems to be a byte object!");
         }
-    }
-
-    @Override
-    default void configure(@NotNull SqlVariable variable) {
-        variable.getDatabase().getManager().getVariablesManager().setType(variable, getSqlType());
     }
 
     default byte[] serialize(@Nullable Serializable value) {

@@ -31,4 +31,6 @@ public interface Database {
 
     void delete();
 
+    boolean isLoaded();
+
 }
