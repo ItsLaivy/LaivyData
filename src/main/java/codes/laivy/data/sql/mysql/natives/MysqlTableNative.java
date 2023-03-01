@@ -4,11 +4,9 @@ import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlTable;
-import codes.laivy.data.sql.mysql.MysqlVariable;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -74,10 +72,6 @@ public class MysqlTableNative implements MysqlTable {
     @Override
     public @NotNull Set<SqlVariable> getLoadedVariables() {
         return variables;
-    }
-    @Override
-    public @Nullable MysqlVariable getLoadedVariable(@NotNull String id) {
-        return null;
     }
 
     @Override

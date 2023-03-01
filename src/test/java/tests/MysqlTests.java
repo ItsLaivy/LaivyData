@@ -6,7 +6,7 @@ import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.natives.*;
 import codes.laivy.data.sql.mysql.natives.manager.MysqlManagerNative;
-import codes.laivy.data.sql.mysql.variable.type.MysqlByteVariableType;
+import codes.laivy.data.sql.mysql.variable.type.MysqlTextVariableType;
 
 import java.sql.SQLException;
 
@@ -18,10 +18,11 @@ public class MysqlTests {
             MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
             MysqlTable table = new MysqlTableNative(database, "table");
 
-            new MysqlVariableNative(table, "var", new MysqlByteVariableType(database), null);
+            new MysqlVariableNative(table, "var", new MysqlTextVariableType(database, MysqlTextVariableType.Size.TINYTEXT), "a");
 
             MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
             receptor.load();
+            
             for (VariableContainer var : receptor.getActiveContainers()) {
                 System.out.println("Value: '" + var.get() + "'");
             }

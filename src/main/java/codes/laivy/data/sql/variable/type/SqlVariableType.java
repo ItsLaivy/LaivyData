@@ -30,7 +30,7 @@ public interface SqlVariableType<V extends SqlVariable> extends VariableType {
      * @param object the object stored at the database
      * @return the variable final object
      */
-    @Nullable Object get(@NotNull Object object);
+    @Nullable Object get(@Nullable Object object);
 
     /**
      * This will return the variable type's sql type, the database manager will work with it.

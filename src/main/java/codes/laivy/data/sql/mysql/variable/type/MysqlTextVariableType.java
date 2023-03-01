@@ -2,20 +2,20 @@ package codes.laivy.data.sql.mysql.variable.type;
 
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
-import codes.laivy.data.sql.variable.type.SqlByteVariableType;
+import codes.laivy.data.sql.variable.type.SqlTextVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.sql.JDBCType;
 import java.sql.SQLType;
 
-public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable> {
+public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable> {
 
     private final @NotNull MysqlDatabase database;
     private final @NotNull Size size;
     protected @NotNull SQLType type;
 
-    public MysqlByteVariableType(@NotNull MysqlDatabase database, @NotNull Size size) {
+    public MysqlTextVariableType(@NotNull MysqlDatabase database, @NotNull Size size) {
         this.database = database;
         this.size = size;
 
@@ -57,7 +57,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
     }
 
     /**
-     * The {@link MysqlByteVariableType} saves the objects as Blob, you can select here what size do you prefer to use.
+     * The {@link MysqlTextVariableType} saves the objects as TEXT, you can select here what size do you prefer to use.
      * @author Laivy
      * @since 1.0
      */
@@ -65,32 +65,32 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
         /**
          * <p>
          *     This size could store up to 255 bytes. It's recommended for variables that will save simple bytes of data.
-         *     Has a performance higher than {@link #BLOB}
+         *     Has a performance higher than {@link #TEXT}
          * </p>
          *
          * @since 1.0
          */
-        TINYBLOB(255L, "TINYBLOB"),
+        TINYTEXT(255L, "TINYTEXT"),
 
         /**
          * <p>
          *     This size could store up to 65,535 bytes. It's recommended for normal use.
-         *     Has a performance higher than {@link #MEDIUMBLOB}, lower than {@link #TINYBLOB}
+         *     Has a performance higher than {@link #MEDIUMTEXT}, lower than {@link #TINYTEXT}
          * </p>
          *
          * @since 1.0
          */
-        BLOB(65535L, "BLOB"),
+        TEXT(65535L, "TEXT"),
 
         /**
          * <p>
          *     This size could store up to 16,777,215 bytes. It's recommended for large variables, with a big data storing
-         *     Has a performance higher than {@link #LONGBLOB}, lower than {@link #BLOB}
+         *     Has a performance higher than {@link #TEXT}, lower than {@link #TEXT}
          * </p>
          *
          * @since 1.0
          */
-        MEDIUMBLOB(16777215L, "MEDIUMBLOB"),
+        MEDIUMTEXT(16777215L, "MEDIUMTEXT"),
 
         /**
          * <p>
@@ -99,12 +99,12 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * <p>
          *     This size could store up to 4,294,967,295L bytes. It's recommended for massive variables.
-         *     Has a performance lower than {@link #MEDIUMBLOB}
+         *     Has a performance lower than {@link #MEDIUMTEXT}
          * </p>
          *
          * @since 1.0
          */
-        LONGBLOB(4294967295L, "LONGBLOB"),
+        LONGTEXT(4294967295L, "LONGTEXT"),
         ;
 
         private final @Range(from = 1, to = Long.MAX_VALUE) long capacity;

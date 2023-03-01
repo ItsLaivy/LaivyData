@@ -12,12 +12,12 @@ import java.io.*;
 
 /**
  * <p>
- * The blob type are used to store byte arrays, you can save objects here too, it will convert the
- * Serializable object into a byte array and store it on the database.
+ *     The blob type are used to store byte arrays, you can save objects here too, it will convert the
+ *     Serializable object into a byte array and store it on the database.
  * </p>
  *<br>
  * <p>
- * <b>Note:</b> The object that will be stored needs to be {@link Serializable}. However, if you use this data type, it may not be compatible with other languages' LaivyData, and it could cause performance issues. Therefore, I strongly recommend that you create your own serialization system.
+ *     <b>Note:</b> The object that will be stored needs to be {@link Serializable}. However, if you use this data type, it may not be compatible with other languages' LaivyData, and it could cause performance issues. Therefore, I strongly recommend that you create your own serialization system.
  * </p>
  *
  * @author ItsLaivy
@@ -48,7 +48,11 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
     }
 
     @Override
-    default @Nullable Object get(@NotNull Object object) {
+    default @Nullable Object get(@Nullable Object object) {
+        if (object == null) {
+            return null;
+        }
+
         if (object instanceof byte[]) {
             byte[] bytes = (byte[]) object;
             return deserialize(bytes);
