@@ -1,0 +1,118 @@
+package codes.laivy.data.api.receptor;
+
+import codes.laivy.data.api.database.Database;
+import codes.laivy.data.api.variable.Variable;
+import codes.laivy.data.api.variable.VariableType;
+import org.intellij.lang.annotations.Pattern;
+import org.intellij.lang.annotations.Subst;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public interface Receptor {
+
+    /**
+     * Gets the database's receptor
+     * @return the database of this receptor
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    @NotNull Database getDatabase();
+
+    /**
+     * The id is used to get the receptor at the database, some databases uses custom regexes.
+     * @return the receptor id
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    @Pattern(".")
+    @NotNull String getId();
+
+    /**
+     * This will change the receptor's database id.
+     * @param id the new receptor id
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void setId(@NotNull @Pattern(".") String id);
+
+    /**
+     * Loads the receptor from the database and gets all the data
+     * A receptor instance couldn't be loaded if a different instance of the same id at this database is already loaded
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void load();
+
+    /**
+     * Unloads the receptor from the database and removes all data from the memory.
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void unload(boolean save);
+
+    /**
+     * Checks if a receptor is loaded
+     * @return true if is loaded
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    boolean isLoaded();
+
+    /**
+     * Unloads the receptor and deletes from the database.
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void delete();
+
+    /**
+     * A receptor is new if it has created before loaded at the database.
+     * @return true if the receiver didn't exist before loading and been created
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    boolean isNew();
+
+    /**
+     * Unloads the receptor and loads again if the receptor is loaded.
+     * @param save save or not if the reloading process occurs
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    default void reload(boolean save) {
+        if (isLoaded()) {
+            unload(save);
+            load();
+        }
+    }
+
+    /**
+     * Gets a value of a {@link Variable} according to the {@link VariableType} processor
+     * @param name the {@link Variable} name
+     * @return the object
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    @Nullable <T> T get(@NotNull @Pattern(".") @Subst(".") String name);
+
+    /**
+     * Sets a value of a {@link Variable} according to the {@link VariableType} processor
+     * @param name the {@link Variable} name
+     * @param object the object
+     *
+     * @author ItsLaivy
+     * @since 1.0
+     */
+    void set(@NotNull @Pattern(".") @Subst(".") String name, @Nullable Object object);
+
+}
