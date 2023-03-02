@@ -1,5 +1,7 @@
 package codes.laivy.data.api.manager;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The main manager
  *
@@ -14,7 +16,7 @@ public interface Manager<T> {
      * @author ItsLaivy
      * @since 1.0
      */
-    void load(T object);
+    void load(@NotNull T object);
 
     /**
      * Unloads the manager's resources
@@ -22,7 +24,7 @@ public interface Manager<T> {
      * @author ItsLaivy
      * @since 1.0
      */
-    void unload(T object);
+    void unload(@NotNull T object);
 
     /**
      * Deletes the manager's resources
@@ -30,12 +32,12 @@ public interface Manager<T> {
      * @author ItsLaivy
      * @since 1.0
      */
-    void delete(T object);
+    void delete(@NotNull T object);
 
     /**
      * Checks if the manager is loaded
      * @return true if the manager is loaded
      */
-    boolean isLoaded(T object);
+    boolean isLoaded(@NotNull T object);
 
 }

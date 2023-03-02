@@ -1,5 +1,6 @@
 package codes.laivy.data.sql.sqlite.variable.type;
 
+import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.variable.SqliteVariableType;
@@ -72,13 +73,15 @@ public class SqliteBooleanVariableType implements SqlBooleanVariableType<SqliteV
 
         if (object instanceof Boolean) {
             return (boolean) object;
+        } else if (object instanceof Integer) {
+            return ((int) object) != 0;
         } else {
             throw new IllegalArgumentException("This object doesn't seems to be a boolean object!");
         }
     }
 
     @Override
-    public void configure(@NotNull SqliteVariable variable) {
+    public void configure(@NotNull SqlVariable variable) {
         variable.getDatabase().getManager().getVariablesManager().setType(variable, getSqlType());
     }
 }

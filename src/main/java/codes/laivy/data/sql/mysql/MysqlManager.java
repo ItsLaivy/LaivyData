@@ -9,6 +9,5 @@ import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import org.jetbrains.annotations.NotNull;
 
 public interface MysqlManager<R extends MysqlReceptor, V extends MysqlVariable, D extends MysqlDatabase, T extends MysqlTable> extends SqlManager<R, V, D, T> {
-    @Override
     @NotNull MysqlConnection getConnection();
 }

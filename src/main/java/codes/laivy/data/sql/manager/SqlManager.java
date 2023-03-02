@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface SqlManager<R extends SqlReceptor, V extends SqlVariable, D extends SqlDatabase, T extends SqlTable> extends DatabaseManager<R, V, D, T> {
 
-    @NotNull SqlConnection getConnection();
-
     @Override
     @NotNull SqlVariablesManager<V> getVariablesManager();
 

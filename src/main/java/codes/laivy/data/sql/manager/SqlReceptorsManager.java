@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface SqlReceptorsManager<R extends SqlReceptor> extends ReceptorsManager<R> {
 
-    void setId(R receptor, @NotNull String id);
+    void setId(@NotNull R receptor, @NotNull String id);
 
 }

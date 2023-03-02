@@ -1,8 +1,10 @@
 package codes.laivy.data.sql.mysql.variable.type;
 
+import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
+import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.variable.type.SqlByteVariableType;
 import com.mysql.cj.MysqlType;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +55,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
     }
 
     @Override
-    public void configure(@NotNull MysqlVariable variable) {
+    public void configure(@NotNull SqlVariable variable) {
         variable.getDatabase().getManager().getVariablesManager().setType(variable, getSqlType());
     }
 

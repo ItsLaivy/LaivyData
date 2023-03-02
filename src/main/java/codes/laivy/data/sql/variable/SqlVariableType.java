@@ -3,6 +3,7 @@ package codes.laivy.data.sql.variable;
 import codes.laivy.data.api.variable.VariableType;
 import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.SqlVariable;
+import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.values.SqlParameters;
 import codes.laivy.data.sql.values.metadata.SqlMetadata;
 import org.jetbrains.annotations.Contract;
@@ -43,6 +44,6 @@ public interface SqlVariableType<V extends SqlVariable> extends VariableType {
      * Changes the variable type for the required type, changes variable configurations at the database, and everything it needs.
      * @param variable the sql variable
      */
-    void configure(@NotNull V variable);
+    void configure(@NotNull SqlVariable variable);
 
 }

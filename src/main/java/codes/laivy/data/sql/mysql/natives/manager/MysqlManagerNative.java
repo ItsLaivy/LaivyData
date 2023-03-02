@@ -14,6 +14,7 @@ import codes.laivy.data.sql.mysql.natives.MysqlConnectionNative;
 import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
 import codes.laivy.data.sql.mysql.MysqlManager;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
+import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -44,12 +45,12 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     public MysqlManagerNative(@NotNull String address, @NotNull String user, @NotNull String password, int port) throws SQLException {
         this(new MysqlConnectionNative(DriverManager.getConnection("jdbc:mysql://" + address + ":" + port + "/?autoReconnect=true&failOverReadOnly=false&verifyServerCertificate=false", user, password)));
     }
-    public MysqlManagerNative(@NotNull MysqlConnectionNative connection) {
+    public MysqlManagerNative(@NotNull MysqlConnection connection) {
         this.connection = connection;
 
-        this.receptorsManager = new MysqlReceptorsManagerNative(getConnection());
-        this.variablesManager = new MysqlVariablesManagerNative(getConnection());
-        this.tablesManager = new MysqlTablesManagerNative(getConnection());
+        this.receptorsManager = new MysqlReceptorsManagerNative();
+        this.variablesManager = new MysqlVariablesManagerNative();
+        this.tablesManager = new MysqlTablesManagerNative();
     }
 
     @Override
@@ -67,7 +68,10 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     public @NotNull MysqlReceptor[] getStored(@NotNull MysqlDatabase database) {
         Set<MysqlReceptor> receptors = new LinkedHashSet<>();
         for (SqlTable table : database.getLoadedTables()) {
-            MysqlResultData query = database.getConnection().createStatement("SELECT `id` FROM `" + database.getId() + "`.`" + table.getId() + "`").execute();
+            MysqlResultStatement statement = database.getConnection().createStatement("SELECT `id` FROM `" + database.getId() + "`.`" + table.getId() + "`");
+            MysqlResultData query = statement.execute();
+            statement.close();
+
             if (query == null) {
                 throw new NullPointerException("Couldn't get query results");
             }

@@ -1,5 +1,6 @@
 package codes.laivy.data.sql.sqlite.variable.type;
 
+import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.variable.SqliteVariableType;
@@ -45,7 +46,7 @@ public class SqliteTextVariableType implements SqlTextVariableType<SqliteVariabl
     }
 
     @Override
-    public void configure(@NotNull SqliteVariable variable) {
+    public void configure(@NotNull SqlVariable variable) {
         variable.getDatabase().getManager().getVariablesManager().setType(variable, getSqlType());
     }
 }

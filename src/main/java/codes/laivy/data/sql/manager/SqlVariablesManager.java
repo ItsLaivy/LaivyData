@@ -12,6 +12,6 @@ public interface SqlVariablesManager<V extends SqlVariable> extends VariablesMan
      * Sets the variable type
      * @param type the new variable type
      */
-    void setType(@NotNull V variable, @NotNull SQLType type);
+    void setType(@NotNull SqlVariable variable, @NotNull SQLType type);
 
 }
