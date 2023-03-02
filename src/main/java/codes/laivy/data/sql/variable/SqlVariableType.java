@@ -1,4 +1,4 @@
-package codes.laivy.data.sql.variable.type;
+package codes.laivy.data.sql.variable;
 
 import codes.laivy.data.api.variable.VariableType;
 import codes.laivy.data.sql.SqlDatabase;

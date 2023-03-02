@@ -2,6 +2,7 @@ package codes.laivy.data.sql.mysql.variable.type;
 
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
+import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
 import codes.laivy.data.sql.variable.type.SqlTextVariableType;
 import com.mysql.cj.MysqlType;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Range;
 
 import java.sql.SQLType;
 
-public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable> {
+public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>, MysqlVariableType<MysqlVariable> {
 
     private final @NotNull MysqlDatabase database;
     private final @NotNull Size size;

@@ -5,7 +5,7 @@ import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.MysqlVariable;
-import codes.laivy.data.sql.mysql.types.MysqlManager;
+import codes.laivy.data.sql.mysql.MysqlManager;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;

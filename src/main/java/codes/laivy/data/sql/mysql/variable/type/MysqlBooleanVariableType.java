@@ -2,13 +2,14 @@ package codes.laivy.data.sql.mysql.variable.type;
 
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
+import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
 import codes.laivy.data.sql.variable.type.SqlBooleanVariableType;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.JDBCType;
 import java.sql.SQLType;
 
-public class MysqlBooleanVariableType implements SqlBooleanVariableType<MysqlVariable> {
+public class MysqlBooleanVariableType implements SqlBooleanVariableType<MysqlVariable>, MysqlVariableType<MysqlVariable> {
 
     private final @NotNull MysqlDatabase database;
     protected @NotNull SQLType type;

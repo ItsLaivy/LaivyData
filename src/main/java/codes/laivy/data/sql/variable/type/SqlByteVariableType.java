@@ -1,10 +1,9 @@
 package codes.laivy.data.sql.variable.type;
 
-import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.values.SqlParameters;
 import codes.laivy.data.sql.values.metadata.SqlMetadata;
-import org.jetbrains.annotations.Contract;
+import codes.laivy.data.sql.variable.SqlVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,11 +24,6 @@ import java.io.*;
  */
 public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableType<V> {
 
-    @Override
-    @Contract(pure = true)
-    @NotNull SqlDatabase getDatabase();
-
-    @Override
     default void set(@Nullable Object object, @NotNull SqlParameters parameters, @Nullable SqlMetadata metadata) {
         if (object == null) {
             parameters.setNull(getSqlType());
@@ -42,7 +36,6 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
         }
     }
 
-    @Override
     default @Nullable Object get(@Nullable Object object) {
         if (object == null) {
             return null;
@@ -78,4 +71,5 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
         }
         throw new IllegalStateException();
     }
+    
 }

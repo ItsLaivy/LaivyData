@@ -1,7 +1,6 @@
 package codes.laivy.data.sql.mysql;
 
 import codes.laivy.data.sql.SqlDatabase;
-import codes.laivy.data.sql.mysql.types.MysqlManager;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;

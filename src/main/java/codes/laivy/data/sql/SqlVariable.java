@@ -3,7 +3,7 @@ package codes.laivy.data.sql;
 import codes.laivy.data.api.table.Tableable;
 import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.sql.variable.SqlVariableConfiguration;
-import codes.laivy.data.sql.variable.type.SqlVariableType;
+import codes.laivy.data.sql.variable.SqlVariableType;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.Contract;

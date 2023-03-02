@@ -3,8 +3,8 @@ package codes.laivy.data.sql.mysql.natives;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.MysqlVariable;
+import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
 import codes.laivy.data.sql.variable.SqlVariableConfiguration;
-import codes.laivy.data.sql.variable.type.SqlVariableType;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ public class MysqlVariableNative implements MysqlVariable {
     private final @NotNull MysqlTable table;
     private @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id;
 
-    private final @NotNull SqlVariableType<MysqlVariable> type;
+    private final @NotNull MysqlVariableType<MysqlVariable> type;
     private final @Nullable Object defValue;
 
     private final @Nullable SqlVariableConfiguration configuration;
@@ -36,7 +36,7 @@ public class MysqlVariableNative implements MysqlVariable {
     public MysqlVariableNative(
             @NotNull MysqlTable table,
             @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id,
-            @NotNull SqlVariableType<MysqlVariable> type,
+            @NotNull MysqlVariableType<MysqlVariable> type,
             @Nullable Object defValue
     ) {
         this(table, id, type, defValue, null);
@@ -45,7 +45,7 @@ public class MysqlVariableNative implements MysqlVariable {
     public MysqlVariableNative(
             @NotNull MysqlTable table,
             @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id,
-            @NotNull SqlVariableType<MysqlVariable> type,
+            @NotNull MysqlVariableType<MysqlVariable> type,
             @Nullable Object defValue,
             @Nullable SqlVariableConfiguration configuration
     ) {
@@ -109,7 +109,7 @@ public class MysqlVariableNative implements MysqlVariable {
     }
 
     @Override
-    public @NotNull SqlVariableType<MysqlVariable> getType() {
+    public @NotNull MysqlVariableType<MysqlVariable> getType() {
         return type;
     }
 

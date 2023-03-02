@@ -12,7 +12,7 @@ import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.natives.MysqlConnectionNative;
 import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
-import codes.laivy.data.sql.mysql.types.MysqlManager;
+import codes.laivy.data.sql.mysql.MysqlManager;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
