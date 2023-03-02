@@ -14,12 +14,10 @@ import java.sql.SQLType;
 
 public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>, MysqlVariableType<MysqlVariable> {
 
-    private final @NotNull MysqlDatabase database;
     private final @NotNull Size size;
     protected @NotNull SQLType type;
 
-    public MysqlTextVariableType(@NotNull MysqlDatabase database, @NotNull Size size) {
-        this.database = database;
+    public MysqlTextVariableType(@NotNull Size size) {
         this.size = size;
 
         type = new SQLType() {
@@ -42,11 +40,6 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
 
     public @NotNull Size getSize() {
         return size;
-    }
-
-    @Override
-    public @NotNull MysqlDatabase getDatabase() {
-        return database;
     }
 
     @Override

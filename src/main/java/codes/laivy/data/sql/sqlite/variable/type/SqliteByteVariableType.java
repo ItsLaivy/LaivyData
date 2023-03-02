@@ -11,12 +11,9 @@ import java.sql.SQLType;
 
 public class SqliteByteVariableType implements SqlByteVariableType<SqliteVariable>, SqliteVariableType<SqliteVariable> {
 
-    private final @NotNull SqliteDatabase database;
     protected @NotNull SQLType type;
 
-    public SqliteByteVariableType(@NotNull SqliteDatabase database) {
-        this.database = database;
-
+    public SqliteByteVariableType() {
         type = new SQLType() {
             @Override
             public String getName() {
@@ -33,11 +30,6 @@ public class SqliteByteVariableType implements SqlByteVariableType<SqliteVariabl
                 return 4;
             }
         };
-    }
-
-    @Override
-    public @NotNull SqliteDatabase getDatabase() {
-        return database;
     }
 
     @Override

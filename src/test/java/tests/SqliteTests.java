@@ -9,18 +9,17 @@ import codes.laivy.data.sql.sqlite.natives.SqliteReceptorNative;
 import codes.laivy.data.sql.sqlite.natives.SqliteTableNative;
 import codes.laivy.data.sql.sqlite.natives.SqliteVariableNative;
 import codes.laivy.data.sql.sqlite.natives.manager.SqliteManagerNative;
-import codes.laivy.data.sql.sqlite.variable.type.SqliteBooleanVariableType;
+import codes.laivy.data.sql.sqlite.variable.type.SqliteByteVariableType;
 
 import java.io.File;
 
 public class SqliteTests {
-
     public static void main(String[] args) {
         SqliteManagerNative manager = new SqliteManagerNative(new File("."));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
 
-        SqlVariable var = new SqliteVariableNative(table, "var", new SqliteBooleanVariableType(database));
+        SqlVariable var = new SqliteVariableNative(table, "var", new SqliteByteVariableType());
 
         SqliteReceptor receptor = new SqliteReceptorNative(table, "test");
         receptor.load();
@@ -29,9 +28,9 @@ public class SqliteTests {
         System.out.println(receptor.get("var").toString());
 
         receptor.save();
-        receptor.delete();
+        //receptor.delete();
         //var.delete();
+        //table.delete();
         database.delete();
     }
-
 }

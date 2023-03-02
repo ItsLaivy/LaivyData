@@ -1,9 +1,5 @@
 package codes.laivy.data.api.variable;
 
-import codes.laivy.data.api.database.Database;
-import codes.laivy.data.sql.SqlVariable;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * The VariableType controls, sets, gets, removes, and modifies the value of a variable. This is important.
  *
@@ -11,7 +7,4 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 public interface VariableType {
-
-    @NotNull Database getDatabase();
-
 }

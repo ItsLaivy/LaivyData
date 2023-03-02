@@ -1,11 +1,8 @@
 package codes.laivy.data.sql.sqlite.variable.type;
 
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.variable.SqliteVariableType;
-import codes.laivy.data.sql.values.SqlParameters;
-import codes.laivy.data.sql.values.metadata.SqlMetadata;
 import codes.laivy.data.sql.variable.type.SqlBooleanVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,12 +17,9 @@ import java.sql.SQLType;
  */
 public class SqliteBooleanVariableType implements SqlBooleanVariableType<SqliteVariable>, SqliteVariableType<SqliteVariable> {
 
-    private final @NotNull SqliteDatabase database;
     protected @NotNull SQLType type;
 
-    public SqliteBooleanVariableType(@NotNull SqliteDatabase database) {
-        this.database = database;
-
+    public SqliteBooleanVariableType() {
         type = new SQLType() {
             @Override
             public String getName() {
@@ -45,24 +39,8 @@ public class SqliteBooleanVariableType implements SqlBooleanVariableType<SqliteV
     }
 
     @Override
-    public @NotNull SqliteDatabase getDatabase() {
-        return database;
-    }
-
-    @Override
     public @NotNull SQLType getSqlType() {
         return type;
-    }
-
-    @Override
-    public void set(@Nullable Object object, @NotNull SqlParameters parameters, @Nullable SqlMetadata metadata) {
-        if (object == null) {
-            parameters.setNull(getSqlType());
-        } else if (object instanceof Boolean) {
-            parameters.setBoolean((boolean) object);
-        } else {
-            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a boolean!");
-        }
     }
 
     @Override

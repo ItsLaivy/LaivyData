@@ -14,10 +14,6 @@ import java.sql.SQLType;
 
 public interface SqlVariableType<V extends SqlVariable> extends VariableType {
 
-    @Override
-    @Contract(pure = true)
-    @NotNull SqlDatabase getDatabase();
-
     /**
      * You can change the query for the variable here.
      * @param object the object that will be stored

@@ -1,10 +1,8 @@
 package codes.laivy.data.sql.mysql.variable.type;
 
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
-import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.variable.type.SqlByteVariableType;
 import com.mysql.cj.MysqlType;
 import org.jetbrains.annotations.NotNull;
@@ -14,12 +12,10 @@ import java.sql.SQLType;
 
 public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>, MysqlVariableType<MysqlVariable> {
 
-    private final @NotNull MysqlDatabase database;
     private final @NotNull Size size;
     protected @NotNull SQLType type;
 
-    public MysqlByteVariableType(@NotNull MysqlDatabase database, @NotNull Size size) {
-        this.database = database;
+    public MysqlByteVariableType(@NotNull Size size) {
         this.size = size;
 
         type = new SQLType() {
@@ -42,11 +38,6 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
 
     public @NotNull Size getSize() {
         return size;
-    }
-
-    @Override
-    public @NotNull MysqlDatabase getDatabase() {
-        return database;
     }
 
     @Override
