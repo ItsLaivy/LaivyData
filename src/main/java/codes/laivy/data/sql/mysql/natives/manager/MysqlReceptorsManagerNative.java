@@ -1,5 +1,7 @@
 package codes.laivy.data.sql.mysql.natives.manager;
 
+import codes.laivy.data.api.variable.Variable;
+import codes.laivy.data.api.variable.VariableType;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.ActiveVariableContainerImpl;
 import codes.laivy.data.api.variable.container.InactiveVariableContainerImpl;
@@ -10,6 +12,8 @@ import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
+import org.intellij.lang.annotations.Pattern;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,16 +72,17 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
 
         Map<Integer, ActiveVariableContainer> indexVariables = new LinkedHashMap<>();
 
-        int row = 0;
+        int row = 1;
         for (ActiveVariableContainer activeVar : receptor.getActiveContainers()) {
-            if (row != 0) query.append(",");
-            query.append("``=?");
+            if (row != 1) query.append(",");
+            query.append("`").append(activeVar.getVariable().getId()).append("`=?");
             indexVariables.put(row, activeVar);
             row++;
         }
 
-        MysqlResultStatement statement = getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET " + query + " WHERE id = ?");
-        statement.getParameters(0).setString(receptor.getId());
+        MysqlResultStatement statement = getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?," + query + " WHERE id = ?");
+        statement.getParameters(0).setInt(receptor.getIndex());
+        statement.getParameters(row).setString(receptor.getId());
 
         for (Map.Entry<Integer, ActiveVariableContainer> map : indexVariables.entrySet()) {
             ((SqlVariable) map.getValue().getVariable()).getType().set(
@@ -143,6 +148,27 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             }
             row++;
         }
+    }
+
+    @Override
+    public void setId(MysqlReceptor receptor, @NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+        if (!id.matches("^.{0,128}$")) {
+            throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
+        }
+
+        MysqlResultData data = getData(new MysqlReceptorNative(receptor.getTable(), id));
+        if (data != null) {
+            data.close();
+            throw new IllegalArgumentException("A receptor with that id '" + id + "' already exists on the table '" + receptor.getTable() + "'");
+        }
+
+        MysqlResultStatement statement = getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET id = ? WHERE id = ?");
+
+        statement.getParameters(0).setString(id);
+        statement.getParameters(1).setString(receptor.getId());
+
+        statement.execute();
+        statement.close();
     }
 
     @Override

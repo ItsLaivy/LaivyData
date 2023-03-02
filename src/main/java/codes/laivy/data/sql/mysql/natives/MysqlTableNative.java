@@ -36,6 +36,10 @@ public class MysqlTableNative implements MysqlTable {
         this.database = database;
         this.id = id;
 
+        if (!database.isLoaded()) {
+            throw new IllegalStateException("This database isn't loaded!");
+        }
+
         load();
     }
 

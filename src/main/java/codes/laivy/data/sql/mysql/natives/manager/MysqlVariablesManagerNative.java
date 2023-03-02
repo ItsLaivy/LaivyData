@@ -1,5 +1,8 @@
 package codes.laivy.data.sql.mysql.natives.manager;
 
+import codes.laivy.data.api.variable.container.ActiveVariableContainerImpl;
+import codes.laivy.data.api.variable.container.InactiveVariableContainer;
+import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.manager.SqlVariablesManager;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
@@ -7,6 +10,7 @@ import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLType;
+import java.util.LinkedList;
 
 public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVariable> {
 
@@ -45,6 +49,16 @@ public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVar
         variable.getType().set(variable.getDefault(), statement.getParameters(0), statement.getMetaData());
         statement.execute();
         statement.close();
+
+        // Load inactive containers
+        for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
+            for (InactiveVariableContainer container : new LinkedList<>(receptor.getInactiveContainers())) {
+                if (container.getVariable().equals(variable.getId())) {
+                    receptor.getInactiveContainers().remove(container);
+                    receptor.getActiveContainers().add(new ActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
+                }
+            }
+        }
     }
 
     @Override

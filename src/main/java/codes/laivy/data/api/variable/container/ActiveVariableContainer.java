@@ -2,6 +2,7 @@ package codes.laivy.data.api.variable.container;
 
 import codes.laivy.data.api.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -26,6 +27,6 @@ public interface ActiveVariableContainer extends VariableContainer {
      * @author ItsLaivy
      * @since 1.0
      */
-    void set(@NotNull Object value);
+    void set(@Nullable Object value);
 
 }

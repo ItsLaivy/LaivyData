@@ -12,18 +12,17 @@ import java.io.*;
 
 /**
  * <p>
- *     The blob type are used to store byte arrays, you can save objects here too, it will convert the
- *     Serializable object into a byte array and store it on the database.
+ *     The boolean type are used to store booleans.
  * </p>
  *<br>
  * <p>
- *     <b>Note:</b> The object that will be stored needs to be {@link Serializable}. However, if you use this data type, it may not be compatible with other languages' LaivyData, and it could cause performance issues. Therefore, I strongly recommend that you create your own serialization system.
+ *     This variable type is compatible with others languages LaivyData.
  * </p>
  *
  * @author ItsLaivy
  * @since 1.0
  */
-public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableType<V> {
+public interface SqlBooleanVariableType<V extends SqlVariable> extends SqlVariableType<V> {
 
     @Override
     @Contract(pure = true)
@@ -33,26 +32,23 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
     default void set(@Nullable Object object, @NotNull SqlParameters parameters, @Nullable SqlMetadata metadata) {
         if (object == null) {
             parameters.setNull(getSqlType());
-        } else if (object instanceof byte[]) {
-            parameters.setBytes((byte[]) object);
-        } else if (object instanceof Serializable) {
-            parameters.setBytes(serialize((Serializable) object));
+        } else if (object instanceof Boolean) {
+            parameters.setBoolean((boolean) object);
         } else {
-            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a byte[] or a Serializable!");
+            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a boolean!");
         }
     }
 
     @Override
-    default @Nullable Object get(@Nullable Object object) {
+    default @Nullable Boolean get(@Nullable Object object) {
         if (object == null) {
             return null;
         }
 
-        if (object instanceof byte[]) {
-            byte[] bytes = (byte[]) object;
-            return deserialize(bytes);
+        if (object instanceof Boolean) {
+            return (boolean) object;
         } else {
-            throw new IllegalArgumentException("This object doesn't seems to be a byte object!");
+            throw new IllegalArgumentException("This object doesn't seems to be a boolean object!");
         }
     }
 

@@ -38,7 +38,7 @@ public interface SqlTextVariableType<V extends SqlVariable> extends SqlVariableT
     }
 
     @Override
-    default @Nullable Object get(@Nullable Object object) {
+    default @Nullable String get(@Nullable Object object) {
         if (object == null) {
             return null;
         }

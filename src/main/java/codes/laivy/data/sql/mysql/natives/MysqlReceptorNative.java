@@ -45,6 +45,10 @@ public class MysqlReceptorNative implements MysqlReceptor {
         this.table = table;
         this.id = id;
 
+        if (!table.isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
+        }
+
         if (!matches("^.{0,128}$", id)) {
             throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
         }
@@ -52,6 +56,9 @@ public class MysqlReceptorNative implements MysqlReceptor {
 
     @Override
     public void load() {
+        getActiveContainers().clear();
+        getInactiveContainers().clear();
+
         getDatabase().getManager().getReceptorsManager().load(this);
         getTable().getLoadedReceptors().add(this);
         loaded = true;
@@ -59,11 +66,22 @@ public class MysqlReceptorNative implements MysqlReceptor {
 
     @Override
     public void save() {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The receptor isn't loaded.");
+        }
+
         getDatabase().getManager().getReceptorsManager().save(this);
     }
 
     @Override
     public void unload(boolean save) {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The receptor isn't loaded.");
+        }
+
+        getActiveContainers().clear();
+        getInactiveContainers().clear();
+
         getDatabase().getManager().getReceptorsManager().unload(this, save);
         getTable().getLoadedReceptors().remove(this);
         loaded = false;
@@ -80,11 +98,19 @@ public class MysqlReceptorNative implements MysqlReceptor {
         getDatabase().getManager().getReceptorsManager().delete(this);
     }
 
+    /**
+     * This set is cleared when a receptor loads/unloads, contains the inactive variable containers.
+     * @return a set has all inactive variable container
+     */
     @Override
     public @NotNull Set<@NotNull InactiveVariableContainer> getInactiveContainers() {
         return inactiveVariableContainers;
     }
 
+    /**
+     * This set is cleared when a receptor loads/unloads, contains the active variable containers.
+     * @return a set has all active variable container
+     */
     @Override
     public @NotNull Set<@NotNull ActiveVariableContainer> getActiveContainers() {
         return activeVariableContainers;
@@ -103,6 +129,7 @@ public class MysqlReceptorNative implements MysqlReceptor {
 
     @Override
     public void setId(@NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+        getDatabase().getManager().getReceptorsManager().setId(this, id);
         this.id = id;
     }
 
@@ -134,17 +161,41 @@ public class MysqlReceptorNative implements MysqlReceptor {
     }
 
     @Override
-    public <T> @Nullable T get(@NotNull String name) {
-        return null;
-    }
-
-    @Override
-    public void set(@NotNull String name, @Nullable Object object) {
-
-    }
-
-    @Override
     public @NotNull MysqlDatabase getDatabase() {
         return getTable().getDatabase();
+    }
+
+    @Override
+    public @Nullable <T> T get(@NotNull @Pattern(".*") @Subst("variable_id") String id) {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The receptor isn't loaded.");
+        }
+
+        for (ActiveVariableContainer container : getActiveContainers()) {
+            if (container.getVariable().getId().equals(id)) {
+                //noinspection unchecked
+                return (T) container.get();
+            }
+        }
+        throw new NullPointerException("Couldn't find a variable with id '" + id + "' at the receptor '" + getId() + "'");
+    }
+
+    @Override
+    public void set(@NotNull @Pattern(".*") @Subst("variable_id") String id, @Nullable Object object) {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The receptor isn't loaded.");
+        }
+
+        boolean set = false;
+        for (ActiveVariableContainer container : getActiveContainers()) {
+            if (container.getVariable().getId().equals(id)) {
+                container.set(object);
+                set = true;
+            }
+        }
+
+        if (!set) {
+            throw new NullPointerException("Couldn't find a variable with id '" + id + "' at the receptor '" + getId() + "'");
+        }
     }
 }

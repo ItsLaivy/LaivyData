@@ -3,10 +3,10 @@ package codes.laivy.data.sql.mysql.variable.type;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.variable.type.SqlTextVariableType;
+import com.mysql.cj.MysqlType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.sql.JDBCType;
 import java.sql.SQLType;
 
 public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable> {
@@ -32,7 +32,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
 
             @Override
             public Integer getVendorTypeNumber() {
-                return JDBCType.BLOB.getVendorTypeNumber();
+                return getSize().getVendorTypeNumber();
             }
         };
     }
@@ -70,7 +70,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        TINYTEXT(255L, "TINYTEXT"),
+        TINYTEXT(255L, "TINYTEXT", MysqlType.TINYTEXT.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -80,7 +80,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        TEXT(65535L, "TEXT"),
+        TEXT(65535L, "TEXT", MysqlType.TEXT.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -90,7 +90,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        MEDIUMTEXT(16777215L, "MEDIUMTEXT"),
+        MEDIUMTEXT(16777215L, "MEDIUMTEXT", MysqlType.MEDIUMTEXT.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -104,15 +104,17 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        LONGTEXT(4294967295L, "LONGTEXT"),
+        LONGTEXT(4294967295L, "LONGTEXT", MysqlType.LONGTEXT.getVendorTypeNumber()),
         ;
 
         private final @Range(from = 1, to = Long.MAX_VALUE) long capacity;
         private final @NotNull String name;
+        private final @Range(from = 1, to = Integer.MAX_VALUE) int vendorTypeNumber;
 
-        Size(@Range(from = 1, to = Long.MAX_VALUE) long capacity, @NotNull String name) {
+        Size(@Range(from = 1, to = Long.MAX_VALUE) long capacity, @NotNull String name, @Range(from = 1, to = Integer.MAX_VALUE) int vendorTypeNumber) {
             this.capacity = capacity;
             this.name = name;
+            this.vendorTypeNumber = vendorTypeNumber;
         }
 
         public @Range(from = 1, to = Long.MAX_VALUE) long getCapacity() {
@@ -121,6 +123,10 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
 
         public @NotNull String getName() {
             return name;
+        }
+
+        public @Range(from = 1, to = Integer.MAX_VALUE) int getVendorTypeNumber() {
+            return vendorTypeNumber;
         }
     }
 

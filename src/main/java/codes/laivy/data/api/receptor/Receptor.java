@@ -30,7 +30,7 @@ public interface Receptor {
      * @author ItsLaivy
      * @since 1.0
      */
-    @Pattern(".")
+    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -40,7 +40,7 @@ public interface Receptor {
      * @author ItsLaivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".") String id);
+    void setId(@NotNull @Pattern(".*") String id);
 
     /**
      * Loads the receptor from the database and gets all the data
@@ -109,23 +109,23 @@ public interface Receptor {
 
     /**
      * Gets a value of a {@link Variable} according to the {@link VariableType} processor
-     * @param name the {@link Variable} name
+     * @param id the {@link Variable} id
      * @return the object
      *
      * @author ItsLaivy
      * @since 1.0
      */
-    @Nullable <T> T get(@NotNull @Pattern(".") @Subst(".") String name);
+    @Nullable <T> T get(@NotNull @Pattern(".*") @Subst("variable_id") String id);
 
     /**
      * Sets a value of a {@link Variable} according to the {@link VariableType} processor
-     * @param name the {@link Variable} name
+     * @param id the {@link Variable} id
      * @param object the object
      *
      * @author ItsLaivy
      * @since 1.0
      */
-    void set(@NotNull @Pattern(".") @Subst(".") String name, @Nullable Object object);
+    void set(@NotNull @Pattern(".*") @Subst("variable_id") String id, @Nullable Object object);
 
     /**
      * The unloaded variable containers

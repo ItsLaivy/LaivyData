@@ -44,6 +44,8 @@ public class MysqlDatabaseNative implements MysqlDatabase {
         }
 
         this.id = id;
+
+        load();
     }
 
     @Override
@@ -89,4 +91,6 @@ public class MysqlDatabaseNative implements MysqlDatabase {
     public @NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> getManager() {
         return manager;
     }
+
+
 }

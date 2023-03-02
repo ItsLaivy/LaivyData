@@ -1,4 +1,4 @@
-package codes.laivy.data.sql.variable.type;
+package codes.laivy.data.sql.variable;
 
 public interface SqlVariableConfiguration {
 }

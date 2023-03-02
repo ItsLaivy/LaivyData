@@ -20,7 +20,7 @@ public interface Database {
      * @author ItsLaivy
      * @since 1.0
      */
-    @Pattern(".")
+    @Pattern(".*")
     @NotNull String getId();
 
     @NotNull DatabaseManager<?, ?, ?, ?> getManager();

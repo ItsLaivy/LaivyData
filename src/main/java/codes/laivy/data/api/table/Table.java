@@ -28,7 +28,7 @@ public interface Table {
      * @author ItsLaivy
      * @since 1.0
      */
-    @Pattern(".")
+    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -38,7 +38,7 @@ public interface Table {
      * @author ItsLaivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".") String id);
+    void setId(@NotNull @Pattern(".*") String id);
 
     void load();
 

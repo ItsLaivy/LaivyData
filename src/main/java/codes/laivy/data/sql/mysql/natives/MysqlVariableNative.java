@@ -3,7 +3,7 @@ package codes.laivy.data.sql.mysql.natives;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.MysqlVariable;
-import codes.laivy.data.sql.variable.type.SqlVariableConfiguration;
+import codes.laivy.data.sql.variable.SqlVariableConfiguration;
 import codes.laivy.data.sql.variable.type.SqlVariableType;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
@@ -54,6 +54,10 @@ public class MysqlVariableNative implements MysqlVariable {
         this.type = type;
         this.defValue = defValue;
         this.configuration = configuration;
+
+        if (!table.isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
+        }
 
         load();
     }

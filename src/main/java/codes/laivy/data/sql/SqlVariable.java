@@ -2,7 +2,7 @@ package codes.laivy.data.sql;
 
 import codes.laivy.data.api.table.Tableable;
 import codes.laivy.data.api.variable.Variable;
-import codes.laivy.data.sql.variable.type.SqlVariableConfiguration;
+import codes.laivy.data.sql.variable.SqlVariableConfiguration;
 import codes.laivy.data.sql.variable.type.SqlVariableType;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
@@ -18,7 +18,7 @@ public interface SqlVariable extends Variable, Tableable {
     @NotNull String getId();
 
     @Override
-    void setId(@NotNull @Pattern(".*") @Subst("variable_name") String id);
+    void setId(@NotNull @Pattern(".*") @Subst("variable_id") String id);
 
     @Override
     @Contract(pure = true)

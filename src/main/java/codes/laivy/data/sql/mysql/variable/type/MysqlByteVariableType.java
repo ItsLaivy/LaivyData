@@ -3,10 +3,10 @@ package codes.laivy.data.sql.mysql.variable.type;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.variable.type.SqlByteVariableType;
+import com.mysql.cj.MysqlType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.sql.JDBCType;
 import java.sql.SQLType;
 
 public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable> {
@@ -32,7 +32,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
 
             @Override
             public Integer getVendorTypeNumber() {
-                return JDBCType.BLOB.getVendorTypeNumber();
+                return size.getVendorTypeNumber();
             }
         };
     }
@@ -70,7 +70,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        TINYBLOB(255L, "TINYBLOB"),
+        TINYBLOB(255L, "TINYBLOB", MysqlType.TINYBLOB.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -80,7 +80,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        BLOB(65535L, "BLOB"),
+        BLOB(65535L, "BLOB", MysqlType.BLOB.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -90,7 +90,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        MEDIUMBLOB(16777215L, "MEDIUMBLOB"),
+        MEDIUMBLOB(16777215L, "MEDIUMBLOB", MysqlType.MEDIUMBLOB.getVendorTypeNumber()),
 
         /**
          * <p>
@@ -104,15 +104,17 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * @since 1.0
          */
-        LONGBLOB(4294967295L, "LONGBLOB"),
+        LONGBLOB(4294967295L, "LONGBLOB", MysqlType.LONGBLOB.getVendorTypeNumber()),
         ;
 
         private final @Range(from = 1, to = Long.MAX_VALUE) long capacity;
         private final @NotNull String name;
+        private final @Range(from = 1, to = Integer.MAX_VALUE) int vendorTypeNumber;
 
-        Size(@Range(from = 1, to = Long.MAX_VALUE) long capacity, @NotNull String name) {
+        Size(@Range(from = 1, to = Long.MAX_VALUE) long capacity, @NotNull String name, @Range(from = 1, to = Integer.MAX_VALUE) int vendorTypeNumber) {
             this.capacity = capacity;
             this.name = name;
+            this.vendorTypeNumber = vendorTypeNumber;
         }
 
         public @Range(from = 1, to = Long.MAX_VALUE) long getCapacity() {
@@ -121,6 +123,10 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
 
         public @NotNull String getName() {
             return name;
+        }
+
+        public @Range(from = 1, to = Integer.MAX_VALUE) int getVendorTypeNumber() {
+            return vendorTypeNumber;
         }
     }
 

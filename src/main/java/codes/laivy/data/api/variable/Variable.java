@@ -25,7 +25,7 @@ public interface Variable {
      * @author ItsLaivy
      * @since 1.0
      */
-    @Pattern(".")
+    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -35,7 +35,7 @@ public interface Variable {
      * @author ItsLaivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".") String id);
+    void setId(@NotNull @Pattern(".*") String id);
 
     /**
      * The database of the variable, every variable must have one.

@@ -22,7 +22,7 @@ public interface SqlReceptor extends Receptor, Tableable {
     @NotNull String getId();
 
     @Override
-    void setId(@NotNull @Pattern(".*") @Subst("example id") String id);
+    void setId(@NotNull @Pattern(".*") @Subst("receptor id") String id);
 
     /**
      * This receptor's index at the table
@@ -36,11 +36,5 @@ public interface SqlReceptor extends Receptor, Tableable {
      */
     @UnstableApi
     void setIndex(@Range(from = 0, to = Long.MAX_VALUE) int index);
-
-    @Override
-    <T> @Nullable T get(@NotNull @Pattern(".*") @Subst("variable_name") String name);
-
-    @Override
-    void set(@NotNull @Pattern(".*") @Subst("variable_name") String name, @Nullable Object object);
 
 }
