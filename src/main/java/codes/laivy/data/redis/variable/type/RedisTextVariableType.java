@@ -1,7 +1,7 @@
 package codes.laivy.data.redis.variable.type;
 
 import codes.laivy.data.redis.variable.RedisVariableType;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -12,14 +12,16 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 public class RedisTextVariableType implements RedisVariableType {
-
     @Override
-    public @NotNull String serialize(@NotNull Object object) {
-        return null;
+    public @Nullable String serialize(@Nullable Object object) {
+        if (object == null) {
+            return null;
+        }
+        return object.toString();
     }
 
     @Override
-    public @NotNull Object deserialize(@NotNull String value) {
-        return null;
+    public @Nullable Object deserialize(@Nullable String value) {
+        return value;
     }
 }

@@ -17,7 +17,7 @@ public class MysqlTests {
             MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
             MysqlTable table = new MysqlTableNative(database, "table");
 
-            MysqlVariable var = new MysqlVariableNative(table, "var", new MysqlBooleanVariableType(database), true);
+            MysqlVariable var = new MysqlVariableNative(table, "var", new MysqlBooleanVariableType(), true);
 
             MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
             receptor.load();

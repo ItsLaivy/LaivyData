@@ -1,8 +1,7 @@
 package codes.laivy.data.redis.variable;
 
-import codes.laivy.data.api.database.Database;
 import codes.laivy.data.api.variable.VariableType;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -22,7 +21,7 @@ public interface RedisVariableType extends VariableType {
      * @author ItsLaivy
      * @since 1.0
      */
-    @NotNull String serialize(@NotNull Object object);
+    @Nullable String serialize(@Nullable Object object);
 
     /**
      * Deserializes a key from the Redis database and converts it into the object again
@@ -32,6 +31,6 @@ public interface RedisVariableType extends VariableType {
      * @author ItsLaivy
      * @since 1.0
      */
-    @NotNull Object deserialize(@NotNull String value);
+    @Nullable Object deserialize(@Nullable String value);
 
 }

@@ -100,11 +100,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
             result.close();
         }
 
-        if (receptor instanceof SqliteReceptorNative) {
-            ((SqliteReceptorNative) receptor).setNew(data.isEmpty());
-        } else {
-            throw new IllegalStateException("The native sqlite manager's receptor manager doesn't supports that receptor type!");
-        }
+        receptor.setNew(data.isEmpty());
 
         if (data.isEmpty()) {
             // Execute

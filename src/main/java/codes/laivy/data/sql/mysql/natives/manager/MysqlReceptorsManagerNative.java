@@ -102,11 +102,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             result.close();
         }
 
-        if (receptor instanceof MysqlReceptorNative) {
-            ((MysqlReceptorNative) receptor).setNew(data.isEmpty());
-        } else {
-            throw new IllegalStateException("The native mysql manager's receptor manager doesn't supports that receptor type!");
-        }
+        receptor.setNew(data.isEmpty());
 
         if (data.isEmpty()) {
             // Execute

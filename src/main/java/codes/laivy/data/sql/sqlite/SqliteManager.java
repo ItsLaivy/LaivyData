@@ -1,4 +1,4 @@
-package codes.laivy.data.sql.sqlite.manager;
+package codes.laivy.data.sql.sqlite;
 
 import codes.laivy.data.sql.manager.SqlManager;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;

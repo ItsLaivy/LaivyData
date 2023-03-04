@@ -1,18 +1,18 @@
-package codes.laivy.data.api.variable.container;
+package codes.laivy.data.redis.variable.container;
 
 import codes.laivy.data.api.receptor.Receptor;
-import codes.laivy.data.api.variable.Variable;
+import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ActiveVariableContainerImpl implements ActiveVariableContainer {
+public class RedisInactiveVariableContainerImpl implements InactiveVariableContainer {
 
-    private final @NotNull Variable variable;
+    private final @NotNull String variable;
     private final @NotNull Receptor receptor;
-    private @Nullable Object object;
+    private final @Nullable Object object;
 
-    public ActiveVariableContainerImpl(@NotNull Variable variable, @NotNull Receptor receptor, @Nullable Object object) {
+    public RedisInactiveVariableContainerImpl(@NotNull String variable, @NotNull Receptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.receptor = receptor;
         this.object = object;
@@ -20,13 +20,8 @@ public class ActiveVariableContainerImpl implements ActiveVariableContainer {
 
     @Override
     @Contract(pure = true)
-    public @NotNull Variable getVariable() {
+    public @NotNull String getVariable() {
         return variable;
-    }
-
-    @Override
-    public void set(@Nullable Object value) {
-        this.object = value;
     }
 
     @Override

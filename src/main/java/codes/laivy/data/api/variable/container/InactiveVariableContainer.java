@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public interface InactiveVariableContainer extends VariableContainer {
 
     /**
-     * As it's impossible to get the configurations/type of a unloaded variable, this variable doesn't contains an instance, is saved as a String.
+     * As it's impossible to get the configurations/type of unloaded variable, this variable doesn't contain an instance, is saved as a String.
      * @return The unloaded variable name
      * @author ItsLaivy
      * @since 1.0

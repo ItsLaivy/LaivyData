@@ -1,18 +1,20 @@
-package codes.laivy.data.api.variable.container;
+package codes.laivy.data.redis.variable.container;
 
 import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.variable.Variable;
+import codes.laivy.data.api.variable.container.ActiveVariableContainer;
+import codes.laivy.data.redis.RedisVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ActiveVariableContainerImpl implements ActiveVariableContainer {
+public class RedisActiveVariableContainerImpl implements RedisActiveVariableContainer {
 
-    private final @NotNull Variable variable;
+    private final @NotNull RedisVariable variable;
     private final @NotNull Receptor receptor;
     private @Nullable Object object;
 
-    public ActiveVariableContainerImpl(@NotNull Variable variable, @NotNull Receptor receptor, @Nullable Object object) {
+    public RedisActiveVariableContainerImpl(@NotNull RedisVariable variable, @NotNull Receptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.receptor = receptor;
         this.object = object;
@@ -20,7 +22,7 @@ public class ActiveVariableContainerImpl implements ActiveVariableContainer {
 
     @Override
     @Contract(pure = true)
-    public @NotNull Variable getVariable() {
+    public @NotNull RedisVariable getVariable() {
         return variable;
     }
 

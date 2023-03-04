@@ -148,13 +148,7 @@ public class MysqlReceptorNative implements MysqlReceptor {
         return isNew;
     }
 
-    /**
-     * Use at your own risk, it's made for internal use.
-     * @param isNew the new state of receptor
-     *
-     * @author Laivy
-     * @since 1.0
-     */
+    @Override
     @ApiStatus.Internal
     public void setNew(boolean isNew) {
         this.isNew = isNew;

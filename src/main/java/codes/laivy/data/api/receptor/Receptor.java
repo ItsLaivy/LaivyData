@@ -7,6 +7,7 @@ import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +93,15 @@ public interface Receptor {
      * @since 1.0
      */
     boolean isNew();
+
+    /**
+     * This sets the new state of a receptor
+     * @param isNew the new state of receptor
+     *
+     * @author Laivy
+     * @since 1.0
+     */
+    void setNew(boolean isNew);
 
     /**
      * Unloads the receptor and loads again if the receptor is loaded.
