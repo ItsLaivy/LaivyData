@@ -5,10 +5,18 @@ import codes.laivy.data.redis.variable.RedisVariableType;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface RedisVariable extends Variable {
+
     @Override
     @NotNull RedisDatabase getDatabase();
+
+    /**
+     * The redis table is the variable's table, could be null.
+     * @return the table, null if it doesn't have one.
+     */
+    @Nullable RedisTable getTable();
 
     @Override
     @NotNull RedisVariableType getType();

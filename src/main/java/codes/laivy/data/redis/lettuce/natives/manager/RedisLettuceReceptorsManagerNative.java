@@ -1,9 +1,14 @@
 package codes.laivy.data.redis.lettuce.natives.manager;
 
 import codes.laivy.data.api.values.ResultData;
+import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.redis.RedisVariable;
 import codes.laivy.data.redis.lettuce.RedisLettuceReceptor;
 import codes.laivy.data.redis.manager.RedisReceptorsManager;
+import codes.laivy.data.redis.variable.RedisKey;
+import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
+import codes.laivy.data.redis.variable.container.RedisActiveVariableContainerImpl;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,26 +17,35 @@ public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager
     public void load(@NotNull RedisLettuceReceptor receptor) {
         receptor.setNew(false);
 
+        // TODO: 05/03/2023 Storing data
+//        if (receptor.getStoringData()) {
+//
+//        }
+
+        receptor.setNew(receptor.getKeys().isEmpty());
+
         for (RedisVariable variable : receptor.getVariables()) {
-            String key = variable.getRedisVariableName(receptor);
-            if (isKeyRegisteredAtRedis(key)) {
-                receptor.setNew(false);
-                new RedisInactiveVariable(receptor, variable.getName(), getConnection().sync().get(key));
+            RedisKey key = receptor.getDatabase().getKey(receptor, variable);
+            if (key != null) {
+                receptor.getActiveContainers().add(new RedisActiveVariableContainerImpl(variable, receptor, key.getValue()));
             } else {
-                new RedisActiveVariable(variable, receptor, variable.getDefaultValue());
+                receptor.getActiveContainers().add(new RedisActiveVariableContainerImpl(variable, receptor, variable.getDefault()));
             }
         }
 
-        receptorSave(receptor);
+        save(receptor);
     }
 
     @Override
-    public void unload(@NotNull RedisLettuceReceptor object) {
-
+    public void unload(@NotNull RedisLettuceReceptor receptor) {
+        // TODO: 05/03/2023 Storing data
+//        if (receptor.getStoringData()) {
+//
+//        }
     }
 
     @Override
-    public boolean isLoaded(@NotNull RedisLettuceReceptor object) {
+    public boolean isLoaded(@NotNull RedisLettuceReceptor receptor) {
         return false;
     }
 
@@ -42,16 +56,25 @@ public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager
 
     @Override
     public void unload(@NotNull RedisLettuceReceptor receptor, boolean save) {
-
+        if (save) {
+            receptor.save();
+        }
     }
 
     @Override
     public void save(@NotNull RedisLettuceReceptor receptor) {
+        for (@NotNull ActiveVariableContainer container : receptor.getActiveContainers()) {
+            RedisActiveVariableContainer redisContainer = (RedisActiveVariableContainer) container;
 
+            @Subst("redis_key") String key = receptor.getKey(redisContainer.getVariable());
+            receptor.getDatabase().getConnection().setKey(() -> key, redisContainer);
+        }
     }
 
     @Override
     public void delete(@NotNull RedisLettuceReceptor receptor) {
-
+        for (@NotNull RedisKey key : receptor.getKeys()) {
+            receptor.getDatabase().getConnection().delete(key);
+        }
     }
 }

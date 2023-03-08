@@ -1,15 +1,30 @@
 package codes.laivy.data.redis.lettuce.natives;
 
+import codes.laivy.data.redis.RedisReceptor;
+import codes.laivy.data.redis.RedisVariable;
 import codes.laivy.data.redis.lettuce.*;
 import codes.laivy.data.redis.lettuce.connection.RedisLettuceConnection;
 import codes.laivy.data.redis.lettuce.natives.manager.RedisLettuceManagerNative;
+import codes.laivy.data.redis.variable.RedisKey;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * <p>
+ *     The native Redis Lettuce Database of LaivyData.
+ *     This native database autoload when created at the constructor.
+ * </p>
+ *
+ * @author Laivy
+ * @since 1.0
+ *
+ * @version 1.0 - (07/03/2023)
+ */
 public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
 
     private final @NotNull RedisLettuceManagerNative manager;
@@ -17,12 +32,17 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
 
     private boolean loaded = false;
 
+    private final @NotNull Set<RedisReceptor> receptors = new LinkedHashSet<>();
+    private final @NotNull Set<RedisVariable> variables = new LinkedHashSet<>();
+
     public RedisLettuceDatabaseNative(
             @NotNull RedisLettuceManagerNative manager,
             @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id
     ) {
         this.manager = manager;
         this.id = id;
+
+        load();
     }
 
     @Override
@@ -60,6 +80,16 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
     }
 
     @Override
+    public @Nullable RedisKey getKey(@NotNull RedisReceptor receptor, @NotNull RedisVariable variable) {
+        if (receptor.getDatabase() == this && variable.getDatabase() == this) {
+            @Subst("redis_key") String key = receptor.getKey(variable);
+            return getConnection().getKey(key);
+        } else {
+            throw new IllegalArgumentException("The receptor and/or the variable database isn't this database!");
+        }
+    }
+
+    @Override
     public @NotNull RedisLettuceManagerNative getManager() {
         return manager;
     }
@@ -67,5 +97,15 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
     @Override
     public @NotNull RedisLettuceConnection getConnection() {
         return getManager().getConnection();
+    }
+
+    @Override
+    public @NotNull Set<RedisReceptor> getLoadedReceptors() {
+        return receptors;
+    }
+
+    @Override
+    public @NotNull Set<RedisVariable> getLoadedVariables() {
+        return variables;
     }
 }

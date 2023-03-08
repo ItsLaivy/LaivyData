@@ -1,6 +1,8 @@
 package codes.laivy.data.redis.lettuce.natives;
 
+import codes.laivy.data.redis.RedisTable;
 import codes.laivy.data.redis.lettuce.RedisLettuceDatabase;
+import codes.laivy.data.redis.lettuce.RedisLettuceTable;
 import codes.laivy.data.redis.lettuce.RedisLettuceVariable;
 import codes.laivy.data.redis.variable.RedisVariableType;
 import org.intellij.lang.annotations.Pattern;
@@ -15,6 +17,10 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     private final @NotNull RedisVariableType type;
     private final @Nullable Object defValue;
 
+    private final @Nullable RedisLettuceTable table;
+
+    private boolean loaded = false;
+
     public RedisLettuceVariableNative(
             @NotNull RedisLettuceDatabase database,
             @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id,
@@ -22,12 +28,27 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
             @Nullable Object defValue
     ) {
         this.database = database;
+        this.table = null;
         this.id = id;
         this.type = type;
         this.defValue = defValue;
-    }
 
-    private boolean loaded = false;
+        load();
+    }
+    public RedisLettuceVariableNative(
+            @NotNull RedisLettuceTable table,
+            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id,
+            @NotNull RedisVariableType type,
+            @Nullable Object defValue
+    ) {
+        this.table = table;
+        this.database = table.getDatabase();
+        this.id = id;
+        this.type = type;
+        this.defValue = defValue;
+
+        load();
+    }
 
     @Override
     public @Nullable Object getDefault() {
@@ -48,12 +69,14 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     @Override
     public void load() {
         getDatabase().getManager().getVariablesManager().load(this);
+        getDatabase().getLoadedVariables().add(this);
         loaded = true;
     }
 
     @Override
     public void unload() {
         getDatabase().getManager().getVariablesManager().unload(this);
+        getDatabase().getLoadedVariables().remove(this);
         loaded = false;
     }
 
@@ -76,5 +99,10 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     @Override
     public @NotNull RedisLettuceDatabase getDatabase() {
         return database;
+    }
+
+    @Override
+    public @Nullable RedisTable getTable() {
+        return table;
     }
 }

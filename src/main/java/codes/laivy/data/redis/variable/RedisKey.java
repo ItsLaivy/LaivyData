@@ -15,6 +15,7 @@ public interface RedisKey {
     /**
      * @return The redis value at the database
      */
-    @Nullable String getValue();
-
+    default @Nullable String getValue() {
+        return null;
+    }
 }

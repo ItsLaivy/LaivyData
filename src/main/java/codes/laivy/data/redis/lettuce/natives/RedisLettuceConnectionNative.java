@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class RedisLettuceConnectionNative implements RedisLettuceConnection {
@@ -57,7 +59,7 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
     }
 
     @Override
-    public @NotNull RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key) throws NullPointerException {
+    public @Nullable RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key) {
         if (getSync().exists(new String[] {key}) == 1) {
             return new RedisKey() {
                 @Override
@@ -71,8 +73,28 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
                 }
             };
         } else {
-            throw new NullPointerException("Couldn't find a key named '" + key + "' at this database");
+            return null;
         }
+    }
+
+    @Override
+    public @NotNull Set<RedisKey> getKeys(@NotNull String pattern) {
+        Set<RedisKey> keys = new LinkedHashSet<>();
+        for (@Subst("redis_key") String key : getSync().keys(pattern)) {
+            keys.add(new RedisKey() {
+                @Override
+                @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
+                public @NotNull String getKey() {
+                    return key;
+                }
+
+                @Override
+                public @Nullable String getValue() {
+                    return getSync().get(key);
+                }
+            });
+        }
+        return keys;
     }
 
     @Override
@@ -82,5 +104,21 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
         } else {
             getSync().set(key.getKey(), null);
         }
+    }
+
+    @Override
+    @Deprecated
+    public boolean exists(@NotNull String key) {
+        return getSync().exists(new String[] { key }) == 1;
+    }
+
+    @Override
+    public boolean exists(@NotNull RedisKey key) {
+        return getSync().exists(new String[] { key.getKey() }) == 1;
+    }
+
+    @Override
+    public void delete(@NotNull RedisKey key) {
+        getSync().del(key.getKey());
     }
 }

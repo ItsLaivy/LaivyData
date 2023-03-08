@@ -7,15 +7,23 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
+
 public interface RedisConnection {
 
     /**
      * Gets a redis key or throws a NullPointerException in case of invalid key
      * @param key the redis key
-     * @return the {@link RedisKey}
-     * @throws NullPointerException if this key doesn't exist at the redis
+     * @return the {@link RedisKey}, or null if the key doesn't exist
      */
-    @NotNull RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key) throws NullPointerException;
+    @Nullable RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key);
+
+    /**
+     * Gets the keys using the pattern
+     * @param pattern the pattern
+     * @return keys included at this pattern
+     */
+    @NotNull Set<RedisKey> getKeys(@NotNull String pattern);
 
     /**
      * Sets the redis key value at the redis database
@@ -23,5 +31,26 @@ public interface RedisConnection {
      * @param container the value
      */
     void setKey(@NotNull RedisKey key, @Nullable RedisActiveVariableContainer container);
+
+    /**
+     * Checks if a key exists at the database
+     * @return true if exists, false otherwise
+     * @param key the redis string key
+     * @deprecated Use {@link #exists(RedisKey)} instead
+     */
+    @Deprecated
+    boolean exists(@NotNull String key);
+    /**
+     * Checks if a key exists at the database
+     * @return true if exists, false otherwise
+     * @param key the redis key
+     */
+    boolean exists(@NotNull RedisKey key);
+
+    /**
+     * Deletes a redis key
+     * @param key the redis key
+     */
+    void delete(@NotNull RedisKey key);
 
 }

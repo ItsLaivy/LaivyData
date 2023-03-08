@@ -2,17 +2,25 @@ package codes.laivy.data.redis;
 
 import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
+import codes.laivy.data.redis.variable.RedisKey;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public interface RedisReceptor extends Receptor {
     @Override
     @NotNull RedisDatabase getDatabase();
+
+    /**
+     * Returns a string key of a variable at this receptor
+     * @return the string key of the variable
+     */
+    @NotNull String getKey(@NotNull RedisVariable variable);
 
     /**
      * <p>
@@ -38,7 +46,17 @@ public interface RedisReceptor extends Receptor {
      * @return The arrays that could hold this receptor
      */
     default @NotNull RedisVariable[] getVariables() {
-
+        Set<RedisVariable> variables = new LinkedHashSet<>();
+        if (getTable() != null) {
+            variables.addAll(getTable().getLoadedVariables());
+        } else {
+            for (RedisVariable variable : getDatabase().getLoadedVariables()) {
+                if (variable.getTable() == null) {
+                    variables.add(variable);
+                }
+            }
+        }
+        return variables.toArray(new RedisVariable[0]);
     }
 
     /**
@@ -48,7 +66,7 @@ public interface RedisReceptor extends Receptor {
      * @author ItsLaivy
      * @since 1.0
      */
-    @NotNull Set<String> getKeys();
+    @NotNull Set<RedisKey> getKeys();
 
     @Override
     @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")

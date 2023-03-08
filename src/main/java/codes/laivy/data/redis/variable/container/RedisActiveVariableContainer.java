@@ -7,6 +7,4 @@ import org.jetbrains.annotations.NotNull;
 public interface RedisActiveVariableContainer extends ActiveVariableContainer {
     @Override
     @NotNull RedisVariable getVariable();
-
-
 }
