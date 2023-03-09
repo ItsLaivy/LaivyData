@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * The {@link ResultData} is the main data flow controller, every database operation that returns something will need to have their DataResult.
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface ResultData extends Iterator<Map<String, Object>> {
@@ -19,7 +19,7 @@ public interface ResultData extends Iterator<Map<String, Object>> {
     /**
      * Sets the cursor to the first result
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void first();
@@ -28,7 +28,7 @@ public interface ResultData extends Iterator<Map<String, Object>> {
      * Gets the current cursor index
      * @return the current cursor index
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     int index();

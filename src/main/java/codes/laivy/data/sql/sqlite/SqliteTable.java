@@ -1,12 +1,14 @@
 package codes.laivy.data.sql.sqlite;
 
-import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.mysql.MysqlVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqliteTable extends SqlTable {
     @Override
     @NotNull SqliteDatabase getDatabase();

@@ -7,6 +7,10 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface RedisVariable extends Variable {
 
     @Override

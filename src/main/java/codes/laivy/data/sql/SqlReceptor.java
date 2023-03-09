@@ -7,6 +7,10 @@ import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.*;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlReceptor extends Receptor, Tableable {
 
     @Override

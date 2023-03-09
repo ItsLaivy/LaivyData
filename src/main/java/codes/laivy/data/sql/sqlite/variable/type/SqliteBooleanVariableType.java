@@ -12,7 +12,7 @@ import java.sql.SQLType;
 /**
  * As default, the SQLite doesn't have the BOOLEAN data type, then we use the INTEGER data type and set 0 to false, and 1 to true.
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public class SqliteBooleanVariableType implements SqlBooleanVariableType<SqliteVariable>, SqliteVariableType<SqliteVariable> {

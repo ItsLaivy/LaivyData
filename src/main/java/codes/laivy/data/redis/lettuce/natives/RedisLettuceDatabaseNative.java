@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * <p>
  *     The native Redis Lettuce Database of LaivyData.
- *     This native database autoload when created at the constructor.
+ *     This native database autoload when created by the constructor.
  * </p>
  *
  * @author Laivy

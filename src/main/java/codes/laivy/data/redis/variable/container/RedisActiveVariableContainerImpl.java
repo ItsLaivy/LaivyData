@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisActiveVariableContainerImpl implements RedisActiveVariableContainer {
 
     private final @NotNull RedisVariable variable;

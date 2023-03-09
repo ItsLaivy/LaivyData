@@ -12,6 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface RedisReceptor extends Receptor {
     @Override
     @NotNull RedisDatabase getDatabase();
@@ -63,7 +67,7 @@ public interface RedisReceptor extends Receptor {
      * Gets a full list of all registered keys by this receptor
      * @return the set containing all keys of this receptor
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<RedisKey> getKeys();

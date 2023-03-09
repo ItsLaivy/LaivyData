@@ -7,6 +7,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface RedisTable extends Table {
     @Override
     @NotNull RedisDatabase getDatabase();
@@ -15,7 +19,7 @@ public interface RedisTable extends Table {
      * The full list of all loaded receptors of this table
      * @return a set of all loaded receptors
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<RedisReceptor> getLoadedReceptors();
@@ -24,7 +28,7 @@ public interface RedisTable extends Table {
      * The full list of all loaded variables of this table
      *
      * @return a set of all loaded variables
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<RedisVariable> getLoadedVariables();

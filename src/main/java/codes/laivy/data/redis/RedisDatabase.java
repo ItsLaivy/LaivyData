@@ -11,6 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface RedisDatabase extends Database {
     @Override
     @NotNull RedisManager<?, ?, ?, ?> getManager();
@@ -19,7 +23,7 @@ public interface RedisDatabase extends Database {
      * Gets a full list of all registered keys by this database
      * @return the set containing all keys of this database
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<String> getKeys();

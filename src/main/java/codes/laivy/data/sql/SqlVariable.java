@@ -10,6 +10,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlVariable extends Variable, Tableable {
     @Nullable SqlVariableConfiguration getConfiguration();
 
@@ -29,5 +33,5 @@ public interface SqlVariable extends Variable, Tableable {
 
     @Override
     @Contract(pure = true)
-    @NotNull SqlVariableType getType();
+    @NotNull SqlVariableType<?> getType();
 }

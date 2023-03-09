@@ -7,6 +7,12 @@ import codes.laivy.data.sql.variable.SqlVariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Stores the variable as boolean at the SQL database
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlBooleanVariableType<V extends SqlVariable> extends SqlVariableType<V> {
 
     @Override

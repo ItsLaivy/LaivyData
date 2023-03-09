@@ -4,6 +4,10 @@ import codes.laivy.data.redis.lettuce.RedisLettuceTable;
 import codes.laivy.data.redis.manager.RedisTablesManager;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceTablesManagerNative implements RedisTablesManager<RedisLettuceTable> {
     @Override
     public void load(@NotNull RedisLettuceTable object) {
@@ -22,6 +26,6 @@ public class RedisLettuceTablesManagerNative implements RedisTablesManager<Redis
 
     @Override
     public boolean isLoaded(@NotNull RedisLettuceTable object) {
-        return false;
+        return object.isLoaded();
     }
 }

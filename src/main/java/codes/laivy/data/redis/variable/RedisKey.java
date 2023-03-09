@@ -5,6 +5,11 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The redis key that contains the key and the value at the database
+ * @author Laivy
+ * @since 1.0
+ */
 public interface RedisKey {
 
     /**
@@ -15,7 +20,5 @@ public interface RedisKey {
     /**
      * @return The redis value at the database
      */
-    default @Nullable String getValue() {
-        return null;
-    }
+    @Nullable String getValue();
 }

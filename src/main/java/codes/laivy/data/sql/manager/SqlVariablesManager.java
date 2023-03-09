@@ -6,6 +6,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLType;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlVariablesManager<V extends SqlVariable> extends VariablesManager<V> {
 
     /**

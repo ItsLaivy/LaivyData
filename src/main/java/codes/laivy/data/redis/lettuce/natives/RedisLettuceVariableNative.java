@@ -1,5 +1,6 @@
 package codes.laivy.data.redis.lettuce.natives;
 
+import codes.laivy.data.redis.RedisReceptor;
 import codes.laivy.data.redis.RedisTable;
 import codes.laivy.data.redis.lettuce.RedisLettuceDatabase;
 import codes.laivy.data.redis.lettuce.RedisLettuceTable;
@@ -10,6 +11,13 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The native Redis Lettuce variable support of the LaivyData.
+ * The constructor autoload the variable!
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceVariableNative implements RedisLettuceVariable {
 
     private final @NotNull RedisLettuceDatabase database;

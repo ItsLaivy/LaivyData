@@ -1,7 +1,6 @@
 package codes.laivy.data.sql.sqlite.variable.type;
 
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.variable.SqliteVariableType;
 import codes.laivy.data.sql.variable.type.SqlByteVariableType;

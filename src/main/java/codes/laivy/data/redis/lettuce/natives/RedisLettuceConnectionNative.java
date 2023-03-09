@@ -18,6 +18,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The native Redis Lettuce connection support of the LaivyData.
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceConnectionNative implements RedisLettuceConnection {
 
     private final @NotNull RedisClient client;

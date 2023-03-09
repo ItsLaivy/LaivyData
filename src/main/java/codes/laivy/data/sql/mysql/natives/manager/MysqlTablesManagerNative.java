@@ -6,6 +6,10 @@ import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class MysqlTablesManagerNative implements SqlTablesManager<MysqlTable> {
 
     public MysqlTablesManagerNative() {

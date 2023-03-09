@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The main manager
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface Manager<T> {
@@ -13,7 +13,7 @@ public interface Manager<T> {
     /**
      * Loads the manager's resources
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void load(@NotNull T object);
@@ -21,7 +21,7 @@ public interface Manager<T> {
     /**
      * Unloads the manager's resources
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void unload(@NotNull T object);
@@ -29,7 +29,7 @@ public interface Manager<T> {
     /**
      * Deletes the manager's resources
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void delete(@NotNull T object);

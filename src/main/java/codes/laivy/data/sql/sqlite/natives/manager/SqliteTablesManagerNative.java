@@ -5,6 +5,10 @@ import codes.laivy.data.sql.sqlite.SqliteTable;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class SqliteTablesManagerNative implements SqlTablesManager<SqliteTable> {
 
     public SqliteTablesManagerNative() {

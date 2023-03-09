@@ -5,7 +5,10 @@ import codes.laivy.data.sql.SqlVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface MysqlTable extends SqlTable {
     @Override
     @NotNull MysqlDatabase getDatabase();

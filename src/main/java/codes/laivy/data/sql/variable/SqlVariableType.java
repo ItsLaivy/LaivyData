@@ -12,6 +12,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLType;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlVariableType<V extends SqlVariable> extends VariableType {
 
     /**

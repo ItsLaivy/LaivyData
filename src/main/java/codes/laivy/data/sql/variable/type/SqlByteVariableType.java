@@ -19,7 +19,7 @@ import java.io.*;
  *     <b>Note:</b> The object that will be stored needs to be {@link Serializable} or {@link Byte} array. However, if you use this data type, it may not be compatible with other languages' LaivyData, and it could cause performance issues. Therefore, I strongly recommend that you create your own serialization system.
  * </p>
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableType<V> {

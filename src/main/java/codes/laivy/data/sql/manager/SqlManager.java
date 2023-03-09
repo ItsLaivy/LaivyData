@@ -8,6 +8,10 @@ import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.values.SqlConnection;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlManager<R extends SqlReceptor, V extends SqlVariable, D extends SqlDatabase, T extends SqlTable> extends DatabaseManager<R, V, D, T> {
 
     @Override

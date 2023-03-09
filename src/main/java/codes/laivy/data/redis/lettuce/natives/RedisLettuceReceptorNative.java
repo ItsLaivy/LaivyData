@@ -16,6 +16,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * The native Redis Lettuce receptor support of the LaivyData.
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     private final @NotNull RedisLettuceDatabase database;

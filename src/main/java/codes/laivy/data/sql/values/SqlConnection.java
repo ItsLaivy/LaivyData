@@ -7,6 +7,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface SqlConnection {
 
+    /**
+     * Creates a new statement using the query parameter.
+     * 
+     * @param query the query
+     * @return the sql statement
+     * @author Laivy
+     * @since 1.0
+     */
     @NotNull SqlResultStatement createStatement(@NotNull String query);
 
 }

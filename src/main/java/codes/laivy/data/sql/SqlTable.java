@@ -8,13 +8,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlTable extends Table {
 
     /**
      * This set <b>MUST</b> contains only loaded receptors
      * @return all loaded receptors at this table
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<SqlReceptor> getLoadedReceptors();
@@ -23,7 +27,7 @@ public interface SqlTable extends Table {
      * This set <b>MUST</b> contains only loaded variables
      * @return all loaded variables at this table
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<SqlVariable> getLoadedVariables();

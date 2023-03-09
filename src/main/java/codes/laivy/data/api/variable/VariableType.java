@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The VariableType controls, sets, gets, removes, and modifies the value of a variable. This is important.
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface VariableType {

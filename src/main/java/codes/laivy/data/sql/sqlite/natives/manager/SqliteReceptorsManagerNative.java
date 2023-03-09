@@ -19,6 +19,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteReceptor> {
     
     public SqliteReceptorsManagerNative() {

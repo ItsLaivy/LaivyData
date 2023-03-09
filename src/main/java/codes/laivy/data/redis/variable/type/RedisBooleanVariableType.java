@@ -2,6 +2,12 @@ package codes.laivy.data.redis.variable.type;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Saves the boolean as string using the "true" or "false".
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisBooleanVariableType extends RedisTextVariableType {
     @Override
     public @Nullable Object deserialize(@Nullable String value) {

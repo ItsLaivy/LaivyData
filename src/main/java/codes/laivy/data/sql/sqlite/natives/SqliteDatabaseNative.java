@@ -50,8 +50,8 @@ public class SqliteDatabaseNative implements SqliteDatabase {
         load();
     }
 
-    @NotNull
-    public File getFile() {
+    @Override
+    public @NotNull File getFile() {
         return new File(getManager().getPath() + File.separator + getId() + ".db");
     }
 

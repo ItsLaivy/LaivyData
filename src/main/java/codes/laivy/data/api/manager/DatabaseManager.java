@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <R> The receptor class of this manager
  * @param <V> The variable class of this manager
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface DatabaseManager<R extends Receptor, V extends Variable, D extends Database, T extends Table> extends Manager<D> {
@@ -22,7 +22,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * Example: For MySQL managers, you can use "MYSQL_MANAGER_YOUR_PROJECT_NAME" or something similar, like an ID.
      * @return the name of manager type
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Pattern("^[a-zA-Z_]+$")
@@ -32,7 +32,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * The variables manager is responsible to manage the variables
      * @return the variables manager
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull VariablesManager<V> getVariablesManager();
@@ -41,7 +41,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * The receptors manager is responsible to manage the receptors
      * @return the receptors manager
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull ReceptorsManager<R> getReceptorsManager();
@@ -50,7 +50,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * The tables manager is responsible to manage the tables
      * @return the tables manager
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull TablesManager<T> getTablesManager();
@@ -60,7 +60,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * @param database the database
      * @return all receptors stored on the database, if a receptor is already loaded, it will retrieve this loaded instance, if not, will create a unloaded one.
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull R[] getStored(@NotNull D database);

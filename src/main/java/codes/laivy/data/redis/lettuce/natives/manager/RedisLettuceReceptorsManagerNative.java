@@ -8,10 +8,15 @@ import codes.laivy.data.redis.manager.RedisReceptorsManager;
 import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainerImpl;
+import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager<RedisLettuceReceptor> {
     @Override
     public void load(@NotNull RedisLettuceReceptor receptor) {
@@ -67,7 +72,18 @@ public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager
             RedisActiveVariableContainer redisContainer = (RedisActiveVariableContainer) container;
 
             @Subst("redis_key") String key = receptor.getKey(redisContainer.getVariable());
-            receptor.getDatabase().getConnection().setKey(() -> key, redisContainer);
+            receptor.getDatabase().getConnection().setKey(new RedisKey() {
+                @Override
+                @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
+                public @NotNull String getKey() {
+                    return key;
+                }
+
+                @Override
+                public @Nullable String getValue() {
+                    throw new UnsupportedOperationException("This redis key's value isn't supported.");
+                }
+            }, redisContainer);
         }
     }
 

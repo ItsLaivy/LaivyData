@@ -7,6 +7,12 @@ import org.jetbrains.annotations.Range;
 import java.io.InputStream;
 import java.sql.SQLType;
 
+/**
+ * The SQL parameters are used to easily bind the parameters of a index
+ * 
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlParameters {
 
     /**

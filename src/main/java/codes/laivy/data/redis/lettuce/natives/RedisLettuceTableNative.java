@@ -11,6 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * The native Redis Lettuce table support of the LaivyData.
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceTableNative implements RedisLettuceTable {
 
     private final @NotNull RedisLettuceDatabase database;

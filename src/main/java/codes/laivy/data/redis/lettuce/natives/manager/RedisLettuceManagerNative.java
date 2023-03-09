@@ -9,6 +9,12 @@ import codes.laivy.data.redis.manager.RedisVariablesManager;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The native Redis Lettuce manager support of the LaivyData
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceManagerNative implements RedisLettuceManager<RedisLettuceReceptor, RedisLettuceVariable, RedisLettuceDatabase, RedisLettuceTable> {
 
     protected @NotNull RedisReceptorsManager<RedisLettuceReceptor> receptorsManager;

@@ -10,6 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * The native result data for SQLite databases
+ * 
+ * @author Laivy
+ * @since 1.0
+ */
 public class SqliteResultDataNative implements SqliteResultData {
 
     private final @NotNull ResultSet result;

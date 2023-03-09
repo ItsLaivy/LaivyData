@@ -4,6 +4,12 @@ import codes.laivy.data.api.receptor.Receptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The variable container
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public interface VariableContainer {
 
     /**

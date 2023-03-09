@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  *     This variable type is compatible with others languages LaivyData.
  * </p>
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface SqlTextVariableType<V extends SqlVariable> extends SqlVariableType<V> {

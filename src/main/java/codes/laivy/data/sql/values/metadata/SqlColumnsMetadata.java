@@ -9,7 +9,7 @@ import java.sql.SQLType;
 /**
  * The columns metadata contains information about the columns.
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface SqlColumnsMetadata extends SqlMetadata {

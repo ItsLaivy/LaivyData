@@ -19,7 +19,7 @@ public interface Receptor {
      * Gets the database's receptor
      * @return the database of this receptor
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Database getDatabase();
@@ -28,7 +28,7 @@ public interface Receptor {
      * The id is used to get the receptor at the database, some databases uses custom regexes.
      * @return the receptor id
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Pattern(".*")
@@ -38,7 +38,7 @@ public interface Receptor {
      * This will change the receptor's database id.
      * @param id the new receptor id
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void setId(@NotNull @Pattern(".*") String id);
@@ -47,7 +47,7 @@ public interface Receptor {
      * Loads the receptor from the database and gets all the data
      * A receptor instance couldn't be loaded if a different instance of the same id at this database is already loaded
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void load();
@@ -55,7 +55,7 @@ public interface Receptor {
     /**
      * Save receptor variables and values into the database
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void save();
@@ -63,7 +63,7 @@ public interface Receptor {
     /**
      * Unloads the receptor from the database and removes all data from the memory.
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void unload(boolean save);
@@ -72,7 +72,7 @@ public interface Receptor {
      * Checks if a receptor is loaded
      * @return true if is loaded
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     boolean isLoaded();
@@ -80,7 +80,7 @@ public interface Receptor {
     /**
      * Unloads the receptor and deletes from the database.
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void delete();
@@ -89,7 +89,7 @@ public interface Receptor {
      * A receptor is new if it has created before loaded at the database.
      * @return true if the receiver didn't exist before loading and been created
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     boolean isNew();
@@ -107,7 +107,7 @@ public interface Receptor {
      * Unloads the receptor and loads again if the receptor is loaded.
      * @param save save or not if the reloading process occurs
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     default void reload(boolean save) {
@@ -122,7 +122,7 @@ public interface Receptor {
      * @param id the {@link Variable} id
      * @return the object
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Nullable <T> T get(@NotNull @Pattern(".*") @Subst("variable_id") String id);
@@ -132,7 +132,7 @@ public interface Receptor {
      * @param id the {@link Variable} id
      * @param object the object
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void set(@NotNull @Pattern(".*") @Subst("variable_id") String id, @Nullable Object object);
@@ -141,7 +141,7 @@ public interface Receptor {
      * The unloaded variable containers
      * @return a set containing all unloaded variable containers
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<@NotNull InactiveVariableContainer> getInactiveContainers();
@@ -150,7 +150,7 @@ public interface Receptor {
      * The loaded variable containers
      * @return a set containing all loaded variable containers
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<@NotNull ActiveVariableContainer> getActiveContainers();

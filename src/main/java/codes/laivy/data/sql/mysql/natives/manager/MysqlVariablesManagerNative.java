@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.SQLType;
 import java.util.LinkedList;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVariable> {
 
     public MysqlVariablesManagerNative() {

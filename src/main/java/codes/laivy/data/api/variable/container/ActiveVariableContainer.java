@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  *     This interface is responsible to hold the receptor's variable value.
  * </p>
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface ActiveVariableContainer extends VariableContainer {
@@ -24,7 +24,7 @@ public interface ActiveVariableContainer extends VariableContainer {
      * Sets the value of this variable container
      * @param value the new container value
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void set(@Nullable Object value);

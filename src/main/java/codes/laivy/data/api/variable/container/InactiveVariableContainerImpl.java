@@ -5,6 +5,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The native inactive variable container
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class InactiveVariableContainerImpl implements InactiveVariableContainer {
 
     private final @NotNull String variable;

@@ -9,6 +9,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public interface SqlDatabase extends Database {
 
     @Contract(pure = true)
@@ -18,7 +22,7 @@ public interface SqlDatabase extends Database {
      * This set <b>MUST</b> contains only loaded tables
      * @return all loaded tables at this database
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Set<SqlTable> getLoadedTables();

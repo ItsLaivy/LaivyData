@@ -13,6 +13,10 @@ import org.sqlite.SQLiteException;
 import java.sql.SQLType;
 import java.util.LinkedList;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteVariable> {
 
     public SqliteVariablesManagerNative() {

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Range;
 /**
  * The statement of a sql result are the previous state of a {@link ResultData}, you can configure everything before execute and retrieve the result data.
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface SqlResultStatement {
@@ -18,7 +18,7 @@ public interface SqlResultStatement {
      * The connection's manager of this statement
      * @return the connection
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull SqlConnection getConnection();
@@ -27,7 +27,7 @@ public interface SqlResultStatement {
      * Execute the statement with the configurations and gets the result data
      * @return the result data of this statement or null if the statement isn't a query
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Nullable SqlResultData execute();
@@ -41,7 +41,7 @@ public interface SqlResultStatement {
     /**
      * Gets the metadata of the statement.
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Nullable SqlMetadata getMetaData();
@@ -49,7 +49,7 @@ public interface SqlResultStatement {
     /**
      * Closes the statement
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void close();

@@ -4,6 +4,10 @@ import codes.laivy.data.redis.lettuce.RedisLettuceVariable;
 import codes.laivy.data.redis.manager.RedisVariablesManager;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 public class RedisLettuceVariablesManagerNative implements RedisVariablesManager<RedisLettuceVariable> {
     @Override
     public void load(@NotNull RedisLettuceVariable object) {
@@ -17,7 +21,7 @@ public class RedisLettuceVariablesManagerNative implements RedisVariablesManager
 
     @Override
     public boolean isLoaded(@NotNull RedisLettuceVariable object) {
-        return false;
+        return object.isLoaded();
     }
 
     @Override

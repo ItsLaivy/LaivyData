@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This controls the variables
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface VariablesManager<V extends Variable> extends Manager<V> {
@@ -15,7 +15,7 @@ public interface VariablesManager<V extends Variable> extends Manager<V> {
      * Deletes the variable and all of its data.
      * @param variable the variable
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void delete(@NotNull V variable);

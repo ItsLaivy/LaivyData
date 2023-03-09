@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A table is a good way to order your database and separate the receptors and variable by category
  *
- * @author ItsLaivy
+ * @author Laivy
  * @since 1.0
  */
 public interface Table {
@@ -16,7 +16,7 @@ public interface Table {
      * Gets the table's receptor
      * @return the database of this table
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @NotNull Database getDatabase();
@@ -25,7 +25,7 @@ public interface Table {
      * The id will be used to identify this table at the database, some databases uses custom regexes.
      * @return the receptor id
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     @Pattern(".*")
@@ -35,7 +35,7 @@ public interface Table {
      * This will change the table's database id.
      * @param id the new table id
      *
-     * @author ItsLaivy
+     * @author Laivy
      * @since 1.0
      */
     void setId(@NotNull @Pattern(".*") String id);

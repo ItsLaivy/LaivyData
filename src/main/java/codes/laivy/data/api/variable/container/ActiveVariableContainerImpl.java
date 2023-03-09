@@ -6,6 +6,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The native active variable container
+ *
+ * @author Laivy
+ * @since 1.0
+ */
 public class ActiveVariableContainerImpl implements ActiveVariableContainer {
 
     private final @NotNull Variable variable;

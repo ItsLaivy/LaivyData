@@ -8,6 +8,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLType;
 
+/**
+ * Converts a object into string using the {@link Object#toString()} method, and saves at the database using the TEXT column data type.
+ * 
+ * @author Laivy
+ * @since 1.0
+ */
 public class SqliteTextVariableType implements SqlTextVariableType<SqliteVariable>, SqliteVariableType<SqliteVariable> {
 
     protected @NotNull SQLType type;

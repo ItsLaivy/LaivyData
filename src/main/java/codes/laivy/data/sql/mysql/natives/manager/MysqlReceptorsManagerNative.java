@@ -20,6 +20,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Laivy
+ * @since 1.0
+ */
 @ApiStatus.Internal
 public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlReceptor> {
 
