@@ -1,18 +1,15 @@
-package codes.laivy.data.sql.variable.type;
+package codes.laivy.data.redis.variable.type;
 
-import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.values.SqlParameters;
-import codes.laivy.data.sql.values.metadata.SqlMetadata;
-import codes.laivy.data.sql.variable.SqlVariableType;
-import org.jetbrains.annotations.NotNull;
+import codes.laivy.data.redis.variable.RedisVariableType;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.Base64;
 
 /**
  * <p>
- *     The byte type are used to store byte arrays, you can save objects here too, it will convert the
- *     Serializable object into a byte array and store it on the database.
+ *     The redis byte type are used to store byte arrays, you can save objects here too, it will convert the
+ *     Serializable object into a byte array and store it on the database using the Base64 encoder/decoder.
  * </p>
  *<br>
  * <p>
@@ -22,34 +19,32 @@ import java.io.*;
  * @author ItsLaivy
  * @since 1.0
  */
-public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableType<V> {
-
-    default void set(@Nullable Object object, @NotNull SqlParameters parameters, @Nullable SqlMetadata metadata) {
-        if (object == null) {
-            parameters.setNull(getSqlType());
-        } else if (object instanceof byte[]) {
-            parameters.setBytes((byte[]) object);
-        } else if (object instanceof Serializable) {
-            parameters.setBytes(serialize((Serializable) object));
-        } else {
-            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a byte[] or a Serializable!");
-        }
-    }
-
-    default @Nullable Object get(@Nullable Object object) {
+public class RedisByteVariableType implements RedisVariableType {
+    @Override
+    public @Nullable String serialize(@Nullable Object object) {
         if (object == null) {
             return null;
         }
 
         if (object instanceof byte[]) {
-            byte[] bytes = (byte[]) object;
-            return deserialize(bytes);
+            return Base64.getEncoder().encodeToString(serialize((byte[]) object));
+        } else if (object instanceof Serializable) {
+            return Base64.getEncoder().encodeToString(serialize((Serializable) object));
         } else {
-            throw new IllegalArgumentException("This object doesn't seems to be a byte object!");
+            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a byte[] or a Serializable!");
         }
     }
 
-    default byte[] serialize(@Nullable Serializable value) {
+    @Override
+    public @Nullable Object deserialize(@Nullable String value) {
+        if (value == null) {
+            return null;
+        }
+
+        return deserialize(Base64.getDecoder().decode(value));
+    }
+
+    protected byte[] serialize(@Nullable Serializable value) {
         try {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             ObjectOutputStream stream = new ObjectOutputStream(b);
@@ -61,7 +56,7 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
         throw new IllegalStateException();
     }
 
-    default @Nullable Serializable deserialize(byte[] value) {
+    protected @Nullable Serializable deserialize(byte[] value) {
         try {
             ByteArrayInputStream b = new ByteArrayInputStream(value);
             ObjectInputStream stream = new ObjectInputStream(b);
@@ -73,8 +68,7 @@ public interface SqlByteVariableType<V extends SqlVariable> extends SqlVariableT
     }
 
     @Override
-    default boolean isCompatible(@Nullable Object object) {
+    public boolean isCompatible(@Nullable Object object) {
         return object == null || object instanceof Serializable;
     }
-    
 }

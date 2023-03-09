@@ -27,7 +27,7 @@ public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager
         for (RedisVariable variable : receptor.getVariables()) {
             RedisKey key = receptor.getDatabase().getKey(receptor, variable);
             if (key != null) {
-                receptor.getActiveContainers().add(new RedisActiveVariableContainerImpl(variable, receptor, key.getValue()));
+                receptor.getActiveContainers().add(new RedisActiveVariableContainerImpl(variable, receptor, variable.getType().deserialize(key.getValue())));
             } else {
                 receptor.getActiveContainers().add(new RedisActiveVariableContainerImpl(variable, receptor, variable.getDefault()));
             }

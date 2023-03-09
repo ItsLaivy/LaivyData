@@ -24,4 +24,9 @@ public class RedisTextVariableType implements RedisVariableType {
     public @Nullable Object deserialize(@Nullable String value) {
         return value;
     }
+
+    @Override
+    public boolean isCompatible(@Nullable Object object) {
+        return true;
+    }
 }

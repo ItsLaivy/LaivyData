@@ -33,6 +33,11 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
         this.type = type;
         this.defValue = defValue;
 
+        // Parsing the default value
+        if (!getType().isCompatible(getDefault())) {
+            throw new RuntimeException("This default variable object isn't compatible with that variable type");
+        }
+
         load();
     }
     public RedisLettuceVariableNative(

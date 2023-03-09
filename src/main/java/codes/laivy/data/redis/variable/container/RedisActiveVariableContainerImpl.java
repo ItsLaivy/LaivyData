@@ -1,8 +1,6 @@
 package codes.laivy.data.redis.variable.container;
 
 import codes.laivy.data.api.receptor.Receptor;
-import codes.laivy.data.api.variable.Variable;
-import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.redis.RedisVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +15,7 @@ public class RedisActiveVariableContainerImpl implements RedisActiveVariableCont
     public RedisActiveVariableContainerImpl(@NotNull RedisVariable variable, @NotNull Receptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.receptor = receptor;
-        this.object = object;
+        set(object);
     }
 
     @Override
@@ -28,6 +26,10 @@ public class RedisActiveVariableContainerImpl implements RedisActiveVariableCont
 
     @Override
     public void set(@Nullable Object value) {
+        if (!getVariable().getType().isCompatible(value)) {
+            throw new IllegalStateException("This value isn't compatible with that variable type");
+        }
+
         this.object = value;
     }
 

@@ -38,4 +38,9 @@ public interface SqlTextVariableType<V extends SqlVariable> extends SqlVariableT
         return object.toString();
     }
 
+    @Override
+    default boolean isCompatible(@Nullable Object object) {
+        return true;
+    }
+
 }

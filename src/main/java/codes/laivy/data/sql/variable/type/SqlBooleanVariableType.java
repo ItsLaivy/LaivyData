@@ -16,7 +16,7 @@ public interface SqlBooleanVariableType<V extends SqlVariable> extends SqlVariab
         } else if (object instanceof Boolean) {
             parameters.setBoolean((boolean) object);
         } else {
-            throw new IllegalArgumentException("To use the byte variable type, the object needs to be a boolean!");
+            throw new IllegalArgumentException("To use the boolean variable type, the object needs to be a boolean!");
         }
     }
 
@@ -33,4 +33,8 @@ public interface SqlBooleanVariableType<V extends SqlVariable> extends SqlVariab
         }
     }
 
+    @Override
+    default boolean isCompatible(@Nullable Object object) {
+        return object == null || object instanceof Boolean;
+    }
 }

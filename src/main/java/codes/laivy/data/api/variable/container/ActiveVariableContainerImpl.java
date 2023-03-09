@@ -15,7 +15,7 @@ public class ActiveVariableContainerImpl implements ActiveVariableContainer {
     public ActiveVariableContainerImpl(@NotNull Variable variable, @NotNull Receptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.receptor = receptor;
-        this.object = object;
+        set(object);
     }
 
     @Override
@@ -26,6 +26,10 @@ public class ActiveVariableContainerImpl implements ActiveVariableContainer {
 
     @Override
     public void set(@Nullable Object value) {
+        if (!getVariable().getType().isCompatible(value)) {
+            throw new IllegalStateException("This value isn't compatible with that variable type");
+        }
+
         this.object = value;
     }
 

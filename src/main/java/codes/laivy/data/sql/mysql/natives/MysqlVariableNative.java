@@ -55,6 +55,11 @@ public class MysqlVariableNative implements MysqlVariable {
         this.defValue = defValue;
         this.configuration = configuration;
 
+        // Parsing the default value
+        if (!getType().isCompatible(getDefault())) {
+            throw new RuntimeException("This default variable object isn't compatible with that variable type");
+        }
+
         if (!table.isLoaded()) {
             throw new IllegalStateException("This table isn't loaded!");
         }
