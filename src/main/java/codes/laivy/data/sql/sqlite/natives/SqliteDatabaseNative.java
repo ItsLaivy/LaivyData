@@ -3,7 +3,6 @@ package codes.laivy.data.sql.sqlite.natives;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
-import codes.laivy.data.sql.sqlite.SqliteManager;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;

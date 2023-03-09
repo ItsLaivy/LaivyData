@@ -1,12 +1,11 @@
 package codes.laivy.data.sql.mysql.variable.type;
 
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
-import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.variable.type.SqlTextVariableType;
 import com.mysql.cj.MysqlType;
+import io.netty.util.internal.UnstableApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -100,6 +99,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          *
          * @since 1.0
          */
+        @UnstableApi
         LONGTEXT(4294967295L, "LONGTEXT", MysqlType.LONGTEXT.getVendorTypeNumber()),
         ;
 

@@ -13,6 +13,7 @@ import java.util.Set;
 
 /**
  * The native Redis Lettuce table support of the LaivyData.
+ * this native table autoload at the constructor.
  *
  * @author Laivy
  * @since 1.0
@@ -31,6 +32,8 @@ public class RedisLettuceTableNative implements RedisLettuceTable {
     ) {
         this.database = database;
         this.id = id;
+
+        load();
     }
 
     @Override

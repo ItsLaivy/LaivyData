@@ -1,12 +1,9 @@
 package codes.laivy.data.sql.variable;
 
 import codes.laivy.data.api.variable.VariableType;
-import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.values.SqlParameters;
 import codes.laivy.data.sql.values.metadata.SqlMetadata;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

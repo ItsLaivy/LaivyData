@@ -8,6 +8,8 @@ import codes.laivy.data.redis.manager.RedisTablesManager;
 import codes.laivy.data.redis.manager.RedisVariablesManager;
 import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * The native Redis Lettuce manager support of the LaivyData
@@ -23,6 +25,9 @@ public class RedisLettuceManagerNative implements RedisLettuceManager<RedisLettu
 
     private final @NotNull RedisLettuceConnectionNative connection;
 
+    public RedisLettuceManagerNative(@NotNull String host, @Nullable String password, @Range(from = 1, to = Integer.MAX_VALUE) int timeoutMillis, @Range(from = 0, to = 65535) int port, boolean ssl) {
+        this(new RedisLettuceConnectionNative(host, password, timeoutMillis, port, ssl));
+    }
     public RedisLettuceManagerNative(@NotNull RedisLettuceConnectionNative connection) {
         this.connection = connection;
 

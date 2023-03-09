@@ -7,7 +7,6 @@ import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

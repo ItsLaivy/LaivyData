@@ -1,6 +1,6 @@
 package codes.laivy.data.api.variable.container;
 
-import codes.laivy.data.api.variable.Variable;
+import codes.laivy.data.api.variable.VariableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,10 +15,10 @@ import org.jetbrains.annotations.Nullable;
 public interface ActiveVariableContainer extends VariableContainer {
 
     /**
-     * The variable of this container, needs to be loaded.
-     * @return the loaded variable
+     * Gets the variable type of this container.
+     * @return the variable type
      */
-    @NotNull Variable getVariable();
+    @NotNull VariableType getType();
 
     /**
      * Sets the value of this variable container

@@ -7,6 +7,7 @@ import codes.laivy.data.redis.lettuce.RedisLettuceDatabase;
 import codes.laivy.data.redis.lettuce.RedisLettuceReceptor;
 import codes.laivy.data.redis.lettuce.RedisLettuceTable;
 import codes.laivy.data.redis.variable.RedisKey;
+import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
@@ -54,10 +55,13 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     @Override
     public void load() {
-        if (getTable() != null) getTable().getLoadedReceptors().remove(this);
-        getDatabase().getLoadedReceptors().remove(this);
-
         getDatabase().getManager().getReceptorsManager().load(this);
+
+        getDatabase().getLoadedReceptors().add(this);
+        if (getTable() != null) {
+            getTable().getLoadedReceptors().add(this);
+        }
+
         loaded = true;
     }
 
@@ -68,10 +72,13 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     @Override
     public void unload(boolean save) {
-        if (getTable() != null) getTable().getLoadedReceptors().add(this);
-        getDatabase().getLoadedReceptors().add(this);
-
         getDatabase().getManager().getReceptorsManager().unload(this, save);
+
+        getDatabase().getLoadedReceptors().remove(this);
+        if (getTable() != null) {
+            getTable().getLoadedReceptors().remove(this);
+        }
+
         loaded = false;
     }
 
@@ -109,10 +116,20 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
 
-        for (ActiveVariableContainer container : getActiveContainers()) {
-            if (container.getVariable().getId().equals(id)) {
-                //noinspection unchecked
-                return (T) container.get();
+        for (ActiveVariableContainer activeVar : getActiveContainers()) {
+            if (activeVar instanceof RedisActiveVariableContainer) {
+                RedisActiveVariableContainer container = (RedisActiveVariableContainer) activeVar;
+
+                if (container.getVariable() != null) {
+                    if (container.getVariable().getId().equals(id)) {
+                        //noinspection unchecked
+                        return (T) container.get();
+                    }
+                } else {
+                    throw new NullPointerException("The active containers of a receptor needs to have a variable!");
+                }
+            } else {
+                throw new IllegalArgumentException("This receptor contains illegal container types");
             }
         }
         throw new NullPointerException("Couldn't find a variable with id '" + id + "' at the receptor '" + getId() + "'");
@@ -125,10 +142,20 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
         }
 
         boolean set = false;
-        for (ActiveVariableContainer container : getActiveContainers()) {
-            if (container.getVariable().getId().equals(id)) {
-                container.set(object);
-                set = true;
+        for (ActiveVariableContainer activeVar : getActiveContainers()) {
+            if (activeVar instanceof RedisActiveVariableContainer) {
+                RedisActiveVariableContainer container = (RedisActiveVariableContainer) activeVar;
+
+                if (container.getVariable() != null) {
+                    if (container.getVariable().getId().equals(id)) {
+                        container.set(object);
+                        set = true;
+                    }
+                } else {
+                    throw new NullPointerException("The active containers of a receptor needs to have a variable!");
+                }
+            } else {
+                throw new IllegalArgumentException("This receptor contains illegal container types");
             }
         }
 

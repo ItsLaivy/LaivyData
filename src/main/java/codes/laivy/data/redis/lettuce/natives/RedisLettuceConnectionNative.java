@@ -106,7 +106,7 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
     @Override
     public void setKey(@NotNull RedisKey key, @Nullable RedisActiveVariableContainer container) {
         if (container != null) {
-            getSync().set(key.getKey(), container.getVariable().getType().serialize(container.get()));
+            getSync().set(key.getKey(), container.getType().serialize(container.get()));
         } else {
             getSync().set(key.getKey(), null);
         }

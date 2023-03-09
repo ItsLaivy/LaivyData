@@ -1,5 +1,6 @@
 package codes.laivy.data.api.variable.container;
 
+import codes.laivy.data.api.receptor.Receptor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,4 +21,6 @@ public interface InactiveVariableContainer extends VariableContainer {
      */
     @NotNull String getVariable();
 
+    @Override
+    @NotNull Receptor getReceptor();
 }

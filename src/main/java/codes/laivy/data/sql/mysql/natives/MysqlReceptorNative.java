@@ -5,6 +5,7 @@ import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.MysqlTable;
+import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
@@ -165,10 +166,20 @@ public class MysqlReceptorNative implements MysqlReceptor {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
 
-        for (ActiveVariableContainer container : getActiveContainers()) {
-            if (container.getVariable().getId().equals(id)) {
-                //noinspection unchecked
-                return (T) container.get();
+        for (ActiveVariableContainer activeVar : getActiveContainers()) {
+            if (activeVar instanceof SqlActiveVariableContainer) {
+                SqlActiveVariableContainer container = (SqlActiveVariableContainer) activeVar;
+
+                if (container.getVariable() != null) {
+                    if (container.getVariable().getId().equals(id)) {
+                        //noinspection unchecked
+                        return (T) container.get();
+                    }
+                } else {
+                    throw new NullPointerException("The active containers of a receptor needs to have a variable!");
+                }
+            } else {
+                throw new IllegalArgumentException("This receptor contains illegal container types");
             }
         }
         throw new NullPointerException("Couldn't find a variable with id '" + id + "' at the receptor '" + getId() + "'");
@@ -181,10 +192,20 @@ public class MysqlReceptorNative implements MysqlReceptor {
         }
 
         boolean set = false;
-        for (ActiveVariableContainer container : getActiveContainers()) {
-            if (container.getVariable().getId().equals(id)) {
-                container.set(object);
-                set = true;
+        for (ActiveVariableContainer activeVar : getActiveContainers()) {
+            if (activeVar instanceof SqlActiveVariableContainer) {
+                SqlActiveVariableContainer container = (SqlActiveVariableContainer) activeVar;
+
+                if (container.getVariable() != null) {
+                    if (container.getVariable().getId().equals(id)) {
+                        container.set(object);
+                        set = true;
+                    }
+                } else {
+                    throw new NullPointerException("The active containers of a receptor needs to have a variable!");
+                }
+            } else {
+                throw new IllegalArgumentException("This receptor contains illegal container types");
             }
         }
 

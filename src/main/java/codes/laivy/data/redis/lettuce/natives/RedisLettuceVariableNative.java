@@ -1,6 +1,5 @@
 package codes.laivy.data.redis.lettuce.natives;
 
-import codes.laivy.data.redis.RedisReceptor;
 import codes.laivy.data.redis.RedisTable;
 import codes.laivy.data.redis.lettuce.RedisLettuceDatabase;
 import codes.laivy.data.redis.lettuce.RedisLettuceTable;
@@ -82,14 +81,24 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     @Override
     public void load() {
         getDatabase().getManager().getVariablesManager().load(this);
+
         getDatabase().getLoadedVariables().add(this);
+        if (getTable() != null) {
+            getTable().getLoadedVariables().add(this);
+        }
+
         loaded = true;
     }
 
     @Override
     public void unload() {
         getDatabase().getManager().getVariablesManager().unload(this);
+
         getDatabase().getLoadedVariables().remove(this);
+        if (getTable() != null) {
+            getTable().getLoadedVariables().remove(this);
+        }
+
         loaded = false;
     }
 

@@ -6,7 +6,6 @@ import codes.laivy.data.sql.manager.SqlReceptorsManager;
 import codes.laivy.data.sql.manager.SqlTablesManager;
 import codes.laivy.data.sql.manager.SqlVariablesManager;
 import codes.laivy.data.sql.sqlite.*;
-import codes.laivy.data.sql.sqlite.SqliteManager;
 import codes.laivy.data.sql.sqlite.natives.SqliteReceptorNative;
 import codes.laivy.data.sql.sqlite.values.SqliteResultData;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;

@@ -20,5 +20,7 @@ public interface RedisKey {
     /**
      * @return The redis value at the database
      */
-    @Nullable String getValue();
+    default @Nullable String getValue() {
+        throw new UnsupportedOperationException("This redis key's value isn't supported.");
+    }
 }

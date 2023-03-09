@@ -2,7 +2,6 @@ package codes.laivy.data.sql.mysql.natives.manager;
 
 import codes.laivy.data.sql.manager.SqlTablesManager;
 import codes.laivy.data.sql.mysql.MysqlTable;
-import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
 

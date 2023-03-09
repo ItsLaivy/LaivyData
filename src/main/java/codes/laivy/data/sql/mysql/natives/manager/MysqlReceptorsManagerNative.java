@@ -1,14 +1,15 @@
 package codes.laivy.data.sql.mysql.natives.manager;
 
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
-import codes.laivy.data.api.variable.container.ActiveVariableContainerImpl;
-import codes.laivy.data.api.variable.container.InactiveVariableContainerImpl;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlReceptorsManager;
 import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
+import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
+import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
+import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
 import org.intellij.lang.annotations.Pattern;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
@@ -64,22 +65,33 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
     public void save(@NotNull MysqlReceptor receptor) {
         StringBuilder query = new StringBuilder();
 
-        Map<Integer, ActiveVariableContainer> indexVariables = new LinkedHashMap<>();
+        Map<Integer, SqlActiveVariableContainer> indexVariables = new LinkedHashMap<>();
 
         int row = 1;
+
         for (ActiveVariableContainer activeVar : receptor.getActiveContainers()) {
-            if (row != 1) query.append(",");
-            query.append("`").append(activeVar.getVariable().getId()).append("`=?");
-            indexVariables.put(row, activeVar);
-            row++;
+            if (activeVar instanceof SqlActiveVariableContainer) {
+                SqlActiveVariableContainer container = (SqlActiveVariableContainer) activeVar;
+
+                if (container.getVariable() != null) {
+                    if (row != 1) query.append(",");
+                    query.append("`").append(container.getVariable().getId()).append("`=?");
+                    indexVariables.put(row, container);
+                    row++;
+                } else {
+                    throw new NullPointerException("The active containers of a receptor needs to have a variable!");
+                }
+            } else {
+                throw new IllegalArgumentException("This receptor contains illegal container types");
+            }
         }
 
         MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?," + query + " WHERE id = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 
-        for (Map.Entry<Integer, ActiveVariableContainer> map : indexVariables.entrySet()) {
-            ((SqlVariable) map.getValue().getVariable()).getType().set(
+        for (Map.Entry<Integer, SqlActiveVariableContainer> map : indexVariables.entrySet()) {
+            map.getValue().getType().set(
                     map.getValue().get(),
                     statement.getParameters(map.getKey()),
                     statement.getMetaData()
@@ -131,9 +143,9 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             } else if (row > 1) { // After index and id columns
                 SqlVariable variable = receptor.getTable().getLoadedVariable(map.getKey());
                 if (variable != null && variable.isLoaded()) {
-                    receptor.getActiveContainers().add(new ActiveVariableContainerImpl(variable, receptor, variable.getType().get(map.getValue())));
+                    receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(map.getValue())));
                 } else {
-                    receptor.getInactiveContainers().add(new InactiveVariableContainerImpl(map.getKey(), receptor, map.getValue()));
+                    receptor.getInactiveContainers().add(new SqlInactiveVariableContainerImpl(map.getKey(), receptor, map.getValue()));
                 }
             }
             row++;

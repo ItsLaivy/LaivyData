@@ -5,7 +5,6 @@ import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.SqlVariable;
-import codes.laivy.data.sql.values.SqlConnection;
 import org.jetbrains.annotations.NotNull;
 
 /**

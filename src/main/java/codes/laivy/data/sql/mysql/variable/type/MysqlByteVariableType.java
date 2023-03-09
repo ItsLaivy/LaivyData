@@ -5,6 +5,7 @@ import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
 import codes.laivy.data.sql.variable.type.SqlByteVariableType;
 import com.mysql.cj.MysqlType;
+import io.netty.util.internal.UnstableApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -98,6 +99,7 @@ public class MysqlByteVariableType implements SqlByteVariableType<MysqlVariable>
          *
          * @since 1.0
          */
+        @UnstableApi
         LONGBLOB(4294967295L, "LONGBLOB", MysqlType.LONGBLOB.getVendorTypeNumber()),
         ;
 

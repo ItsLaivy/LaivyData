@@ -1,7 +1,7 @@
 package codes.laivy.data.redis.variable.container;
 
-import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
+import codes.laivy.data.redis.RedisReceptor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,10 +13,10 @@ import org.jetbrains.annotations.Nullable;
 public class RedisInactiveVariableContainerImpl implements InactiveVariableContainer {
 
     private final @NotNull String variable;
-    private final @NotNull Receptor receptor;
+    private final @NotNull RedisReceptor receptor;
     private final @Nullable Object object;
 
-    public RedisInactiveVariableContainerImpl(@NotNull String variable, @NotNull Receptor receptor, @Nullable Object object) {
+    public RedisInactiveVariableContainerImpl(@NotNull String variable, @NotNull RedisReceptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.receptor = receptor;
         this.object = object;
@@ -30,7 +30,7 @@ public class RedisInactiveVariableContainerImpl implements InactiveVariableConta
 
     @Override
     @Contract(pure = true)
-    public @NotNull Receptor getReceptor() {
+    public @NotNull RedisReceptor getReceptor() {
         return receptor;
     }
 

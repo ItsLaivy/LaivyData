@@ -1,12 +1,12 @@
 package codes.laivy.data.sql.sqlite.natives.manager;
 
-import codes.laivy.data.api.variable.container.ActiveVariableContainerImpl;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlVariablesManager;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
+import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
 import org.jetbrains.annotations.NotNull;
 import org.sqlite.SQLiteException;
 
@@ -53,7 +53,7 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
             for (InactiveVariableContainer container : new LinkedList<>(receptor.getInactiveContainers())) {
                 if (container.getVariable().equals(variable.getId())) {
                     receptor.getInactiveContainers().remove(container);
-                    receptor.getActiveContainers().add(new ActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
+                    receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
                 }
             }
         }
