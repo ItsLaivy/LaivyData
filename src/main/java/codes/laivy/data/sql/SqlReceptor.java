@@ -3,8 +3,6 @@ package codes.laivy.data.sql;
 import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.table.Tableable;
 import io.netty.util.internal.UnstableApi;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.*;
 
 /**
@@ -22,11 +20,10 @@ public interface SqlReceptor extends Receptor, Tableable {
     @NotNull SqlTable getTable();
 
     @Override
-    @Pattern(".*")
     @NotNull String getId();
 
     @Override
-    void setId(@NotNull @Pattern(".*") @Subst("receptor id") String id);
+    void setId(@NotNull String id);
 
     /**
      * This receptor's index at the table

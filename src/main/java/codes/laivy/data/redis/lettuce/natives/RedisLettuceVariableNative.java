@@ -5,8 +5,6 @@ import codes.laivy.data.redis.lettuce.RedisLettuceDatabase;
 import codes.laivy.data.redis.lettuce.RedisLettuceTable;
 import codes.laivy.data.redis.lettuce.RedisLettuceVariable;
 import codes.laivy.data.redis.variable.RedisVariableType;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 public class RedisLettuceVariableNative implements RedisLettuceVariable {
 
     private final @NotNull RedisLettuceDatabase database;
-    private @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id;
+    private @NotNull String id;
     private final @NotNull RedisVariableType type;
     private final @Nullable Object defValue;
 
@@ -30,7 +28,7 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
 
     public RedisLettuceVariableNative(
             @NotNull RedisLettuceDatabase database,
-            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id,
+            @NotNull String id,
             @NotNull RedisVariableType type,
             @Nullable Object defValue
     ) {
@@ -49,7 +47,7 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     }
     public RedisLettuceVariableNative(
             @NotNull RedisLettuceTable table,
-            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id,
+            @NotNull String id,
             @NotNull RedisVariableType type,
             @Nullable Object defValue
     ) {
@@ -68,13 +66,12 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
     }
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 

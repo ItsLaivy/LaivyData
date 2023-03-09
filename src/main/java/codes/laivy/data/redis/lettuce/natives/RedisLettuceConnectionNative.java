@@ -7,8 +7,6 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.sync.RedisCommands;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,11 +63,10 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
     }
 
     @Override
-    public @Nullable RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key) {
+    public @Nullable RedisKey getKey(@NotNull String key) {
         if (getSync().exists(new String[] {key}) == 1) {
             return new RedisKey() {
                 @Override
-                @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
                 public @NotNull String getKey() {
                     return key;
                 }
@@ -86,10 +83,9 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
     @Override
     public @NotNull Set<RedisKey> getKeys(@NotNull String pattern) {
         Set<RedisKey> keys = new LinkedHashSet<>();
-        for (@Subst("redis_key") String key : getSync().keys(pattern)) {
+        for (String key : getSync().keys(pattern)) {
             keys.add(new RedisKey() {
                 @Override
-                @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
                 public @NotNull String getKey() {
                     return key;
                 }

@@ -1,7 +1,6 @@
 package codes.laivy.data.api.database;
 
 import codes.laivy.data.api.manager.DatabaseManager;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,7 +19,6 @@ public interface Database {
      * @author Laivy
      * @since 1.0
      */
-    @Pattern(".*")
     @NotNull String getId();
 
     @NotNull DatabaseManager<?, ?, ?, ?> getManager();

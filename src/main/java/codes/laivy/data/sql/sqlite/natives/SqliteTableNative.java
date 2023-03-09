@@ -4,8 +4,6 @@ import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteTable;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -25,14 +23,14 @@ import java.util.Set;
 public class SqliteTableNative implements SqliteTable {
 
     private final @NotNull SqliteDatabase database;
-    private @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("table_name") String id;
+    private @NotNull String id;
 
     private final @NotNull Set<SqlReceptor> receptors = new LinkedHashSet<>();
     private final @NotNull Set<SqlVariable> variables = new LinkedHashSet<>();
 
     private boolean loaded = false;
 
-    public SqliteTableNative(@NotNull SqliteDatabase database, @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("table_name") String id) {
+    public SqliteTableNative(@NotNull SqliteDatabase database, @NotNull String id) {
         this.database = database;
         this.id = id;
 
@@ -79,13 +77,12 @@ public class SqliteTableNative implements SqliteTable {
     }
 
     @Override
-    @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("table_name") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 

@@ -4,7 +4,6 @@ import codes.laivy.data.api.database.Database;
 import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.table.Table;
 import codes.laivy.data.api.variable.Variable;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,7 +24,6 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
      * @author Laivy
      * @since 1.0
      */
-    @Pattern("^[a-zA-Z_]+$")
     @NotNull String getName();
 
     /**
@@ -58,7 +56,7 @@ public interface DatabaseManager<R extends Receptor, V extends Variable, D exten
     /**
      * This retrieves all stored receptors (whether unloaded or loaded) from a database.
      * @param database the database
-     * @return all receptors stored on the database, if a receptor is already loaded, it will retrieve this loaded instance, if not, will create a unloaded one.
+     * @return all receptors stored on the database, if a receptor is already loaded, it will retrieve this loaded instance, if not, will create an unloaded one.
      *
      * @author Laivy
      * @since 1.0

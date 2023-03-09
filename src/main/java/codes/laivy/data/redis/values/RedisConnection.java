@@ -2,8 +2,6 @@ package codes.laivy.data.redis.values;
 
 import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,7 @@ public interface RedisConnection {
      * @param key the redis key
      * @return the {@link RedisKey}, or null if the key doesn't exist
      */
-    @Nullable RedisKey getKey(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String key);
+    @Nullable RedisKey getKey(@NotNull String key);
 
     /**
      * Gets the keys using the pattern

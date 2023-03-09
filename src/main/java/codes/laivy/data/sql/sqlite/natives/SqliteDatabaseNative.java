@@ -3,8 +3,6 @@ package codes.laivy.data.sql.sqlite.natives;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +27,7 @@ import static java.util.regex.Pattern.matches;
 public class SqliteDatabaseNative implements SqliteDatabase {
 
     private final @NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager;
-    private final @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("database") String id;
+    private final @NotNull String id;
 
     private final @NotNull Set<SqlTable> tables = new LinkedHashSet<>();
 
@@ -37,7 +35,7 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     protected @Nullable SqliteConnection connection;
 
-    public SqliteDatabaseNative(@NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager, @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("database") String id) {
+    public SqliteDatabaseNative(@NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager, @NotNull String id) {
         this.manager = manager;
 
         if (!matches("^([a-zA-Z][a-zA-Z0-9_]{0,64})$", id)) {
@@ -111,7 +109,6 @@ public class SqliteDatabaseNative implements SqliteDatabase {
     }
 
     @Override
-    @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$")
     public @NotNull String getId() {
         return id;
     }

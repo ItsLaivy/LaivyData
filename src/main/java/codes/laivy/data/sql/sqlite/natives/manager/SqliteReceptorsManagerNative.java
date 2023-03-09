@@ -10,8 +10,6 @@ import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
 import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,7 +148,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
     }
 
     @Override
-    public void setId(@NotNull SqliteReceptor receptor, @NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+    public void setId(@NotNull SqliteReceptor receptor, @NotNull String id) {
         if (!id.matches("^.{0,128}$")) {
             throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
         }

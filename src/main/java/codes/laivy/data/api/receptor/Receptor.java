@@ -5,8 +5,6 @@ import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.api.variable.VariableType;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +28,6 @@ public interface Receptor {
      * @author Laivy
      * @since 1.0
      */
-    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -40,7 +37,7 @@ public interface Receptor {
      * @author Laivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".*") String id);
+    void setId(@NotNull String id);
 
     /**
      * Loads the receptor from the database and gets all the data
@@ -124,7 +121,7 @@ public interface Receptor {
      * @author Laivy
      * @since 1.0
      */
-    @Nullable <T> T get(@NotNull @Pattern(".*") @Subst("variable_id") String id);
+    @Nullable <T> T get(@NotNull String id);
 
     /**
      * Sets a value of a {@link Variable} according to the {@link VariableType} processor
@@ -134,7 +131,7 @@ public interface Receptor {
      * @author Laivy
      * @since 1.0
      */
-    void set(@NotNull @Pattern(".*") @Subst("variable_id") String id, @Nullable Object object);
+    void set(@NotNull String id, @Nullable Object object);
 
     /**
      * The unloaded variable containers

@@ -4,8 +4,6 @@ import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlTable;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -25,14 +23,14 @@ import java.util.Set;
 public class MysqlTableNative implements MysqlTable {
 
     private final @NotNull MysqlDatabase database;
-    private @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("table_name") String id;
+    private @NotNull String id;
 
     private final @NotNull Set<SqlReceptor> receptors = new LinkedHashSet<>();
     private final @NotNull Set<SqlVariable> variables = new LinkedHashSet<>();
 
     private boolean loaded = false;
 
-    public MysqlTableNative(@NotNull MysqlDatabase database, @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("table_name") String id) {
+    public MysqlTableNative(@NotNull MysqlDatabase database, @NotNull String id) {
         this.database = database;
         this.id = id;
 
@@ -79,13 +77,12 @@ public class MysqlTableNative implements MysqlTable {
     }
 
     @Override
-    @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("table_name") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 

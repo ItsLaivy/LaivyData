@@ -7,8 +7,6 @@ import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.MysqlManager;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
@@ -30,13 +28,13 @@ import static java.util.regex.Pattern.matches;
 public class MysqlDatabaseNative implements MysqlDatabase {
 
     private final @NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> manager;
-    private final @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_]{0,63}$") @Subst("database") String id;
+    private final @NotNull String id;
 
     private final @NotNull Set<SqlTable> tables = new LinkedHashSet<>();
 
     private boolean loaded = false;
 
-    public MysqlDatabaseNative(@NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> manager, @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_]{0,63}$") @Subst("database") String id) {
+    public MysqlDatabaseNative(@NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> manager, @NotNull String id) {
         this.manager = manager;
 
         if (!matches("^[a-zA-Z_][a-zA-Z0-9_]{0,63}$", id)) {
@@ -81,7 +79,6 @@ public class MysqlDatabaseNative implements MysqlDatabase {
     }
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_]{0,63}$")
     public @NotNull String getId() {
         return id;
     }

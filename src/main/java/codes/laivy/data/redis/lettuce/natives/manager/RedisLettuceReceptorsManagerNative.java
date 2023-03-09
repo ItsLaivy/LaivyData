@@ -8,7 +8,6 @@ import codes.laivy.data.redis.manager.RedisReceptorsManager;
 import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainerImpl;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +70,7 @@ public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager
             RedisActiveVariableContainer redisContainer = (RedisActiveVariableContainer) container;
 
             if (redisContainer.getVariable() != null) {
-                @Subst("redis_key") String key = receptor.getKey(redisContainer.getVariable());
+                String key = receptor.getKey(redisContainer.getVariable());
                 receptor.getDatabase().getConnection().setKey(() -> key, redisContainer);
             } else {
                 throw new NullPointerException("The active containers of a receptor needs to have a variable!");

@@ -6,8 +6,6 @@ import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.variable.SqliteVariableType;
 import codes.laivy.data.sql.variable.SqlVariableConfiguration;
 import io.netty.util.internal.UnstableApi;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class SqliteVariableNative implements SqliteVariable {
 
     private final @NotNull SqliteTable table;
-    private @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("column_name") String id;
+    private @NotNull String id;
 
     private final @NotNull SqliteVariableType<SqliteVariable> type;
     protected @Nullable Object defValue;
@@ -37,7 +35,7 @@ public class SqliteVariableNative implements SqliteVariable {
 
     public SqliteVariableNative(
             @NotNull SqliteTable table,
-            @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("column_name") String id,
+            @NotNull String id,
             @NotNull SqliteVariableType<SqliteVariable> type
     ) {
         this(table, id, type, null);
@@ -45,7 +43,7 @@ public class SqliteVariableNative implements SqliteVariable {
 
     public SqliteVariableNative(
             @NotNull SqliteTable table,
-            @NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("column_name") String id,
+            @NotNull String id,
             @NotNull SqliteVariableType<SqliteVariable> type,
             @Nullable SqlVariableConfiguration configuration
     ) {
@@ -103,13 +101,12 @@ public class SqliteVariableNative implements SqliteVariable {
     }
 
     @Override
-    @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^([a-zA-Z][a-zA-Z0-9_]{0,64})$") @Subst("column_name") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 

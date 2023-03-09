@@ -15,8 +15,6 @@ import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
 import codes.laivy.data.sql.mysql.MysqlManager;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.DriverManager;
@@ -59,7 +57,6 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     }
 
     @Override
-    @Pattern("^.+")
     public @NotNull String getName() {
         return "LaivyData native - MySQL 1.0";
     }
@@ -81,8 +78,7 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
 
             f1:
             for (Map<String, Object> map : data) {
-                //noinspection PatternValidation
-                @Subst("receptor id") @Pattern("^.{0,128}$") String receptorId =  (String) map.get("id");
+                String receptorId = (String) map.get("id");
 
                 if (!receptorId.matches("^.{0,128}$")) {
                     throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");

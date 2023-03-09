@@ -1,7 +1,6 @@
 package codes.laivy.data.sql;
 
 import codes.laivy.data.api.table.Table;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,9 +50,8 @@ public interface SqlTable extends Table {
     @NotNull SqlDatabase getDatabase();
 
     @Override
-    @Pattern("^.$")
     @NotNull String getId();
 
     @Override
-    void setId(@NotNull @Pattern("^.$") String id);
+    void setId(@NotNull String id);
 }

@@ -5,8 +5,6 @@ import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.MysqlVariable;
 import codes.laivy.data.sql.mysql.variable.MysqlVariableType;
 import codes.laivy.data.sql.variable.SqlVariableConfiguration;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 public class MysqlVariableNative implements MysqlVariable {
 
     private final @NotNull MysqlTable table;
-    private @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id;
+    private @NotNull String id;
 
     private final @NotNull MysqlVariableType<MysqlVariable> type;
     private final @Nullable Object defValue;
@@ -35,7 +33,7 @@ public class MysqlVariableNative implements MysqlVariable {
 
     public MysqlVariableNative(
             @NotNull MysqlTable table,
-            @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id,
+            @NotNull String id,
             @NotNull MysqlVariableType<MysqlVariable> type,
             @Nullable Object defValue
     ) {
@@ -44,7 +42,7 @@ public class MysqlVariableNative implements MysqlVariable {
 
     public MysqlVariableNative(
             @NotNull MysqlTable table,
-            @NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id,
+            @NotNull String id,
             @NotNull MysqlVariableType<MysqlVariable> type,
             @Nullable Object defValue,
             @Nullable SqlVariableConfiguration configuration
@@ -103,13 +101,12 @@ public class MysqlVariableNative implements MysqlVariable {
     }
 
     @Override
-    @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^[a-zA-Z][a-zA-Z0-9_]{0,62}[a-zA-Z0-9]$") @Subst("column_name") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 

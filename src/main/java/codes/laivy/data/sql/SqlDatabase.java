@@ -3,7 +3,6 @@ package codes.laivy.data.sql;
 import codes.laivy.data.api.database.Database;
 import codes.laivy.data.sql.manager.SqlManager;
 import codes.laivy.data.sql.values.SqlConnection;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +27,6 @@ public interface SqlDatabase extends Database {
     @NotNull Set<SqlTable> getLoadedTables();
 
     @Override
-    @Pattern("^.$")
     @Contract(pure = true)
     @NotNull String getId();
 

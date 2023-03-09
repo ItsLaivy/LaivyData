@@ -6,7 +6,6 @@ import codes.laivy.data.redis.lettuce.natives.RedisLettuceConnectionNative;
 import codes.laivy.data.redis.manager.RedisReceptorsManager;
 import codes.laivy.data.redis.manager.RedisTablesManager;
 import codes.laivy.data.redis.manager.RedisVariablesManager;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -82,7 +81,6 @@ public class RedisLettuceManagerNative implements RedisLettuceManager<RedisLettu
     }
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     public @NotNull String getName() {
         return "LaivyData:native-lettuce";
     }

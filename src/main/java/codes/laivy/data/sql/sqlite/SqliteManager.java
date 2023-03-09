@@ -1,10 +1,6 @@
 package codes.laivy.data.sql.sqlite;
 
 import codes.laivy.data.sql.manager.SqlManager;
-import codes.laivy.data.sql.sqlite.SqliteDatabase;
-import codes.laivy.data.sql.sqlite.SqliteReceptor;
-import codes.laivy.data.sql.sqlite.SqliteTable;
-import codes.laivy.data.sql.sqlite.SqliteVariable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

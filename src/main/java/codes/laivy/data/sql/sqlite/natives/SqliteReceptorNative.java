@@ -6,8 +6,6 @@ import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteReceptor;
 import codes.laivy.data.sql.sqlite.SqliteTable;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +30,7 @@ import static java.util.regex.Pattern.matches;
 public class SqliteReceptorNative implements SqliteReceptor {
 
     private final @NotNull SqliteTable table;
-    private @NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id;
+    private @NotNull String id;
 
     private @Range(from = 0, to = Long.MAX_VALUE) int index;
 
@@ -42,7 +40,7 @@ public class SqliteReceptorNative implements SqliteReceptor {
     private final @NotNull Set<InactiveVariableContainer> inactiveVariableContainers = new LinkedHashSet<>();
     private final @NotNull Set<ActiveVariableContainer> activeVariableContainers = new LinkedHashSet<>();
 
-    public SqliteReceptorNative(@NotNull SqliteTable table, @NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+    public SqliteReceptorNative(@NotNull SqliteTable table, @NotNull String id) {
         this.table = table;
         this.id = id;
 
@@ -123,13 +121,12 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    @Pattern("^.{0,128}$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+    public void setId(@NotNull String id) {
         getDatabase().getManager().getReceptorsManager().setId(this, id);
         this.id = id;
     }
@@ -161,7 +158,7 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    public @Nullable <T> T get(@NotNull @Pattern(".*") @Subst("variable_id") String id) {
+    public @Nullable <T> T get(@NotNull String id) {
         if (!isLoaded()) {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
@@ -186,7 +183,7 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    public void set(@NotNull @Pattern(".*") @Subst("variable_id") String id, @Nullable Object object) {
+    public void set(@NotNull String id, @Nullable Object object) {
         if (!isLoaded()) {
             throw new IllegalStateException("The receptor isn't loaded.");
         }

@@ -2,7 +2,6 @@ package codes.laivy.data.sql.sqlite;
 
 import codes.laivy.data.sql.SqlDatabase;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,7 +16,6 @@ public interface SqliteDatabase extends SqlDatabase {
     @NotNull SqliteConnection getConnection();
 
     @Override
-    @Pattern("^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9]+)?$")
     @NotNull String getId();
 
     /**

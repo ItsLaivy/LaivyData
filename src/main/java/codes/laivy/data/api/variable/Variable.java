@@ -1,7 +1,6 @@
 package codes.laivy.data.api.variable;
 
 import codes.laivy.data.api.database.Database;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +24,6 @@ public interface Variable {
      * @author Laivy
      * @since 1.0
      */
-    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -35,7 +33,7 @@ public interface Variable {
      * @author Laivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".*") String id);
+    void setId(@NotNull String id);
 
     /**
      * The database of the variable, every variable must have one.

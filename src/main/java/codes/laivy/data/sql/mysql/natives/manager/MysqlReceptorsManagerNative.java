@@ -10,8 +10,6 @@ import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
 import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -153,7 +151,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
     }
 
     @Override
-    public void setId(@NotNull MysqlReceptor receptor, @NotNull @Pattern("^.{0,128}$") @Subst("receptor id") String id) {
+    public void setId(@NotNull MysqlReceptor receptor, @NotNull String id) {
         if (!id.matches("^.{0,128}$")) {
             throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
         }

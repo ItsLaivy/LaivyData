@@ -9,8 +9,6 @@ import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.natives.SqliteReceptorNative;
 import codes.laivy.data.sql.sqlite.values.SqliteResultData;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -50,7 +48,6 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
     }
 
     @Override
-    @Pattern("^.+")
     public @NotNull String getName() {
         return "LaivyData native - SQLite 1.0";
     }
@@ -72,8 +69,7 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
 
             f1:
             for (Map<String, Object> map : data) {
-                //noinspection PatternValidation
-                @Subst("receptor id") @Pattern("^.{0,128}$") String receptorId =  (String) map.get("id");
+                String receptorId =  (String) map.get("id");
 
                 if (!receptorId.matches("^.{0,128}$")) {
                     throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");

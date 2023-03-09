@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.sql.SQLType;
 
 /**
- * The SQL parameters are used to easily bind the parameters of a index
+ * The SQL parameters are used to easily bind the parameters of an index
  * 
  * @author Laivy
  * @since 1.0

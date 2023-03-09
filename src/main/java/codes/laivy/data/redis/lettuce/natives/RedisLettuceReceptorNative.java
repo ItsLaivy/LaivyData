@@ -8,8 +8,6 @@ import codes.laivy.data.redis.lettuce.RedisLettuceReceptor;
 import codes.laivy.data.redis.lettuce.RedisLettuceTable;
 import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +24,7 @@ import java.util.Set;
 public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     private final @NotNull RedisLettuceDatabase database;
-    private @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id;
+    private @NotNull String id;
 
     private final @NotNull Set<ActiveVariableContainer> activeVariableContainers = new LinkedHashSet<>();
     private final @NotNull Set<InactiveVariableContainer> inactiveVariableContainers = new LinkedHashSet<>();
@@ -38,7 +36,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     public RedisLettuceReceptorNative(
             @NotNull RedisLettuceDatabase database,
-            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id
+            @NotNull String id
     ) {
         this.database = database;
         this.table = null;
@@ -46,7 +44,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
     public RedisLettuceReceptorNative(
             @NotNull RedisLettuceTable table,
-            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id
+            @NotNull String id
     ) {
         this.database = table.getDatabase();
         this.table = table;
@@ -111,7 +109,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
 
     @Override
-    public <T> @Nullable T get(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id) {
+    public <T> @Nullable T get(@NotNull String id) {
         if (!isLoaded()) {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
@@ -136,7 +134,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
 
     @Override
-    public void set(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id, @Nullable Object object) {
+    public void set(@NotNull String id, @Nullable Object object) {
         if (!isLoaded()) {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
@@ -176,7 +174,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     @Override
     public @NotNull Set<RedisKey> getKeys() {
-        @Subst("redis_key") String pattern = getDatabase().getManager().getName() + ":";
+        String pattern = getDatabase().getManager().getName() + ":";
         if (getTable() != null) pattern += getTable().getId() + ":";
         pattern += "*:" + getId();
 
@@ -184,13 +182,12 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     public @NotNull String getId() {
         return id;
     }
 
     @Override
-    public void setId(@NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id) {
+    public void setId(@NotNull String id) {
         this.id = id;
     }
 
@@ -201,7 +198,7 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     @Override
     public @NotNull String getKey(@NotNull RedisVariable variable) {
-        @Subst("redis_key") String key = getDatabase().getManager().getName() + ":";
+        String key = getDatabase().getManager().getName() + ":";
         if (getTable() != null) key += getTable().getId() + ":";
         key += variable.getId() + ":" + getId();
 

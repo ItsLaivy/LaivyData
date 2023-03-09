@@ -1,7 +1,6 @@
 package codes.laivy.data.api.table;
 
 import codes.laivy.data.api.database.Database;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,7 +27,6 @@ public interface Table {
      * @author Laivy
      * @since 1.0
      */
-    @Pattern(".*")
     @NotNull String getId();
 
     /**
@@ -38,7 +36,7 @@ public interface Table {
      * @author Laivy
      * @since 1.0
      */
-    void setId(@NotNull @Pattern(".*") String id);
+    void setId(@NotNull String id);
 
     void load();
 

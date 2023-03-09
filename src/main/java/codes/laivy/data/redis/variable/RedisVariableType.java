@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public interface RedisVariableType extends VariableType {
 
     /**
-     * Serializes a object into a string to be able to store it into the redis database.
+     * Serializes an object into a string to be able to store it into the redis database.
      * @param object the object that will be converted into string
      * @return the string to store into redis
      *

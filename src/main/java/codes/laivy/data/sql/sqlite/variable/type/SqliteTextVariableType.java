@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.SQLType;
 
 /**
- * Converts a object into string using the {@link Object#toString()} method, and saves at the database using the TEXT column data type.
+ * Converts an object into string using the {@link Object#toString()} method, and saves at the database using the TEXT column data type.
  * 
  * @author Laivy
  * @since 1.0

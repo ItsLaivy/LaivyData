@@ -5,7 +5,6 @@ import codes.laivy.data.redis.RedisDatabase;
 import codes.laivy.data.redis.RedisReceptor;
 import codes.laivy.data.redis.RedisTable;
 import codes.laivy.data.redis.RedisVariable;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,6 +24,5 @@ public interface RedisManager<R extends RedisReceptor, V extends RedisVariable, 
     @NotNull RedisTablesManager<T> getTablesManager();
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     @NotNull String getName();
 }

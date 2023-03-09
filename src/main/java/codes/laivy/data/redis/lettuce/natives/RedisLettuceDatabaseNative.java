@@ -6,8 +6,6 @@ import codes.laivy.data.redis.lettuce.*;
 import codes.laivy.data.redis.lettuce.connection.RedisLettuceConnection;
 import codes.laivy.data.redis.lettuce.natives.manager.RedisLettuceManagerNative;
 import codes.laivy.data.redis.variable.RedisKey;
-import org.intellij.lang.annotations.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +26,7 @@ import java.util.Set;
 public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
 
     private final @NotNull RedisLettuceManagerNative manager;
-    private final @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id;
+    private final @NotNull String id;
 
     private boolean loaded = false;
 
@@ -37,7 +35,7 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
 
     public RedisLettuceDatabaseNative(
             @NotNull RedisLettuceManagerNative manager,
-            @NotNull @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$") @Subst("redis_key") String id
+            @NotNull String id
     ) {
         this.manager = manager;
         this.id = id;
@@ -74,7 +72,6 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
     }
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     public @NotNull String getId() {
         return id;
     }
@@ -82,8 +79,7 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
     @Override
     public @Nullable RedisKey getKey(@NotNull RedisReceptor receptor, @NotNull RedisVariable variable) {
         if (receptor.getDatabase() == this && variable.getDatabase() == this) {
-            @Subst("redis_key") String key = receptor.getKey(variable);
-            return getConnection().getKey(key);
+            return getConnection().getKey(receptor.getKey(variable));
         } else {
             throw new IllegalArgumentException("The receptor and/or the variable database isn't this database!");
         }

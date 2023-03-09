@@ -4,7 +4,6 @@ import codes.laivy.data.api.database.Database;
 import codes.laivy.data.redis.manager.RedisManager;
 import codes.laivy.data.redis.values.RedisConnection;
 import codes.laivy.data.redis.variable.RedisKey;
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +35,6 @@ public interface RedisDatabase extends Database {
     @NotNull Set<RedisVariable> getLoadedVariables();
 
     @Override
-    @Pattern("^[a-zA-Z_][a-zA-Z0-9_:-]{0,127}$")
     @NotNull String getId();
 
     // Keys

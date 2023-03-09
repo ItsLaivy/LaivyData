@@ -17,7 +17,7 @@ public interface ReceptorsManager<R extends Receptor> extends Manager<R> {
     /**
      * Gets the receptor data at the database
      * @param receptor the receptor
-     * @return the result data containing necessary informations to load that receptor
+     * @return the result data containing necessary information to load that receptor
      *
      * @author Laivy
      * @since 1.0
