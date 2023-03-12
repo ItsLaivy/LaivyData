@@ -23,7 +23,8 @@ public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVar
 
     @Override
     public void setType(@NotNull SqlVariable variable, @NotNull SQLType type) {
-        MysqlResultStatement statement = (MysqlResultStatement) variable.getDatabase().getConnection().createStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` MODIFY COLUMN `" + variable.getId() + "` " + type.getName() + ";");
+        MysqlResultStatement statement = (MysqlResultStatement) variable.getDatabase().getConnection().createStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` MODIFY COLUMN `" + variable.getId() + "` " + type.getName() + " DEFAULT ?;");
+        variable.getType().set(variable.getDefault(), statement.getParameters(0), statement.getMetaData());
         statement.execute();
         statement.close();
     }
