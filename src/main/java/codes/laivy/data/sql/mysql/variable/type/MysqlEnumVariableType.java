@@ -14,8 +14,14 @@ public class MysqlEnumVariableType<E extends Enum<?>> implements SqlEnumVariable
     private final @NotNull Class<E> enumClass;
     protected @NotNull SQLType type;
 
+    private final boolean allowNull;
+
     public MysqlEnumVariableType(@NotNull Class<E> enumClass) {
+        this(enumClass, false);
+    }
+    public MysqlEnumVariableType(@NotNull Class<E> enumClass, boolean allowNull) {
         this.enumClass = enumClass;
+        this.allowNull = allowNull;
         type = new SQLType() {
             @Override
             public String getName() {
@@ -55,5 +61,10 @@ public class MysqlEnumVariableType<E extends Enum<?>> implements SqlEnumVariable
     @Override
     public @NotNull Class<E> getEnum() {
         return enumClass;
+    }
+
+    @Override
+    public boolean allowNull() {
+        return allowNull;
     }
 }
