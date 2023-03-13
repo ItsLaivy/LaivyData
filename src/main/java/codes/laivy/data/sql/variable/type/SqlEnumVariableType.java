@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
 /**
- * Stores the variable as boolean at the SQL database
+ * Stores the variable as enum at the SQL database
  *
  * @author Laivy
  * @since 1.0
