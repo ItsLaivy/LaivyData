@@ -15,13 +15,18 @@ public class RedisTextVariableType implements RedisVariableType {
     @Override
     public @Nullable String serialize(@Nullable Object object) {
         if (object == null) {
-            return null;
+            return "%null%";
         }
         return object.toString();
     }
 
     @Override
     public @Nullable Object deserialize(@Nullable String value) {
+        if (value == null) {
+            return null;
+        } else if (value.equals("%null%")) {
+            return null;
+        }
         return value;
     }
 

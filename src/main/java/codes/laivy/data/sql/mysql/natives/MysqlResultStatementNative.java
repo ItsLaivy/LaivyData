@@ -41,7 +41,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             statement = connection.getConnection().prepareStatement(query);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Query: '" + getQuery() + "'", e);
         }
     }
 
@@ -69,7 +69,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Query: '" + getQuery() + "'", e);
         }
     }
 
@@ -89,7 +89,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
                 return new SqlColumnsMetadataImpl(statement.getMetaData());
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Query: '" + getQuery() + "'", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             statement.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Query: '" + getQuery() + "'", e);
         }
     }
 
@@ -107,7 +107,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             return statement.isClosed();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Query: '" + getQuery() + "'", e);
         }
     }
 

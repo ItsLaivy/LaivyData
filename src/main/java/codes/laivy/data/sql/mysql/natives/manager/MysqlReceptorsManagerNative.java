@@ -31,7 +31,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
 
     @Override
     public @Nullable MysqlResultData getData(@NotNull MysqlReceptor receptor) {
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("SELECT * FROM `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` WHERE id = ?");
+        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("SELECT * FROM `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` WHERE `id` = ?");
         statement.getParameters(0).setString(receptor.getId());
         MysqlResultData query = statement.execute();
         statement.close();
@@ -84,7 +84,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             }
         }
 
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?," + query + " WHERE id = ?");
+        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?," + query + " WHERE `id` = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 
@@ -101,7 +101,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
 
     @Override
     public void delete(@NotNull MysqlReceptor receptor) {
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("DELETE FROM `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` WHERE id = ?");
+        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("DELETE FROM `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` WHERE `id` = ?");
         statement.getParameters(0).setString(receptor.getId());
         statement.execute();
         statement.close();
@@ -162,7 +162,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             throw new IllegalArgumentException("A receptor with that id '" + id + "' already exists on the table '" + receptor.getTable() + "'");
         }
 
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET id = ? WHERE id = ?");
+        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `id` = ? WHERE `id` = ?");
 
         statement.getParameters(0).setString(id);
         statement.getParameters(1).setString(receptor.getId());
