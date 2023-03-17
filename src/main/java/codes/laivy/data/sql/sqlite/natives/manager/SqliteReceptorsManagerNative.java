@@ -69,8 +69,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
                 SqlActiveVariableContainer container = (SqlActiveVariableContainer) activeVar;
 
                 if (container.getVariable() != null) {
-                    if (row != 1) query.append(",");
-                    query.append("`").append(container.getVariable().getId()).append("`=?");
+                    query.append(",").append("`").append(container.getVariable().getId()).append("`=?");
                     indexVariables.put(row, container);
                     row++;
                 } else {
@@ -81,7 +80,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
             }
         }
 
-        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE '" + receptor.getTable().getId() + "' SET `index`=?," + query + " WHERE `id` = ?");
+        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE '" + receptor.getTable().getId() + "' SET `index`=?" + query + " WHERE `id` = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 

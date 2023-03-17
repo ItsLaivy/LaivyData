@@ -72,8 +72,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
                 SqlActiveVariableContainer container = (SqlActiveVariableContainer) activeVar;
 
                 if (container.getVariable() != null) {
-                    if (row != 1) query.append(",");
-                    query.append("`").append(container.getVariable().getId()).append("`=?");
+                    query.append(",").append("`").append(container.getVariable().getId()).append("`=?");
                     indexVariables.put(row, container);
                     row++;
                 } else {
@@ -84,7 +83,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             }
         }
 
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?," + query + " WHERE `id` = ?");
+        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?" + query + " WHERE `id` = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 
