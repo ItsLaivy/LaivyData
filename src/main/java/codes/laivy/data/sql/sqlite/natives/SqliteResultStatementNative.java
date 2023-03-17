@@ -41,7 +41,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
         try {
             statement = connection.getConnection().prepareStatement(query);
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getQuery() + "'", e);
+            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
 
@@ -69,13 +69,18 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getQuery() + "'", e);
+            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
 
     @Override
     public @NotNull String getQuery() {
         return query;
+    }
+
+    public @NotNull String getStatementQuery() {
+        String statementStr = getPreparedStatement().toString();
+        return statementStr.substring( statementStr.indexOf( ": " ) + 2 );
     }
 
     @Override
@@ -89,7 +94,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
                 return new SqlColumnsMetadataImpl(statement.getMetaData());
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getQuery() + "'", e);
+            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
 
@@ -98,7 +103,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
         try {
             statement.close();
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getQuery() + "'", e);
+            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
 
@@ -107,7 +112,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
         try {
             return statement.isClosed();
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getQuery() + "'", e);
+            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
 
