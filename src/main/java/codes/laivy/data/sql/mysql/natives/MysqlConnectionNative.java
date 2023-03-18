@@ -18,7 +18,6 @@ import java.sql.Connection;
  *
  * @version 1.0 - (01/03/2023)
  */
-@ApiStatus.Internal
 public class MysqlConnectionNative implements MysqlConnection {
 
     private final @NotNull Connection connection;

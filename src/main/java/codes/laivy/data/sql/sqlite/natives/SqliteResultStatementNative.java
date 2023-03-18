@@ -26,7 +26,6 @@ import java.sql.SQLException;
  *
  * @version 1.0 - (01/03/2023)
  */
-@ApiStatus.Internal
 public class SqliteResultStatementNative implements SqliteResultStatement {
 
     private final @NotNull SqliteConnection connection;

@@ -18,7 +18,6 @@ import java.util.*;
  *
  * @version 1.0 - (01/03/2023)
  */
-@ApiStatus.Internal
 public class MysqlResultDataNative implements MysqlResultData {
 
     private final @NotNull ResultSet result;

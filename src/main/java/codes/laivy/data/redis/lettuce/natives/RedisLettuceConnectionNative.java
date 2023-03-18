@@ -5,6 +5,7 @@ import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
+import com.lambdaworks.redis.SetArgs;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.sync.RedisCommands;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,7 +27,6 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
 
     private final @NotNull RedisClient client;
     private final @NotNull StatefulRedisConnection<String, String> connection;
-    private final @NotNull RedisCommands<String, String> sync;
 
     public RedisLettuceConnectionNative(@NotNull String host, int port) {
         this(host, null, 16000, port, false);
@@ -45,7 +45,6 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
 
         this.client = RedisClient.create(builder.build());
         this.connection = this.client.connect();
-        this.sync = connection.sync();
         //
     }
 
@@ -59,7 +58,7 @@ public class RedisLettuceConnectionNative implements RedisLettuceConnection {
 
     @ApiStatus.Experimental
     public @NotNull RedisCommands<String, String> getSync() {
-        return sync;
+        return connection.sync();
     }
 
     @Override

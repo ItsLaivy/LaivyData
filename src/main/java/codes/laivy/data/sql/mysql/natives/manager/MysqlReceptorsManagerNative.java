@@ -23,7 +23,6 @@ import java.util.Set;
  * @author Laivy
  * @since 1.0
  */
-@ApiStatus.Internal
 public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlReceptor> {
 
     public MysqlReceptorsManagerNative() {

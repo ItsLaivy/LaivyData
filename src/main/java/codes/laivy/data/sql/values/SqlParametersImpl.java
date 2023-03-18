@@ -19,7 +19,6 @@ import java.sql.SQLType;
  *
  * @version 1.0 - (01/03/2023)
  */
-@ApiStatus.Internal
 public class SqlParametersImpl implements SqlParameters {
 
     private final @NotNull PreparedStatement statement;

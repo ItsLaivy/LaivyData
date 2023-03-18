@@ -18,7 +18,6 @@ import java.sql.SQLType;
  *
  * @version 1.0 - (01/03/2023)
  */
-@ApiStatus.Internal
 public class SqlColumnsMetadataImpl implements SqlColumnsMetadata {
 
     private final @NotNull ResultSetMetaData metadata;
