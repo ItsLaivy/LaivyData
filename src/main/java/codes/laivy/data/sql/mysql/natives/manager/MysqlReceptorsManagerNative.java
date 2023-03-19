@@ -5,12 +5,13 @@ import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlReceptorsManager;
 import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
+import codes.laivy.data.sql.mysql.natives.MysqlResultStatementNative;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
+import codes.laivy.data.sql.sqlite.natives.SqliteResultStatementNative;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
 import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +55,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
     @Override
     public void unload(@NotNull MysqlReceptor receptor, boolean save) {
         if (save) {
-            save(receptor);
+            receptor.save();
         }
     }
 
@@ -82,7 +83,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
             }
         }
 
-        MysqlResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?" + query + " WHERE `id` = ?");
+        MysqlResultStatementNative statement = (MysqlResultStatementNative) receptor.getDatabase().getConnection().createStatement("UPDATE `" + receptor.getDatabase().getId() + "`.`" + receptor.getTable().getId() + "` SET `index`=?" + query + " WHERE `id` = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 
@@ -93,6 +94,7 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
                     statement.getMetaData()
             );
         }
+
         statement.execute();
         statement.close();
     }

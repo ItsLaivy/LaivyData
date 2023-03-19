@@ -1,17 +1,21 @@
 package codes.laivy.data.sql.sqlite.natives.manager;
 
+import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlVariablesManager;
 import codes.laivy.data.sql.sqlite.SqliteVariable;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
+import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
+import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
 import org.jetbrains.annotations.NotNull;
 import org.sqlite.SQLiteException;
 
 import java.sql.SQLType;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * @author Laivy
@@ -61,7 +65,19 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
 
     @Override
     public void unload(@NotNull SqliteVariable variable) {
-        // TODO: 01/03/2023 Variable unloading system
+        // Unload active containers
+        for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
+            for (ActiveVariableContainer container : new LinkedList<>(receptor.getActiveContainers())) {
+                if (container instanceof SqlActiveVariableContainer) {
+                    SqlActiveVariableContainer sqlContainer = (SqlActiveVariableContainer) container;
+
+                    if (Objects.equals(sqlContainer.getVariable(), variable)) {
+                        receptor.getActiveContainers().remove(container);
+                        receptor.getInactiveContainers().add(new SqlInactiveVariableContainerImpl(variable.getId(), receptor, sqlContainer.get()));
+                    }
+                }
+            }
+        }
     }
 
     @Override

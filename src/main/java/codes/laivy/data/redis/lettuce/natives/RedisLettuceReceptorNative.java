@@ -53,6 +53,13 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
 
     @Override
     public void load() {
+        if (isLoaded()) {
+            throw new IllegalStateException("The receptor already is loaded.");
+        }
+
+        getActiveContainers().clear();
+        getInactiveContainers().clear();
+
         getDatabase().getManager().getReceptorsManager().load(this);
 
         getDatabase().getLoadedReceptors().add(this);
@@ -71,6 +78,9 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     @Override
     public void unload(boolean save) {
         getDatabase().getManager().getReceptorsManager().unload(this, save);
+
+        getActiveContainers().clear();
+        getInactiveContainers().clear();
 
         getDatabase().getLoadedReceptors().remove(this);
         if (getTable() != null) {

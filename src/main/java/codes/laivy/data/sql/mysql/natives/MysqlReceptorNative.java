@@ -55,6 +55,10 @@ public class MysqlReceptorNative implements MysqlReceptor {
 
     @Override
     public void load() {
+        if (isLoaded()) {
+            throw new IllegalStateException("The receptor already is loaded.");
+        }
+
         getActiveContainers().clear();
         getInactiveContainers().clear();
 
@@ -78,10 +82,11 @@ public class MysqlReceptorNative implements MysqlReceptor {
             throw new IllegalStateException("The receptor isn't loaded.");
         }
 
+        getDatabase().getManager().getReceptorsManager().unload(this, save);
+
         getActiveContainers().clear();
         getInactiveContainers().clear();
 
-        getDatabase().getManager().getReceptorsManager().unload(this, save);
         getTable().getLoadedReceptors().remove(this);
         loaded = false;
     }

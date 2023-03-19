@@ -55,10 +55,15 @@ public class SqliteReceptorNative implements SqliteReceptor {
 
     @Override
     public void load() {
+        if (isLoaded()) {
+            throw new IllegalStateException("The receptor already is loaded.");
+        }
+
+        getDatabase().getManager().getReceptorsManager().load(this);
+
         getActiveContainers().clear();
         getInactiveContainers().clear();
 
-        getDatabase().getManager().getReceptorsManager().load(this);
         getTable().getLoadedReceptors().add(this);
         loaded = true;
     }

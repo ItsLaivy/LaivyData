@@ -59,7 +59,6 @@ public interface SqlEnumVariableType<V extends SqlVariable, E extends Enum<?>> e
     @Override
     default boolean isCompatible(@Nullable Object object) {
         if (!allowNull() && object == null) {
-            System.out.println("False 1");
             return false;
         } else if (object != null && getEnum().isAssignableFrom(object.getClass())) {
             return true;
@@ -69,10 +68,8 @@ public interface SqlEnumVariableType<V extends SqlVariable, E extends Enum<?>> e
                     return true;
                 }
             }
-            System.out.println("False 2");
             return false;
         }
-        System.out.println("False 3");
         return false;
     }
 

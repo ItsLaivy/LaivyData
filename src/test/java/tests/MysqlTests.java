@@ -12,12 +12,14 @@ import java.util.Objects;
 
 public class MysqlTests {
     public static void main(String[] args) {
+        testMysql();
         testNumbers();
+        testEnum();
     }
 
     public static void testMysql() {
         try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
             MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
             MysqlTable table = new MysqlTableNative(database, "table");
 
@@ -40,7 +42,7 @@ public class MysqlTests {
 
     public static void testEnum() {
         try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
             MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
             MysqlTable table = new MysqlTableNative(database, "table");
 
@@ -49,7 +51,7 @@ public class MysqlTests {
             MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
             receptor.load();
 
-            System.out.println("Enum value: '" + ((TestEnum) Objects.requireNonNull(receptor.get("var"))).name() + "'");
+            System.out.println("Enum value: '" + ((TestEnum) Objects.requireNonNull(receptor.get("enum"))).name() + "'");
 
             receptor.save();
             receptor.delete();
@@ -63,7 +65,7 @@ public class MysqlTests {
 
     public static void testNumbers() {
         try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
             MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
             MysqlTable table = new MysqlTableNative(database, "table");
 

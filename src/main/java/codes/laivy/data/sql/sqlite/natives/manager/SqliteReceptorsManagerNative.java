@@ -53,7 +53,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
     @Override
     public void unload(@NotNull SqliteReceptor receptor, boolean save) {
         if (save) {
-            save(receptor);
+            receptor.save();
         }
     }
 
