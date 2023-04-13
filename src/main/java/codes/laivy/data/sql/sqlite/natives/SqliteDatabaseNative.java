@@ -1,5 +1,6 @@
 package codes.laivy.data.sql.sqlite.natives;
 
+import codes.laivy.data.api.table.Table;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
@@ -76,6 +77,10 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     @Override
     public void unload() {
+        for (SqlTable table : new LinkedHashSet<>(getLoadedTables())) {
+            table.unload();
+        }
+
         getManager().unload(this);
         this.connection = null;
         loaded = false;

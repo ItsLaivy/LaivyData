@@ -36,21 +36,23 @@ public class SqliteVariableNative implements SqliteVariable {
     public SqliteVariableNative(
             @NotNull SqliteTable table,
             @NotNull String id,
-            @NotNull SqliteVariableType<SqliteVariable> type
+            @NotNull SqliteVariableType<SqliteVariable> type,
+            @Nullable Object object
     ) {
-        this(table, id, type, null);
+        this(table, id, type, object, null);
     }
 
     public SqliteVariableNative(
             @NotNull SqliteTable table,
             @NotNull String id,
             @NotNull SqliteVariableType<SqliteVariable> type,
+            @Nullable Object object,
             @Nullable SqlVariableConfiguration configuration
     ) {
         this.table = table;
         this.id = id;
         this.type = type;
-        this.defValue = null;
+        this.defValue = object;
         this.configuration = configuration;
 
         // Parsing the default value

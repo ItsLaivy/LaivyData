@@ -1,5 +1,7 @@
 package codes.laivy.data.sql.sqlite.natives;
 
+import codes.laivy.data.api.receptor.Receptor;
+import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;
@@ -50,6 +52,13 @@ public class SqliteTableNative implements SqliteTable {
 
     @Override
     public void unload() {
+        for (Receptor receptor : new LinkedHashSet<>(getLoadedReceptors())) {
+            receptor.unload(true);
+        }
+        for (Variable variable : new LinkedHashSet<>(getLoadedVariables())) {
+            variable.unload();
+        }
+
         getDatabase().getManager().getTablesManager().unload(this);
         getDatabase().getLoadedTables().remove(this);
         loaded = false;

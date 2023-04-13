@@ -19,7 +19,7 @@ public class SqliteTests {
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
 
-        SqlVariable var = new SqliteVariableNative(table, "var", new SqliteByteVariableType());
+        SqlVariable var = new SqliteVariableNative(table, "var", new SqliteByteVariableType(), null);
 
         SqliteReceptor receptor = new SqliteReceptorNative(table, "test");
         receptor.load();

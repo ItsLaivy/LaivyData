@@ -12,6 +12,7 @@ import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,34 +57,43 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
     public @NotNull SqliteReceptor[] getStored(@NotNull SqliteDatabase database) {
         Set<SqliteReceptor> receptors = new LinkedHashSet<>();
         for (SqlTable table : database.getLoadedTables()) {
-            SqliteResultStatement statement = database.getConnection().createStatement("SELECT `id` FROM `" + database.getId() + "`.`" + table.getId() + "`");
-            SqliteResultData query = statement.execute();
-            statement.close();
-
-            if (query == null) {
-                throw new NullPointerException("Couldn't get query results");
-            }
-
-            Set<Map<String, Object>> data = query.getValues();
-            query.close();
-
-            f1:
-            for (Map<String, Object> map : data) {
-                String receptorId =  (String) map.get("id");
-
-                if (!receptorId.matches("^.{0,128}$")) {
-                    throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
-                }
-
-                for (SqlReceptor receptor : table.getLoadedReceptors()) {
-                    if (receptor.getId().equals(receptorId)) {
-                        receptors.add((SqliteReceptor) receptor);
-                        continue f1;
-                    }
-                }
-                receptors.add(new SqliteReceptorNative((SqliteTable) table, receptorId));
-            }
+            receptors.addAll(Arrays.asList(getStored((SqliteDatabase) table)));
         }
+        return receptors.toArray(new SqliteReceptor[0]);
+    }
+
+    @Override
+    public @NotNull SqliteReceptor[] getStored(@NotNull SqliteTable table) {
+        Set<SqliteReceptor> receptors = new LinkedHashSet<>();
+
+        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("SELECT `id` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "`");
+        SqliteResultData query = statement.execute();
+        statement.close();
+
+        if (query == null) {
+            throw new NullPointerException("Couldn't get query results");
+        }
+
+        Set<Map<String, Object>> data = query.getValues();
+        query.close();
+
+        f1:
+        for (Map<String, Object> map : data) {
+            String receptorId = (String) map.get("id");
+
+            if (!receptorId.matches("^.{0,128}$")) {
+                throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
+            }
+
+            for (SqlReceptor receptor : table.getLoadedReceptors()) {
+                if (receptor.getId().equals(receptorId)) {
+                    receptors.add((SqliteReceptor) receptor);
+                    continue f1;
+                }
+            }
+            receptors.add(new SqliteReceptorNative(table, receptorId));
+        }
+
         return receptors.toArray(new SqliteReceptor[0]);
     }
 

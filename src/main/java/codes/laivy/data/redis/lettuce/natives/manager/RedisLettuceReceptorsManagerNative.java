@@ -22,8 +22,6 @@ import java.util.*;
 public class RedisLettuceReceptorsManagerNative implements RedisReceptorsManager<RedisLettuceReceptor> {
     @Override
     public void load(@NotNull RedisLettuceReceptor receptor) {
-        receptor.setNew(false);
-
         // TODO: 05/03/2023 Storing data
 //        if (receptor.getStoringData()) {
 //

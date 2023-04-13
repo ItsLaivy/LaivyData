@@ -62,36 +62,45 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     }
 
     @Override
+    public @NotNull MysqlReceptor[] getStored(@NotNull MysqlTable table) {
+        Set<MysqlReceptor> receptors = new LinkedHashSet<>();
+
+        MysqlResultStatement statement = table.getDatabase().getConnection().createStatement("SELECT `id` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "`");
+        MysqlResultData query = statement.execute();
+        statement.close();
+
+        if (query == null) {
+            throw new NullPointerException("Couldn't get query results");
+        }
+
+        Set<Map<String, Object>> data = query.getValues();
+        query.close();
+
+        f1:
+        for (Map<String, Object> map : data) {
+            String receptorId = (String) map.get("id");
+
+            if (!receptorId.matches("^.{0,128}$")) {
+                throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
+            }
+
+            for (SqlReceptor receptor : table.getLoadedReceptors()) {
+                if (receptor.getId().equals(receptorId)) {
+                    receptors.add((MysqlReceptor) receptor);
+                    continue f1;
+                }
+            }
+            receptors.add(new MysqlReceptorNative(table, receptorId));
+        }
+
+        return receptors.toArray(new MysqlReceptor[0]);
+    }
+
+    @Override
     public @NotNull MysqlReceptor[] getStored(@NotNull MysqlDatabase database) {
         Set<MysqlReceptor> receptors = new LinkedHashSet<>();
         for (SqlTable table : database.getLoadedTables()) {
-            MysqlResultStatement statement = database.getConnection().createStatement("SELECT `id` FROM `" + database.getId() + "`.`" + table.getId() + "`");
-            MysqlResultData query = statement.execute();
-            statement.close();
-
-            if (query == null) {
-                throw new NullPointerException("Couldn't get query results");
-            }
-
-            Set<Map<String, Object>> data = query.getValues();
-            query.close();
-
-            f1:
-            for (Map<String, Object> map : data) {
-                String receptorId = (String) map.get("id");
-
-                if (!receptorId.matches("^.{0,128}$")) {
-                    throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
-                }
-
-                for (SqlReceptor receptor : table.getLoadedReceptors()) {
-                    if (receptor.getId().equals(receptorId)) {
-                        receptors.add((MysqlReceptor) receptor);
-                        continue f1;
-                    }
-                }
-                receptors.add(new MysqlReceptorNative((MysqlTable) table, receptorId));
-            }
+            receptors.addAll(Arrays.asList(getStored((MysqlTable) table)));
         }
         return receptors.toArray(new MysqlReceptor[0]);
     }

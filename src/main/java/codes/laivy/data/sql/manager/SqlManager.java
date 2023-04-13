@@ -22,4 +22,6 @@ public interface SqlManager<R extends SqlReceptor, V extends SqlVariable, D exte
     @Override
     @NotNull SqlTablesManager<T> getTablesManager();
 
+    @NotNull R[] getStored(@NotNull T table);
+
 }

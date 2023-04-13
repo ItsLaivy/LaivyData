@@ -54,6 +54,10 @@ public class MysqlDatabaseNative implements MysqlDatabase {
 
     @Override
     public void unload() {
+        for (SqlTable table : new LinkedHashSet<>(getLoadedTables())) {
+            table.unload();
+        }
+
         getManager().unload(this);
         loaded = false;
     }
