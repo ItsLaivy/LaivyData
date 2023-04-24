@@ -38,15 +38,20 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
             @NotNull RedisLettuceDatabase database,
             @NotNull String id
     ) {
-        this.database = database;
-        this.table = null;
-        this.id = id;
+        this(database, null, id);
     }
     public RedisLettuceReceptorNative(
             @NotNull RedisLettuceTable table,
             @NotNull String id
     ) {
-        this.database = table.getDatabase();
+        this(table.getDatabase(), table, id);
+    }
+    public RedisLettuceReceptorNative(
+            @NotNull RedisLettuceDatabase database,
+            @Nullable RedisLettuceTable table,
+            @NotNull String id
+    ) {
+        this.database = database;
         this.table = table;
         this.id = id;
     }

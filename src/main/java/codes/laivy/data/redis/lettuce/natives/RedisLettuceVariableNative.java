@@ -32,8 +32,25 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
             @NotNull RedisVariableType type,
             @Nullable Object defValue
     ) {
+        this(database, null, id, type, defValue);
+    }
+    public RedisLettuceVariableNative(
+            @NotNull RedisLettuceTable table,
+            @NotNull String id,
+            @NotNull RedisVariableType type,
+            @Nullable Object defValue
+    ) {
+        this(table.getDatabase(), table, id, type, defValue);
+    }
+    public RedisLettuceVariableNative(
+            @NotNull RedisLettuceDatabase database,
+            @Nullable RedisLettuceTable table,
+            @NotNull String id,
+            @NotNull RedisVariableType type,
+            @Nullable Object defValue
+    ) {
         this.database = database;
-        this.table = null;
+        this.table = table;
         this.id = id;
         this.type = type;
         this.defValue = defValue;
@@ -42,20 +59,6 @@ public class RedisLettuceVariableNative implements RedisLettuceVariable {
         if (!getType().isCompatible(getDefault())) {
             throw new RuntimeException("This default variable object isn't compatible with that variable type");
         }
-
-        load();
-    }
-    public RedisLettuceVariableNative(
-            @NotNull RedisLettuceTable table,
-            @NotNull String id,
-            @NotNull RedisVariableType type,
-            @Nullable Object defValue
-    ) {
-        this.table = table;
-        this.database = table.getDatabase();
-        this.id = id;
-        this.type = type;
-        this.defValue = defValue;
 
         load();
     }
