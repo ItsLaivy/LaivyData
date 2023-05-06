@@ -27,15 +27,8 @@ public class SqliteTests {
         SqliteReceptor receptor = new SqliteReceptorNative(table, "test");
         receptor.load();
 
-        for (@NotNull InactiveVariableContainer variable : receptor.getInactiveContainers()) {
-            System.out.println("Inactive: '" + variable.getVariable() + "'");
-        }
-        for (@NotNull ActiveVariableContainer variable : receptor.getActiveContainers()) {
-            System.out.println("Active: '" + variable.getReceptor().getId() + "'");
-        }
-
-        receptor.set(var.getId(), 1);
         System.out.println(receptor.get(var.getId()).toString());
+        receptor.set(var.getId(), 10);
 
         receptor.save();
 //        receptor.delete();
