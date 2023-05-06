@@ -66,7 +66,7 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
     public @NotNull SqliteReceptor[] getStored(@NotNull SqliteTable table) {
         Set<SqliteReceptor> receptors = new LinkedHashSet<>();
 
-        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("SELECT `id` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "`");
+        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("SELECT \"id\" FROM \"" + table.getDatabase().getId() + "\".\"" + table.getId() + "\"");
         SqliteResultData query = statement.execute();
         statement.close();
 

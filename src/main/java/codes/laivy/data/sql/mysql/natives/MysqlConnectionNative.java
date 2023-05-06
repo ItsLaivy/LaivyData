@@ -2,10 +2,10 @@ package codes.laivy.data.sql.mysql.natives;
 
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * <p>
@@ -18,12 +18,12 @@ import java.sql.Connection;
  *
  * @version 1.0 - (01/03/2023)
  */
-public class MysqlConnectionNative implements MysqlConnection {
+public abstract class MysqlConnectionNative implements MysqlConnection {
 
-    private final @NotNull Connection connection;
+    private @NotNull Connection connection;
 
-    public MysqlConnectionNative(@NotNull Connection connection) {
-        this.connection = connection;
+    public MysqlConnectionNative() {
+        this.connection = connect();
     }
 
     /**
@@ -34,11 +34,19 @@ public class MysqlConnectionNative implements MysqlConnection {
      * @since 1.0
      */
     public @NotNull Connection getConnection() {
-        return connection;
+        try {
+            if (connection.isClosed()) {
+                connection = connect();
+            }
+            return connection;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public @NotNull MysqlResultStatement createStatement(@NotNull String query) {
         return new MysqlResultStatementNative(this, query);
     }
+
 }

@@ -1,13 +1,11 @@
 package codes.laivy.data.sql.mysql.natives;
 
-import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import codes.laivy.data.sql.values.SqlParameters;
 import codes.laivy.data.sql.values.SqlParametersImpl;
 import codes.laivy.data.sql.values.metadata.SqlColumnsMetadataImpl;
 import codes.laivy.data.sql.values.metadata.SqlMetadata;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -28,7 +26,7 @@ import java.sql.SQLException;
  */
 public class MysqlResultStatementNative implements MysqlResultStatement {
 
-    private final @NotNull MysqlConnection connection;
+    private final @NotNull MysqlConnectionNative connection;
     private final @NotNull String query;
 
     private final @NotNull PreparedStatement statement;
@@ -40,7 +38,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             statement = connection.getConnection().prepareStatement(query);
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
+            throw new RuntimeException("Mysql result statement instance", e);
         }
     }
 
@@ -58,7 +56,7 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
     }
 
     @Override
-    public @NotNull MysqlConnection getConnection() {
+    public @NotNull MysqlConnectionNative getConnection() {
         return connection;
     }
 
@@ -73,6 +71,10 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
                 return null;
             }
         } catch (SQLException e) {
+            if (e.getMessage().contains("The last packet successfully received from the server was")) {
+                getConnection().connect();
+                return this.execute();
+            }
             throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
@@ -93,6 +95,10 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
                 return new SqlColumnsMetadataImpl(statement.getMetaData());
             }
         } catch (SQLException e) {
+            if (e.getMessage().contains("The last packet successfully received from the server was")) {
+                getConnection().connect();
+                return this.getMetaData();
+            }
             throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
@@ -102,6 +108,10 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             statement.close();
         } catch (SQLException e) {
+            if (e.getMessage().contains("The last packet successfully received from the server was")) {
+                getConnection().connect();
+                this.close();
+            }
             throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }
@@ -111,6 +121,10 @@ public class MysqlResultStatementNative implements MysqlResultStatement {
         try {
             return statement.isClosed();
         } catch (SQLException e) {
+            if (e.getMessage().contains("The last packet successfully received from the server was")) {
+                getConnection().connect();
+                return this.isClosed();
+            }
             throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }
     }

@@ -32,7 +32,7 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
 
     @Override
     public void delete(@NotNull SqliteVariable variable) {
-        SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE '" + variable.getTable().getId() + "' DROP COLUMN '" + variable.getId() + "'");
+        SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE \"" + variable.getTable().getId() + "\" DROP COLUMN \"" + variable.getId() + "\"");
         statement.execute();
         statement.close();
     }
@@ -40,7 +40,7 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
     @Override
     public void load(@NotNull SqliteVariable variable) {
         try {
-            SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE '" + variable.getTable().getId() + "' ADD COLUMN '" + variable.getId() + "' " + variable.getType().getSqlType().getName() + ";");
+            SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE \"" + variable.getTable().getId() + "\" ADD COLUMN \"" + variable.getId() + "\" " + variable.getType().getSqlType().getName() + ";");
             //variable.getType().set(variable.getDefault(), statement.getParameters(0), statement.getMetaData());
             statement.execute();
             statement.close();

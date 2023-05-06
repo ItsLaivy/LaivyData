@@ -7,7 +7,6 @@ import codes.laivy.data.sql.values.SqlParameters;
 import codes.laivy.data.sql.values.SqlParametersImpl;
 import codes.laivy.data.sql.values.metadata.SqlColumnsMetadataImpl;
 import codes.laivy.data.sql.values.metadata.SqlMetadata;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -40,7 +39,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
         try {
             statement = connection.getConnection().prepareStatement(query);
         } catch (SQLException e) {
-            throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
+            throw new RuntimeException("Sqlite result statement instance", e);
         }
     }
 
@@ -79,7 +78,7 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
 
     public @NotNull String getStatementQuery() {
         String statementStr = getPreparedStatement().toString();
-        return statementStr.substring( statementStr.indexOf( ": " ) + 2 );
+        return statementStr.split(" \n")[0];
     }
 
     @Override

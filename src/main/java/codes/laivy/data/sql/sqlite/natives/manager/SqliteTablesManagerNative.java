@@ -16,7 +16,7 @@ public class SqliteTablesManagerNative implements SqlTablesManager<SqliteTable> 
 
     @Override
     public void load(@NotNull SqliteTable table) {
-        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("CREATE TABLE IF NOT EXISTS '" + table.getId() + "' ('index' INTEGER PRIMARY KEY AUTOINCREMENT, id VARCHAR(128));");
+        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("CREATE TABLE IF NOT EXISTS \"" + table.getId() + "\" (\"index\" INTEGER PRIMARY KEY AUTOINCREMENT, \"id\" VARCHAR(128));");
         statement.execute();
         statement.close();
     }
@@ -27,7 +27,7 @@ public class SqliteTablesManagerNative implements SqlTablesManager<SqliteTable> 
 
     @Override
     public void delete(@NotNull SqliteTable table) {
-        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("DROP TABLE '" + table.getId() + "'");
+        SqliteResultStatement statement = table.getDatabase().getConnection().createStatement("DROP TABLE \"" + table.getId() + "\"");
         statement.execute();
         statement.close();
     }

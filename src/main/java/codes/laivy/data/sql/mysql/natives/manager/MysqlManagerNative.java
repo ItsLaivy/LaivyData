@@ -17,6 +17,7 @@ import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
@@ -41,7 +42,16 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     protected @NotNull SqlVariablesManager<MysqlVariable> variablesManager;
 
     public MysqlManagerNative(@NotNull String address, @NotNull String user, @NotNull String password, int port) throws SQLException {
-        this(new MysqlConnectionNative(DriverManager.getConnection("jdbc:mysql://" + address + ":" + port + "/?autoReconnect=true&failOverReadOnly=false&verifyServerCertificate=false", user, password)));
+        this(new MysqlConnectionNative() {
+            @Override
+            public @NotNull Connection connect() {
+                try {
+                    return DriverManager.getConnection("jdbc:mysql://" + address + ":" + port + "/?autoReconnect=true&failOverReadOnly=false&verifyServerCertificate=false", user, password);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
     public MysqlManagerNative(@NotNull MysqlConnection connection) {
         this.connection = connection;

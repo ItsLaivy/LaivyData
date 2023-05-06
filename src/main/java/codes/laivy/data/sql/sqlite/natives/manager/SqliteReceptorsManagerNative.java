@@ -5,6 +5,7 @@ import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlReceptorsManager;
 import codes.laivy.data.sql.sqlite.SqliteReceptor;
 import codes.laivy.data.sql.sqlite.natives.SqliteReceptorNative;
+import codes.laivy.data.sql.sqlite.natives.SqliteResultStatementNative;
 import codes.laivy.data.sql.sqlite.values.SqliteResultData;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
@@ -29,7 +30,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
 
     @Override
     public @Nullable SqliteResultData getData(@NotNull SqliteReceptor receptor) {
-        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("SELECT * FROM '" + receptor.getTable().getId() + "' WHERE 'id' = ?");
+        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("SELECT * FROM \"" + receptor.getTable().getId() + "\" WHERE \"id\" = ?");
         statement.getParameters(0).setString(receptor.getId());
         SqliteResultData query = statement.execute();
         statement.close();
@@ -39,6 +40,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
         }
 
         @NotNull Set<Map<String, Object>> results = query.getValues();
+        System.out.println(((SqliteResultStatementNative) statement).getStatementQuery());
         query.close();
 
         if (results.isEmpty()) {
@@ -80,7 +82,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
             }
         }
 
-        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE '" + receptor.getTable().getId() + "' SET `index`=?" + query + " WHERE `id` = ?");
+        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE \"" + receptor.getTable().getId() + "\" SET \"index\"=?" + query + " WHERE \"id\" = ?");
         statement.getParameters(0).setInt(receptor.getIndex());
         statement.getParameters(row).setString(receptor.getId());
 
@@ -97,7 +99,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
 
     @Override
     public void delete(@NotNull SqliteReceptor receptor) {
-        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("DELETE FROM '" + receptor.getTable().getId() + "' WHERE 'id' = ?");
+        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("DELETE FROM \"" + receptor.getTable().getId() + "\" WHERE \"id\" = ?");
         statement.getParameters(0).setString(receptor.getId());
         statement.execute();
         statement.close();
@@ -116,7 +118,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
 
         if (data.isEmpty()) {
             // Execute
-            SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("INSERT INTO '" + receptor.getTable().getId() + "' (id) VALUES (?)");
+            SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("INSERT INTO \"" + receptor.getTable().getId() + "\" (id) VALUES (?)");
             statement.getParameters(0).setString(receptor.getId());
             statement.execute();
             statement.close();
@@ -158,7 +160,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
             throw new IllegalArgumentException("A receptor with that id '" + id + "' already exists on the table '" + receptor.getTable() + "'");
         }
 
-        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE '" + receptor.getTable().getId() + "' SET 'id' = ? WHERE 'id' = ?");
+        SqliteResultStatement statement = receptor.getDatabase().getConnection().createStatement("UPDATE \"" + receptor.getTable().getId() + "\" SET \"id\" = ? WHERE \"id\" = ?");
 
         statement.getParameters(0).setString(id);
         statement.getParameters(1).setString(receptor.getId());
