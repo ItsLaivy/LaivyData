@@ -5,7 +5,6 @@ import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.manager.SqlReceptorsManager;
 import codes.laivy.data.sql.sqlite.SqliteReceptor;
 import codes.laivy.data.sql.sqlite.natives.SqliteReceptorNative;
-import codes.laivy.data.sql.sqlite.natives.SqliteResultStatementNative;
 import codes.laivy.data.sql.sqlite.values.SqliteResultData;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
@@ -40,7 +39,6 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
         }
 
         @NotNull Set<Map<String, Object>> results = query.getValues();
-        System.out.println(((SqliteResultStatementNative) statement).getStatementQuery());
         query.close();
 
         if (results.isEmpty()) {
