@@ -1,5 +1,6 @@
 package codes.laivy.data.sql.sqlite.natives.manager;
 
+import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import codes.laivy.data.sql.SqlReceptor;
@@ -14,8 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import org.sqlite.SQLiteException;
 
 import java.sql.SQLType;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Laivy
@@ -28,6 +31,7 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
 
     @Override
     public void setType(@NotNull SqlVariable variable, @NotNull SQLType type) {
+        // Sqlite doesn't support this.
     }
 
     @Override
@@ -40,11 +44,10 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
     @Override
     public void load(@NotNull SqliteVariable variable) {
         try {
-            SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE \"" + variable.getTable().getId() + "\" ADD COLUMN \"" + variable.getId() + "\" " + variable.getType().getSqlType().getName() + ";");
-            //variable.getType().set(variable.getDefault(), statement.getParameters(0), statement.getMetaData());
+            SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE \"" + variable.getTable().getId() + "\" ADD COLUMN \"" + variable.getId() + "\" " + variable.getType().getSqlType().getName() + " default_scheme '" + variable.getDefault() + "';");
             statement.execute();
             statement.close();
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             if (!(e.getCause() instanceof SQLiteException && e.getCause().getMessage().contains("duplicate column name:"))) {
                 throw e;
             }
@@ -53,13 +56,19 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
         variable.getType().configure(variable);
 
         // Load inactive containers
+        Set<Receptor> nonAddedReceptors = new LinkedHashSet<>(variable.getTable().getLoadedReceptors());
         for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
             for (InactiveVariableContainer container : new LinkedList<>(receptor.getInactiveContainers())) {
                 if (container.getVariable().equals(variable.getId())) {
                     receptor.getInactiveContainers().remove(container);
                     receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
+                    nonAddedReceptors.remove(receptor);
                 }
             }
+        }
+
+        for (Receptor receptor : nonAddedReceptors) {
+            receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, (SqlReceptor) receptor, variable.getDefault()));
         }
     }
 

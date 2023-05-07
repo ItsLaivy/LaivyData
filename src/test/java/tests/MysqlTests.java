@@ -1,102 +1,151 @@
 package tests;
 
+import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.MysqlTable;
-import codes.laivy.data.sql.mysql.MysqlVariable;
-import codes.laivy.data.sql.mysql.natives.*;
+import codes.laivy.data.sql.mysql.natives.MysqlDatabaseNative;
+import codes.laivy.data.sql.mysql.natives.MysqlReceptorNative;
+import codes.laivy.data.sql.mysql.natives.MysqlTableNative;
+import codes.laivy.data.sql.mysql.natives.MysqlVariableNative;
 import codes.laivy.data.sql.mysql.natives.manager.MysqlManagerNative;
-import codes.laivy.data.sql.mysql.variable.type.*;
+import codes.laivy.data.sql.mysql.variable.type.MysqlIntVariableType;
+import org.junit.Assert;
+import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class MysqlTests {
-    public static void main(String[] args) {
-        testMysql();
-        testNumbers();
-        testEnum();
+    /**
+     * Test the connection
+     */
+    @Test
+    public void connection() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+        receptor.load();
+
+        // Check if is everything loaded
+        Assert.assertTrue(database.isLoaded());
+        Assert.assertTrue(table.isLoaded());
+        Assert.assertTrue(var.isLoaded());
+        Assert.assertTrue(receptor.isLoaded());
+        // Check if receptor has variable 'var'
+        receptor.get(var.getId());
+        // Testing connection close
+        database.unload(); // Is supposed to unload everything (table, receptor, variables)
+        Assert.assertFalse(database.isLoaded());
+        Assert.assertFalse(table.isLoaded());
+        Assert.assertFalse(var.isLoaded());
+        Assert.assertFalse(receptor.isLoaded());
     }
 
-    public static void testMysql() {
-        try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
-            MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
-            MysqlTable table = new MysqlTableNative(database, "table");
+    /**
+     * Test the database delete
+     */
+    @Test
+    public void deletesDatabase() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+        receptor.load();
 
-            MysqlVariable var = new MysqlVariableNative(table, "var", new MysqlBooleanVariableType(), true);
+        database.delete();
 
-            MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
-            receptor.load();
-
-            receptor.set("var", false);
-
-            receptor.save();
-            receptor.delete();
-            var.delete();
-            table.delete();
-            database.delete();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+        Assert.assertFalse(database.isLoaded());
+        Assert.assertFalse(table.isLoaded());
+        Assert.assertFalse(var.isLoaded());
+        Assert.assertFalse(receptor.isLoaded());
     }
 
-    public static void testEnum() {
-        try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
-            MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
-            MysqlTable table = new MysqlTableNative(database, "table");
+    /**
+     * Test the table delete
+     */
+    @Test
+    public void deletesTable() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+        receptor.load();
 
-            MysqlVariable var = new MysqlVariableNative(table, "enum", new MysqlEnumVariableType<>(TestEnum.class), TestEnum.VALOR_1);
+        table.delete();
 
-            MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
-            receptor.load();
-
-            System.out.println("Enum value: '" + ((TestEnum) Objects.requireNonNull(receptor.get("enum"))).name() + "'");
-
-            receptor.save();
-            receptor.delete();
-            var.delete();
-            table.delete();
-            database.delete();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+        Assert.assertFalse(table.isLoaded());
+        Assert.assertFalse(var.isLoaded());
+        Assert.assertFalse(receptor.isLoaded());
     }
 
-    public static void testNumbers() {
-        try {
-            MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "password", 3306);
-            MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
-            MysqlTable table = new MysqlTableNative(database, "table");
+    /**
+     * Test the variable delete
+     */
+    @Test
+    public void deletesVariable() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+        receptor.load();
 
-            MysqlVariable integerVar = new MysqlVariableNative(table, "integer", new MysqlIntVariableType(), 0);
-            MysqlVariable doubleVar = new MysqlVariableNative(table, "double", new MysqlDoubleVariableType(), 0D);
-            MysqlVariable floatVar = new MysqlVariableNative(table, "float", new MysqlFloatVariableType(), 0F);
-            MysqlVariable longVar = new MysqlVariableNative(table, "long", new MysqlLongVariableType(), 0L);
+        var.delete();
 
-            MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
-            receptor.load();
-
-            receptor.save();
-            receptor.delete();
-
-//            integerVar.delete();
-//            doubleVar.delete();
-//            floatVar.delete();
-//            longVar.delete();
-//
-//            table.delete();
-//            database.delete();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+        Assert.assertFalse(var.isLoaded());
+        Assert.assertEquals(0, receptor.getActiveContainers().size());
     }
 
-    public enum TestEnum {
-        VALOR_1,
-        VALOR_2,
-        VALOR_3,
-        ;
+    /**
+     * Test the variables
+     */
+    @Test
+    public void variables() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+        receptor.load();
+        receptor.delete();
+        receptor.load();
+
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+
+        receptor.get(var.getId());
+
+        receptor.unload(false);
+        receptor.load();
+    }
+
+    /**
+     * Test the receptors
+     */
+    @Test
+    public void receptors() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table");
+        SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
+
+        SqlVariable var2 = new MysqlVariableNative(table, "var2", new MysqlIntVariableType(), 0);
+        receptor.load();
+        receptor.delete();
+        receptor.load();
+
+        Assert.assertEquals(0, (int) Objects.requireNonNull(receptor.get(var2.getId())));
+        receptor.get(var2.getId());
+
+        receptor.set(var.getId(), (int) Objects.requireNonNull(receptor.get(var.getId())) + 1);
+        receptor.reload(true);
+        Assert.assertEquals(1, (int) Objects.requireNonNull(receptor.get(var.getId())));
+
+        receptor.delete();
     }
 
 }

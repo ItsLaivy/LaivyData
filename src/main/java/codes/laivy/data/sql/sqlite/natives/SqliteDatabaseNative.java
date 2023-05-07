@@ -1,6 +1,5 @@
 package codes.laivy.data.sql.sqlite.natives;
 
-import codes.laivy.data.api.table.Table;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
@@ -88,6 +87,8 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     @Override
     public void delete() {
+        unload();
+
         getManager().delete(this);
         //noinspection ResultOfMethodCallIgnored
         getFile().delete();

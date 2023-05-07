@@ -64,6 +64,7 @@ public class MysqlDatabaseNative implements MysqlDatabase {
 
     @Override
     public void delete() {
+        unload();
         getManager().delete(this);
     }
 
