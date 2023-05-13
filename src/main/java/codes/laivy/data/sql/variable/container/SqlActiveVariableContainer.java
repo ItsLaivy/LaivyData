@@ -16,7 +16,7 @@ public interface SqlActiveVariableContainer extends ActiveVariableContainer {
     @Nullable SqlVariable getVariable();
 
     @Override
-    @NotNull SqlVariableType<?> getType();
+    @NotNull SqlVariableType<? extends SqlVariable> getType();
 
     @Override
     @Nullable SqlReceptor getReceptor();

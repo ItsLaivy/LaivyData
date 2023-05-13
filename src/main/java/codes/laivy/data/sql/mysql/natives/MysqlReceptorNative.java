@@ -44,10 +44,6 @@ public class MysqlReceptorNative implements MysqlReceptor {
         this.table = table;
         this.id = id;
 
-        if (!table.isLoaded()) {
-            throw new IllegalStateException("This table isn't loaded!");
-        }
-
         if (!matches("^.{0,128}$", id)) {
             throw new IllegalArgumentException("The receptor id must follow the regex '^.{0,128}$'");
         }
@@ -57,6 +53,8 @@ public class MysqlReceptorNative implements MysqlReceptor {
     public void load() {
         if (isLoaded()) {
             throw new IllegalStateException("The receptor already is loaded.");
+        } else if (!getTable().isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
         }
 
         getActiveContainers().clear();

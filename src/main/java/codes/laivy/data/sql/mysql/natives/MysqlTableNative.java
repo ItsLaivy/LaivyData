@@ -33,18 +33,23 @@ public class MysqlTableNative implements MysqlTable {
     private boolean loaded = false;
 
     public MysqlTableNative(@NotNull MysqlDatabase database, @NotNull String id) {
+        this(database, id, true);
+    }
+    public MysqlTableNative(@NotNull MysqlDatabase database, @NotNull String id, boolean autoLoad) {
         this.database = database;
         this.id = id;
 
-        if (!database.isLoaded()) {
-            throw new IllegalStateException("This database isn't loaded!");
+        if (autoLoad) {
+            load();
         }
-
-        load();
     }
 
     @Override
     public void load() {
+        if (!getDatabase().isLoaded()) {
+            throw new IllegalStateException("This database isn't loaded!");
+        }
+
         getDatabase().getManager().getTablesManager().load(this);
         getDatabase().getLoadedTables().add(this);
         loaded = true;

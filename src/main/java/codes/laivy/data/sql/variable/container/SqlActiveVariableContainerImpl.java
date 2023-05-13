@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SqlActiveVariableContainerImpl implements SqlActiveVariableContainer {
 
-    private final @NotNull SqlVariableType<?> type;
+    private final @NotNull SqlVariableType<? extends SqlVariable> type;
 
     private final @Nullable SqlVariable variable;
     private final @Nullable SqlReceptor receptor;
@@ -19,10 +19,10 @@ public class SqlActiveVariableContainerImpl implements SqlActiveVariableContaine
     public SqlActiveVariableContainerImpl(@NotNull SqlVariable variable, @NotNull SqlReceptor receptor, @Nullable Object object) {
         this(variable, variable.getType(), receptor, object);
     }
-    public SqlActiveVariableContainerImpl(@NotNull SqlVariableType<?> type, @Nullable Object object) {
+    public SqlActiveVariableContainerImpl(@NotNull SqlVariableType<? extends SqlVariable> type, @Nullable Object object) {
         this(null, type, null, object);
     }
-    protected SqlActiveVariableContainerImpl(@Nullable SqlVariable variable, @NotNull SqlVariableType<?> type, @Nullable SqlReceptor receptor, @Nullable Object object) {
+    protected SqlActiveVariableContainerImpl(@Nullable SqlVariable variable, @NotNull SqlVariableType<? extends SqlVariable> type, @Nullable SqlReceptor receptor, @Nullable Object object) {
         this.variable = variable;
         this.type = type;
         this.receptor = receptor;
@@ -36,7 +36,7 @@ public class SqlActiveVariableContainerImpl implements SqlActiveVariableContaine
     }
 
     @Override
-    public @NotNull SqlVariableType<?> getType() {
+    public @NotNull SqlVariableType<? extends SqlVariable> getType() {
         return type;
     }
 

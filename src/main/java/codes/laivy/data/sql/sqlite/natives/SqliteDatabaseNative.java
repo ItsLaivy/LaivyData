@@ -36,6 +36,9 @@ public class SqliteDatabaseNative implements SqliteDatabase {
     protected @Nullable SqliteConnection connection;
 
     public SqliteDatabaseNative(@NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager, @NotNull String id) {
+        this(manager, id, true);
+    }
+    public SqliteDatabaseNative(@NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager, @NotNull String id, boolean autoLoad) {
         this.manager = manager;
 
         if (!matches("^([a-zA-Z][a-zA-Z0-9_]{0,64})$", id)) {
@@ -44,7 +47,9 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
         this.id = id;
 
-        load();
+        if (autoLoad) {
+            load();
+        }
     }
 
     @Override

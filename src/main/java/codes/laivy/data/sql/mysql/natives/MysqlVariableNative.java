@@ -47,6 +47,16 @@ public class MysqlVariableNative implements MysqlVariable {
             @Nullable Object defValue,
             @Nullable SqlVariableConfiguration configuration
     ) {
+        this(table, id, type, defValue, configuration, true);
+    }
+    public MysqlVariableNative(
+            @NotNull MysqlTable table,
+            @NotNull String id,
+            @NotNull MysqlVariableType<MysqlVariable> type,
+            @Nullable Object defValue,
+            @Nullable SqlVariableConfiguration configuration,
+            boolean autoLoad
+    ) {
         this.table = table;
         this.id = id;
         this.type = type;
@@ -58,11 +68,9 @@ public class MysqlVariableNative implements MysqlVariable {
             throw new RuntimeException("This default variable object isn't compatible with that variable type");
         }
 
-        if (!table.isLoaded()) {
-            throw new IllegalStateException("This table isn't loaded!");
+        if (autoLoad) {
+            load();
         }
-
-        load();
     }
 
     @Override
@@ -72,6 +80,10 @@ public class MysqlVariableNative implements MysqlVariable {
 
     @Override
     public void load() {
+        if (!getTable().isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
+        }
+
         getDatabase().getManager().getVariablesManager().load(this);
         getTable().getLoadedVariables().add(this);
         loaded = true;

@@ -3,6 +3,7 @@ package codes.laivy.data.sql.mysql.natives;
 import codes.laivy.data.sql.mysql.connection.MysqlConnection;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,10 +21,12 @@ import java.sql.SQLException;
  */
 public abstract class MysqlConnectionNative implements MysqlConnection {
 
-    private @NotNull Connection connection;
+    private @Nullable Connection connection;
 
-    public MysqlConnectionNative() {
-        this.connection = connect();
+    public MysqlConnectionNative(boolean autoLoad) {
+        if (autoLoad) {
+            this.connection = connect();
+        }
     }
 
     /**
@@ -35,7 +38,7 @@ public abstract class MysqlConnectionNative implements MysqlConnection {
      */
     public @NotNull Connection getConnection() {
         try {
-            if (connection.isClosed()) {
+            if (connection == null || connection.isClosed()) {
                 connection = connect();
             }
             return connection;

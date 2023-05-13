@@ -27,7 +27,6 @@ public class SqliteVariableNative implements SqliteVariable {
     private @NotNull String id;
 
     private final @NotNull SqliteVariableType<SqliteVariable> type;
-    protected @Nullable Object defValue;
 
     private final @Nullable SqlVariableConfiguration configuration;
 
@@ -47,6 +46,16 @@ public class SqliteVariableNative implements SqliteVariable {
             @NotNull SqliteVariableType<SqliteVariable> type,
             @Nullable SqlVariableConfiguration configuration
     ) {
+        this(table, id, type, configuration, true);
+    }
+
+    public SqliteVariableNative(
+            @NotNull SqliteTable table,
+            @NotNull String id,
+            @NotNull SqliteVariableType<SqliteVariable> type,
+            @Nullable SqlVariableConfiguration configuration,
+            boolean autoLoad
+    ) {
         this.table = table;
         this.id = id;
         this.type = type;
@@ -57,11 +66,9 @@ public class SqliteVariableNative implements SqliteVariable {
             throw new RuntimeException("This default variable object isn't compatible with that variable type");
         }
 
-        if (!table.isLoaded()) {
-            throw new IllegalStateException("This table isn't loaded!");
+        if (autoLoad) {
+            load();
         }
-
-        load();
     }
 
     @Override
@@ -71,6 +78,10 @@ public class SqliteVariableNative implements SqliteVariable {
 
     @Override
     public void load() {
+        if (!getTable().isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
+        }
+
         getDatabase().getManager().getVariablesManager().load(this);
         getTable().getLoadedVariables().add(this);
         loaded = true;

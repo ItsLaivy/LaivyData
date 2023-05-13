@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public interface RedisDatabase extends Database {
     @Override
-    @NotNull RedisManager<?, ?, ?, ?> getManager();
+    @NotNull RedisManager<? extends RedisReceptor, ? extends RedisVariable, ? extends RedisDatabase, ? extends RedisTable> getManager();
 
     /**
      * Gets a full list of all registered keys by this database

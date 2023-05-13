@@ -32,5 +32,5 @@ public interface SqlDatabase extends Database {
 
     @Override
     @Contract(pure = true)
-    @NotNull SqlManager<?, ?, ?, ?> getManager();
+    @NotNull SqlManager<? extends SqlReceptor, ? extends SqlVariable, ? extends SqlDatabase, ? extends SqlTable> getManager();
 }

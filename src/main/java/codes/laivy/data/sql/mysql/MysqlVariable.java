@@ -18,5 +18,5 @@ public interface MysqlVariable extends SqlVariable {
     @NotNull MysqlTable getTable();
 
     @Override
-    @NotNull MysqlVariableType<?> getType();
+    @NotNull MysqlVariableType<? extends MysqlVariable> getType();
 }

@@ -16,5 +16,5 @@ public interface SqliteVariable extends SqlVariable {
     @NotNull SqliteTable getTable();
 
     @Override
-    @NotNull SqliteVariableType<?> getType();
+    @NotNull SqliteVariableType<? extends SqliteVariable> getType();
 }

@@ -33,18 +33,23 @@ public class SqliteTableNative implements SqliteTable {
     private boolean loaded = false;
 
     public SqliteTableNative(@NotNull SqliteDatabase database, @NotNull String id) {
+        this(database, id, true);
+    }
+    public SqliteTableNative(@NotNull SqliteDatabase database, @NotNull String id, boolean autoLoad) {
         this.database = database;
         this.id = id;
 
-        if (!database.isLoaded()) {
-            throw new IllegalStateException("This database isn't loaded!");
+        if (autoLoad) {
+            load();
         }
-
-        load();
     }
 
     @Override
     public void load() {
+        if (!getDatabase().isLoaded()) {
+            throw new IllegalStateException("This database isn't loaded!");
+        }
+
         getDatabase().getManager().getTablesManager().load(this);
         getDatabase().getLoadedTables().add(this);
         loaded = true;

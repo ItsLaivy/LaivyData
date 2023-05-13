@@ -1,6 +1,9 @@
 package codes.laivy.data.api.database;
 
 import codes.laivy.data.api.manager.DatabaseManager;
+import codes.laivy.data.api.receptor.Receptor;
+import codes.laivy.data.api.table.Table;
+import codes.laivy.data.api.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +24,7 @@ public interface Database {
      */
     @NotNull String getId();
 
-    @NotNull DatabaseManager<?, ?, ?, ?> getManager();
+    @NotNull DatabaseManager<? extends Receptor, ? extends Variable, ? extends Database, ? extends Table> getManager();
 
     void load();
 

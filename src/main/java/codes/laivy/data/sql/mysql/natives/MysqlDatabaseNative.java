@@ -35,6 +35,9 @@ public class MysqlDatabaseNative implements MysqlDatabase {
     private boolean loaded = false;
 
     public MysqlDatabaseNative(@NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> manager, @NotNull String id) {
+        this(manager, id, true);
+    }
+    public MysqlDatabaseNative(@NotNull MysqlManager<MysqlReceptor, MysqlVariable, MysqlDatabase, MysqlTable> manager, @NotNull String id, boolean autoLoad) {
         this.manager = manager;
 
         if (!matches("^[a-zA-Z_][a-zA-Z0-9_]{0,63}$", id)) {
@@ -43,7 +46,9 @@ public class MysqlDatabaseNative implements MysqlDatabase {
 
         this.id = id;
 
-        load();
+        if (autoLoad) {
+            load();
+        }
     }
 
     @Override

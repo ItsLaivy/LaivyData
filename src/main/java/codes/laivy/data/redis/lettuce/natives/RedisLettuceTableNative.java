@@ -28,10 +28,20 @@ public class RedisLettuceTableNative implements RedisLettuceTable {
             @NotNull RedisLettuceDatabase database,
             @NotNull String id
     ) {
+        this(database, id, true);
+    }
+
+    public RedisLettuceTableNative(
+            @NotNull RedisLettuceDatabase database,
+            @NotNull String id,
+            boolean autoLoad
+    ) {
         this.database = database;
         this.id = id;
 
-        load();
+        if (autoLoad) {
+            load();
+        }
     }
 
     @Override

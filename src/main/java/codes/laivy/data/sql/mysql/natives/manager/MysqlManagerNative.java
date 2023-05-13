@@ -42,7 +42,10 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     protected @NotNull SqlVariablesManager<MysqlVariable> variablesManager;
 
     public MysqlManagerNative(@NotNull String address, @NotNull String user, @NotNull String password, int port) throws SQLException {
-        this(new MysqlConnectionNative() {
+        this(address, user, password, port, true);
+    }
+    public MysqlManagerNative(@NotNull String address, @NotNull String user, @NotNull String password, int port, boolean autoLoad) throws SQLException {
+        this(new MysqlConnectionNative(autoLoad) {
             @Override
             public @NotNull Connection connect() {
                 try {

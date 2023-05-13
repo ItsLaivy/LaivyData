@@ -37,10 +37,20 @@ public class RedisLettuceDatabaseNative implements RedisLettuceDatabase {
             @NotNull RedisLettuceManagerNative manager,
             @NotNull String id
     ) {
+        this(manager, id, true);
+    }
+
+    public RedisLettuceDatabaseNative(
+            @NotNull RedisLettuceManagerNative manager,
+            @NotNull String id,
+            boolean autoLoad
+    ) {
         this.manager = manager;
         this.id = id;
 
-        load();
+        if (autoLoad) {
+            load();
+        }
     }
 
     @Override

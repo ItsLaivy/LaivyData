@@ -30,5 +30,5 @@ public interface SqlVariable extends Variable, Tableable {
 
     @Override
     @Contract(pure = true)
-    @NotNull SqlVariableType<?> getType();
+    @NotNull SqlVariableType<? extends SqlVariable> getType();
 }

@@ -4,8 +4,6 @@ import codes.laivy.data.api.database.Database;
 import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.table.Table;
 import codes.laivy.data.api.variable.Variable;
-import codes.laivy.data.sql.mysql.MysqlReceptor;
-import codes.laivy.data.sql.mysql.MysqlTable;
 import org.jetbrains.annotations.NotNull;
 
 /**
