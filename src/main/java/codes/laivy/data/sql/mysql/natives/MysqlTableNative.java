@@ -6,10 +6,14 @@ import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
 import codes.laivy.data.sql.mysql.MysqlTable;
+import codes.laivy.data.sql.mysql.values.MysqlResultData;
+import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * <p>
@@ -103,5 +107,33 @@ public class MysqlTableNative implements MysqlTable {
     @Override
     public @NotNull MysqlDatabase getDatabase() {
         return database;
+    }
+
+    @Override
+    public @Range(from = 0, to = Long.MAX_VALUE) long getAutoIncrement() {
+        if (!getDatabase().isLoaded()) {
+            throw new IllegalStateException("This database isn't loaded!");
+        }
+
+        MysqlResultStatement statement = getDatabase().getManager().getConnection().createStatement("SHOW TABLE STATUS FROM `" + getDatabase().getId() + "` LIKE '" + getId() + "'");
+        MysqlResultData data = statement.execute();
+
+        int code = 0;
+        if (data != null) {
+            code++;
+            Optional<Map<String, Object>> optional = data.getValues().stream().findFirst();
+
+            if (optional.isPresent()) {
+                code++;
+                Map<String, Object> map = optional.get();
+                for (String key : map.keySet()) {
+                    if (key.equalsIgnoreCase("auto_increment")) {
+                        return ((BigInteger) map.get(key)).longValue();
+                    }
+                }
+            }
+        }
+
+        throw new IllegalStateException("Couldn't execute due to an unknown error: " + code);
     }
 }

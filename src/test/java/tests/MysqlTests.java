@@ -148,4 +148,29 @@ public class MysqlTests {
         receptor.delete();
     }
 
+    /**
+     * Test the auto increment
+     */
+    @Test
+    public void autoIncrement() throws SQLException {
+        MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
+        MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        MysqlTable table = new MysqlTableNative(database, "table_test_ai");
+
+        MysqlReceptor receptor = new MysqlReceptorNative(table, "t0");
+        receptor.load();
+        receptor = new MysqlReceptorNative(table, "t1");
+        receptor.load();
+        receptor = new MysqlReceptorNative(table, "t2");
+        receptor.load();
+        receptor = new MysqlReceptorNative(table, "t3");
+        receptor.load();
+        receptor = new MysqlReceptorNative(table, "t4");
+        receptor.load();
+
+        Assert.assertEquals(table.getAutoIncrement(), 6);
+
+        table.delete();
+    }
+
 }
