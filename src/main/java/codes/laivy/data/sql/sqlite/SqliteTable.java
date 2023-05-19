@@ -4,6 +4,7 @@ import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.SqlVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * @author Laivy
@@ -22,4 +23,6 @@ public interface SqliteTable extends SqlTable {
         }
         return null;
     }
+
+    @Range(from = 0, to = Long.MAX_VALUE) long getAutoIncrement();
 }

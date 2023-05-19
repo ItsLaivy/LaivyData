@@ -6,10 +6,13 @@ import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.sqlite.SqliteDatabase;
 import codes.laivy.data.sql.sqlite.SqliteTable;
+import codes.laivy.data.sql.sqlite.values.SqliteResultData;
+import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * <p>
@@ -103,5 +106,34 @@ public class SqliteTableNative implements SqliteTable {
     @Override
     public @NotNull SqliteDatabase getDatabase() {
         return database;
+    }
+
+    @Override
+    public @Range(from = 0, to = Long.MAX_VALUE) long getAutoIncrement() {
+        if (!getDatabase().isLoaded()) {
+            throw new IllegalStateException("This database isn't loaded!");
+        }
+
+        SqliteResultStatement statement = getDatabase().getConnection().createStatement("SELECT seq FROM sqlite_sequence WHERE name = '" + getId() + "'");
+        SqliteResultData data = statement.execute();
+
+        int code = 0;
+        if (data != null) {
+            code++;
+            Optional<Map<String, Object>> optional = data.getValues().stream().findFirst();
+
+            if (optional.isPresent()) {
+                code++;
+                Map<String, Object> map = optional.get();
+
+                if (map.containsKey("seq")) {
+                    return ((Integer) map.get("seq")).longValue();
+                }
+            } else {
+                return 0L;
+            }
+        }
+
+        throw new IllegalStateException("Couldn't execute due to an unknown error: " + code);
     }
 }

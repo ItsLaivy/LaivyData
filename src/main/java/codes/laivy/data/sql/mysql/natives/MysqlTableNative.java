@@ -128,7 +128,7 @@ public class MysqlTableNative implements MysqlTable {
                 Map<String, Object> map = optional.get();
                 for (String key : map.keySet()) {
                     if (key.equalsIgnoreCase("auto_increment")) {
-                        return ((BigInteger) map.get(key)).longValue();
+                        return ((BigInteger) map.get(key)).longValue() - 1L;
                     }
                 }
             }

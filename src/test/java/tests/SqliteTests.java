@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class SqliteTests {
@@ -147,6 +148,36 @@ public class SqliteTests {
         Assert.assertEquals(1, (int) Objects.requireNonNull(receptor.get(var.getId())));
 
         receptor.delete();
+    }
+
+    /**
+     * Test the auto increment
+     */
+    @Test
+    public void autoIncrement() {
+        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
+        SqliteTable table = new SqliteTableNative(database, "table_test_ai");
+
+        table.delete();
+        table.load();
+
+        Assert.assertEquals(0, table.getAutoIncrement());
+
+        SqliteReceptor receptor = new SqliteReceptorNative(table, "t0");
+        receptor.load();
+        receptor = new SqliteReceptorNative(table, "t1");
+        receptor.load();
+        receptor = new SqliteReceptorNative(table, "t2");
+        receptor.load();
+        receptor = new SqliteReceptorNative(table, "t3");
+        receptor.load();
+        receptor = new SqliteReceptorNative(table, "t4");
+        receptor.load();
+
+        Assert.assertEquals(5, table.getAutoIncrement());
+
+        table.delete();
     }
 
 }

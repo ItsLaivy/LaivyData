@@ -157,6 +157,11 @@ public class MysqlTests {
         MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
         MysqlTable table = new MysqlTableNative(database, "table_test_ai");
 
+        table.delete();
+        table.load();
+
+        Assert.assertEquals(0, table.getAutoIncrement());
+
         MysqlReceptor receptor = new MysqlReceptorNative(table, "t0");
         receptor.load();
         receptor = new MysqlReceptorNative(table, "t1");
@@ -168,7 +173,7 @@ public class MysqlTests {
         receptor = new MysqlReceptorNative(table, "t4");
         receptor.load();
 
-        Assert.assertEquals(table.getAutoIncrement(), 6);
+        Assert.assertEquals(5, table.getAutoIncrement());
 
         table.delete();
     }
