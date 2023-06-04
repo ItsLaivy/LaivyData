@@ -57,7 +57,7 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
     public @NotNull SqliteReceptor[] getStored(@NotNull SqliteDatabase database) {
         Set<SqliteReceptor> receptors = new LinkedHashSet<>();
         for (SqlTable table : database.getLoadedTables()) {
-            receptors.addAll(Arrays.asList(getStored((SqliteDatabase) table)));
+            receptors.addAll(Arrays.asList(getStored((SqliteTable) table)));
         }
         return receptors.toArray(new SqliteReceptor[0]);
     }
