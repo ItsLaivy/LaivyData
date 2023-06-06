@@ -14,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Objects;
 
 public class SqliteTests {

@@ -12,4 +12,7 @@ public interface SqlReceptorsManager<R extends SqlReceptor> extends ReceptorsMan
 
     void setId(@NotNull R receptor, @NotNull String id);
 
+    void save(@NotNull R[] receptors);
+    void unload(@NotNull R[] receptors, boolean save);
+
 }

@@ -34,7 +34,6 @@ public class SqliteReceptorNative implements SqliteReceptor {
 
     private @Range(from = 0, to = Long.MAX_VALUE) int index;
 
-    protected boolean loaded = false;
     protected boolean isNew = false;
 
     private final @NotNull Set<InactiveVariableContainer> inactiveVariableContainers = new LinkedHashSet<>();
@@ -51,52 +50,26 @@ public class SqliteReceptorNative implements SqliteReceptor {
 
     @Override
     public void load() {
-        if (isLoaded()) {
-            throw new IllegalStateException("The receptor already is loaded.");
-        } else if (!getTable().isLoaded()) {
-            throw new IllegalStateException("This table isn't loaded!");
-        }
-
-        getActiveContainers().clear();
-        getInactiveContainers().clear();
-
         getDatabase().getManager().getReceptorsManager().load(this);
-        getTable().getLoadedReceptors().add(this);
-        loaded = true;
     }
 
     @Override
     public void save() {
-        if (!isLoaded()) {
-            throw new IllegalStateException("The receptor isn't loaded.");
-        }
-
         getDatabase().getManager().getReceptorsManager().save(this);
     }
 
     @Override
     public void unload(boolean save) {
-        if (!isLoaded()) {
-            throw new IllegalStateException("The receptor isn't loaded.");
-        }
-
         getDatabase().getManager().getReceptorsManager().unload(this, save);
-
-        getActiveContainers().clear();
-        getInactiveContainers().clear();
-
-        getTable().getLoadedReceptors().remove(this);
-        loaded = false;
     }
 
     @Override
     public boolean isLoaded() {
-        return loaded;
+        return getDatabase().getManager().getReceptorsManager().isLoaded(this);
     }
 
     @Override
     public void delete() {
-        unload(false);
         getDatabase().getManager().getReceptorsManager().delete(this);
     }
 

@@ -5,11 +5,11 @@ import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
 import codes.laivy.data.sql.mysql.MysqlDatabase;
+import codes.laivy.data.sql.mysql.MysqlReceptor;
 import codes.laivy.data.sql.mysql.MysqlTable;
 import codes.laivy.data.sql.mysql.values.MysqlResultData;
 import codes.laivy.data.sql.mysql.values.MysqlResultStatement;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.math.BigInteger;
@@ -61,11 +61,21 @@ public class MysqlTableNative implements MysqlTable {
 
     @Override
     public void unload() {
-        for (Receptor receptor : new LinkedHashSet<>(getLoadedReceptors())) {
-            receptor.unload(true);
+        Map<MysqlTable, Set<MysqlReceptor>> tableMap = new HashMap<>();
+        for (Receptor r : new LinkedHashSet<>(getLoadedReceptors())) {
+            MysqlReceptor receptor = (MysqlReceptor) r;
+            if (receptor.isLoaded()) {
+                tableMap.putIfAbsent(receptor.getTable(), new HashSet<>());
+                tableMap.get(receptor.getTable()).add(receptor);
+            }
         }
+        for (Map.Entry<MysqlTable, Set<MysqlReceptor>> entry : tableMap.entrySet()) {
+            MysqlTable table = entry.getKey();
+            table.getDatabase().getManager().getReceptorsManager().unload(entry.getValue().toArray(new MysqlReceptor[0]), true);
+        }
+
         for (Variable variable : new LinkedHashSet<>(getLoadedVariables())) {
-            variable.unload();
+            if (variable.isLoaded()) variable.unload();
         }
 
         getDatabase().getManager().getTablesManager().unload(this);
