@@ -312,10 +312,9 @@ public class MysqlReceptorsManagerNative implements SqlReceptorsManager<MysqlRec
 
     @Override
     public boolean isLoaded(@NotNull MysqlReceptor receptor) {
-        for (Set<String> set : loadedReceptors.values()) {
-            if (set.contains(receptor.getId())) {
-                return true;
-            }
+        String tableId = receptor.getTable().getId();
+        if (loadedReceptors.containsKey(tableId)) {
+            return loadedReceptors.get(tableId).contains(receptor.getId());
         }
         return false;
     }

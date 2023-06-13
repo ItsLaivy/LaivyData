@@ -300,10 +300,9 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
 
     @Override
     public boolean isLoaded(@NotNull SqliteReceptor receptor) {
-        for (Set<String> set : loadedReceptors.values()) {
-            if (set.contains(receptor.getId())) {
-                return true;
-            }
+        String tableId = receptor.getTable().getId();
+        if (loadedReceptors.containsKey(tableId)) {
+            return loadedReceptors.get(tableId).contains(receptor.getId());
         }
         return false;
     }
