@@ -1,7 +1,6 @@
 package codes.laivy.data.sql.sqlite.natives.manager;
 
 import codes.laivy.data.api.receptor.Receptor;
-import codes.laivy.data.api.table.Table;
 import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.sql.SqlVariable;
@@ -27,9 +26,10 @@ import java.util.stream.Collectors;
 public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteReceptor> {
 
     /**
-     * Contains the loaded receptors, if a receptor id is inside this set, the receptor is loaded.
+     * Contains the loaded receptors, if a receptor id is inside this map, the receptor is loaded.
+     * Key = Table id, Value = Receptor id
      */
-    private final @NotNull Set<String> loadedReceptors = new HashSet<>();
+    private final @NotNull Map<String, Set<String>> loadedReceptors = new HashMap<>();
 
     public SqliteReceptorsManagerNative() {
     }
@@ -300,14 +300,22 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
 
     @Override
     public boolean isLoaded(@NotNull SqliteReceptor receptor) {
-        return loadedReceptors.contains(receptor.getId());
+        for (Set<String> set : loadedReceptors.values()) {
+            if (set.contains(receptor.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setLoaded(@NotNull SqliteReceptor receptor, boolean loaded) {
+        String tableId = receptor.getTable().getId();
+        loadedReceptors.putIfAbsent(tableId, new LinkedHashSet<>());
+
         if (loaded) {
-            loadedReceptors.add(receptor.getId());
+            loadedReceptors.get(tableId).add(receptor.getId());
         } else {
-            loadedReceptors.remove(receptor.getId());
+            loadedReceptors.get(tableId).remove(receptor.getId());
         }
     }
 }
