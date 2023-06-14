@@ -92,11 +92,6 @@ public class MysqlReceptorNative implements MysqlReceptor {
     }
 
     @Override
-    public @NotNull MysqlTable getTable() {
-        return table;
-    }
-
-    @Override
     public @NotNull String getId() {
         return id;
     }
@@ -129,8 +124,13 @@ public class MysqlReceptorNative implements MysqlReceptor {
     }
 
     @Override
-    public @NotNull MysqlDatabase getDatabase() {
+    public final @NotNull MysqlDatabase getDatabase() {
         return getTable().getDatabase();
+    }
+
+    @Override
+    public final @NotNull MysqlTable getTable() {
+        return table;
     }
 
     @Override

@@ -92,11 +92,6 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    public @NotNull SqliteTable getTable() {
-        return table;
-    }
-
-    @Override
     public @NotNull String getId() {
         return id;
     }
@@ -129,8 +124,13 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    public @NotNull SqliteDatabase getDatabase() {
+    public final @NotNull SqliteDatabase getDatabase() {
         return getTable().getDatabase();
+    }
+
+    @Override
+    public final @NotNull SqliteTable getTable() {
+        return table;
     }
 
     @Override

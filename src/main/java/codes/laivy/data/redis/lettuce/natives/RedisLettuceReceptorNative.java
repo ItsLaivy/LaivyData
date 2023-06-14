@@ -38,24 +38,18 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
             @NotNull RedisLettuceDatabase database,
             @NotNull String id
     ) {
-        this(database, null, id);
+        this.database = database;
+        this.table = null;
+        this.id = id;
     }
     public RedisLettuceReceptorNative(
             @NotNull RedisLettuceTable table,
             @NotNull String id
     ) {
-        this(table.getDatabase(), table, id);
-    }
-    public RedisLettuceReceptorNative(
-            @NotNull RedisLettuceDatabase database,
-            @Nullable RedisLettuceTable table,
-            @NotNull String id
-    ) {
-        this.database = database;
+        this.database = table.getDatabase();
         this.table = table;
         this.id = id;
     }
-
     @Override
     public void load() {
         if (isLoaded()) {
@@ -207,8 +201,13 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
 
     @Override
-    public @NotNull RedisLettuceDatabase getDatabase() {
+    public final @NotNull RedisLettuceDatabase getDatabase() {
         return database;
+    }
+
+    @Override
+    public final @Nullable RedisLettuceTable getTable() {
+        return table;
     }
 
     @Override
@@ -218,10 +217,5 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
         key += variable.getId() + ":" + getId();
 
         return key;
-    }
-
-    @Override
-    public @Nullable RedisLettuceTable getTable() {
-        return table;
     }
 }
