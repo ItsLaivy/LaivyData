@@ -124,12 +124,12 @@ public class SqliteReceptorNative implements SqliteReceptor {
     }
 
     @Override
-    public final @NotNull SqliteDatabase getDatabase() {
+    public @NotNull SqliteDatabase getDatabase() {
         return getTable().getDatabase();
     }
 
     @Override
-    public final @NotNull SqliteTable getTable() {
+    public @NotNull SqliteTable getTable() {
         return table;
     }
 

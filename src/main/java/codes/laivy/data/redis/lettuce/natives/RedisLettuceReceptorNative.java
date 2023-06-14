@@ -201,12 +201,12 @@ public class RedisLettuceReceptorNative implements RedisLettuceReceptor {
     }
 
     @Override
-    public final @NotNull RedisLettuceDatabase getDatabase() {
+    public @NotNull RedisLettuceDatabase getDatabase() {
         return database;
     }
 
     @Override
-    public final @Nullable RedisLettuceTable getTable() {
+    public @Nullable RedisLettuceTable getTable() {
         return table;
     }
 

@@ -124,13 +124,13 @@ public class MysqlReceptorNative implements MysqlReceptor {
     }
 
     @Override
-    public final @NotNull MysqlDatabase getDatabase() {
-        return getTable().getDatabase();
+    public @NotNull MysqlTable getTable() {
+        return table;
     }
 
     @Override
-    public final @NotNull MysqlTable getTable() {
-        return table;
+    public @NotNull MysqlDatabase getDatabase() {
+        return getTable().getDatabase();
     }
 
     @Override
