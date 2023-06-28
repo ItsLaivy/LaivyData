@@ -158,6 +158,8 @@ public class SqliteTests {
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table_test_ai");
 
+        manager.getStored(table);
+
         table.delete();
         table.load();
 

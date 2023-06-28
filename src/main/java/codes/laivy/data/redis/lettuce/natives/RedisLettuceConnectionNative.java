@@ -5,7 +5,6 @@ import codes.laivy.data.redis.variable.RedisKey;
 import codes.laivy.data.redis.variable.container.RedisActiveVariableContainer;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
-import com.lambdaworks.redis.SetArgs;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.sync.RedisCommands;
 import org.jetbrains.annotations.ApiStatus;

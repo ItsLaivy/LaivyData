@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
@@ -59,13 +60,16 @@ public class SqliteResultStatementNative implements SqliteResultStatement {
     @Override
     public @Nullable SqliteResultData execute() {
         try {
-            boolean execute = statement.execute();
+            boolean results = statement.execute();
 
-            if (execute) {
-                return new SqliteResultDataNative(statement.getResultSet());
-            } else {
-                return null;
+            if (results) {
+                ResultSet set = statement.getResultSet();
+
+                if (!set.isClosed()) {
+                    return new SqliteResultDataNative(set);
+                }
             }
+            return null;
         } catch (SQLException e) {
             throw new RuntimeException("Query: '" + getStatementQuery() + "'", e);
         }

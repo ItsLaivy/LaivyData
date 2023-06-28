@@ -1,7 +1,6 @@
 package codes.laivy.data.sql.sqlite.natives;
 
 import codes.laivy.data.api.receptor.Receptor;
-import codes.laivy.data.api.table.Table;
 import codes.laivy.data.api.variable.Variable;
 import codes.laivy.data.sql.SqlReceptor;
 import codes.laivy.data.sql.SqlVariable;
@@ -53,6 +52,9 @@ public class SqliteTableNative implements SqliteTable {
         if (!getDatabase().isLoaded()) {
             throw new IllegalStateException("This database isn't loaded!");
         }
+        if (isLoaded()) {
+            throw new IllegalStateException("This table is already loaded!");
+        }
 
         getDatabase().getManager().getTablesManager().load(this);
         getDatabase().getLoadedTables().add(this);
@@ -61,6 +63,10 @@ public class SqliteTableNative implements SqliteTable {
 
     @Override
     public void unload() {
+        if (!isLoaded()) {
+            throw new IllegalStateException("This table isn't loaded!");
+        }
+
         Map<SqliteTable, Set<SqliteReceptor>> tableMap = new HashMap<>();
         for (Receptor r : new LinkedHashSet<>(getLoadedReceptors())) {
             SqliteReceptor receptor = (SqliteReceptor) r;

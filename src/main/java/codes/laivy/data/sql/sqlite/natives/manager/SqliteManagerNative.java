@@ -71,7 +71,7 @@ public class SqliteManagerNative implements SqliteManager<SqliteReceptor, Sqlite
         statement.close();
 
         if (query == null) {
-            throw new NullPointerException("Couldn't get query results");
+            return new SqliteReceptor[0];
         }
 
         Set<Map<String, Object>> data = query.getValues();
