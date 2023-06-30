@@ -42,7 +42,7 @@ public class SqliteReceptorsManagerNative implements SqlReceptorsManager<SqliteR
         statement.close();
 
         if (query == null) {
-            throw new NullPointerException("This result data doesn't have results");
+            return null;
         }
 
         @NotNull Set<Map<String, Object>> results = query.getValues();

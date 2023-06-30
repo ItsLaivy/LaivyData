@@ -149,6 +149,8 @@ public class SqliteTableNative implements SqliteTable {
             } else {
                 return 0L;
             }
+        } else {
+            return 0L;
         }
 
         throw new IllegalStateException("Couldn't execute due to an unknown error: " + code);
