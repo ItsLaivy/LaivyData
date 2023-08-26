@@ -133,6 +133,7 @@ public class SqliteTableNative implements SqliteTable {
 
         SqliteResultStatement statement = getDatabase().getConnection().createStatement("SELECT seq FROM sqlite_sequence WHERE name = '" + getId() + "'");
         SqliteResultData data = statement.execute();
+        statement.close();
 
         int code = 0;
         if (data != null) {

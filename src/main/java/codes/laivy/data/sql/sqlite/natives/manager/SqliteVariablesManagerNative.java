@@ -1,6 +1,5 @@
 package codes.laivy.data.sql.sqlite.natives.manager;
 
-import codes.laivy.data.api.receptor.Receptor;
 import codes.laivy.data.api.variable.container.ActiveVariableContainer;
 import codes.laivy.data.api.variable.container.InactiveVariableContainer;
 import codes.laivy.data.sql.SqlReceptor;
@@ -15,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.sqlite.SQLiteException;
 
 import java.sql.SQLType;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Laivy
@@ -47,28 +43,28 @@ public class SqliteVariablesManagerNative implements SqlVariablesManager<SqliteV
             SqliteResultStatement statement = variable.getDatabase().getConnection().createStatement("ALTER TABLE \"" + variable.getTable().getId() + "\" ADD COLUMN \"" + variable.getId() + "\" " + variable.getType().getSqlType().getName() + " default_scheme '" + variable.getDefault() + "';");
             statement.execute();
             statement.close();
+
+            variable.setNew(true);
         } catch (Throwable e) {
             if (!(e.getCause() instanceof SQLiteException && e.getCause().getMessage().contains("duplicate column name:"))) {
                 throw e;
+            } else {
+                variable.setNew(false);
             }
         }
 
         variable.getType().configure(variable);
 
         // Load inactive containers
-        Set<Receptor> nonAddedReceptors = new LinkedHashSet<>(variable.getTable().getLoadedReceptors());
         for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
-            for (InactiveVariableContainer container : new LinkedList<>(receptor.getInactiveContainers())) {
-                if (container.getVariable().equals(variable.getId())) {
-                    receptor.getInactiveContainers().remove(container);
-                    receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
-                    nonAddedReceptors.remove(receptor);
-                }
+            @NotNull Optional<InactiveVariableContainer> containerOptional = receptor.getInactiveContainers().stream().filter(i -> i.getVariable().equals(variable.getId())).findFirst();
+            if (containerOptional.isPresent()) {
+                @NotNull InactiveVariableContainer container = containerOptional.get();
+                receptor.getInactiveContainers().remove(container);
+                receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
+            } else {
+                receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getDefault()));
             }
-        }
-
-        for (Receptor receptor : nonAddedReceptors) {
-            receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, (SqlReceptor) receptor, variable.getDefault()));
         }
     }
 

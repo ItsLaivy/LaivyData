@@ -108,6 +108,10 @@ public class MysqlTests {
     public void variables() throws SQLException {
         MysqlManagerNative manager = new MysqlManagerNative("localhost", "root", "", 3306);
         MysqlDatabase database = new MysqlDatabaseNative(manager, "test");
+        database.load();
+        database.delete();
+        database.load();
+
         MysqlTable table = new MysqlTableNative(database, "table");
         MysqlReceptor receptor = new MysqlReceptorNative(table, "test");
         receptor.load();
@@ -115,6 +119,13 @@ public class MysqlTests {
         receptor.load();
 
         SqlVariable var = new MysqlVariableNative(table, "var", new MysqlIntVariableType(), 0);
+
+        // Test new
+        Assert.assertTrue(var.isNew());
+        var.unload();
+        var.load();
+        Assert.assertFalse(var.isNew());
+        // Test new
 
         receptor.get(var.getId());
 

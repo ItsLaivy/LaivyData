@@ -21,6 +21,10 @@ public interface SqlVariable extends Variable, Tableable {
     @Override
     void setId(@NotNull String id);
 
+    boolean isNew();
+
+    void setNew(boolean isNew);
+
     @Override
     @Contract(pure = true)
     @NotNull SqlDatabase getDatabase();

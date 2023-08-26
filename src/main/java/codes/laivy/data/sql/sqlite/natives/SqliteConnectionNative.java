@@ -2,7 +2,6 @@ package codes.laivy.data.sql.sqlite.natives;
 
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
 import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -33,6 +32,7 @@ public class SqliteConnectionNative implements SqliteConnection {
      * @author Laivy
      * @since 1.0
      */
+    @Override
     public @NotNull Connection getConnection() {
         return connection;
     }

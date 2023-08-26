@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>codes.laivy.data</groupId>
-    <artifactId>LaivyData-Java</artifactId>
+    <groupId>codes.laivy</groupId>
+    <artifactId>data</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -49,6 +49,12 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.13.0</version>
         </dependency>
     </dependencies>
 

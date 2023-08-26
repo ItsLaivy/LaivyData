@@ -23,7 +23,7 @@ public class SqliteTests {
      */
     @Test
     public void connection() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
         SqlVariable var = new SqliteVariableNative(table, "var", new SqliteIntVariableType());
@@ -50,7 +50,7 @@ public class SqliteTests {
      */
     @Test
     public void deletesDatabase() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
         SqlVariable var = new SqliteVariableNative(table, "var", new SqliteIntVariableType());
@@ -70,7 +70,7 @@ public class SqliteTests {
      */
     @Test
     public void deletesTable() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
         SqlVariable var = new SqliteVariableNative(table, "var", new SqliteIntVariableType());
@@ -89,7 +89,7 @@ public class SqliteTests {
      */
     @Test
     public void deletesVariable() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table");
         SqlVariable var = new SqliteVariableNative(table, "var", new SqliteIntVariableType());
@@ -107,20 +107,35 @@ public class SqliteTests {
      */
     @Test
     public void variables() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
+        database.load();
+        database.delete();
+
+        database.load();
+
         SqliteTable table = new SqliteTableNative(database, "table");
         SqliteReceptor receptor = new SqliteReceptorNative(table, "test");
         receptor.load();
         receptor.delete();
+
         receptor.load();
 
         SqlVariable var = new SqliteVariableNative(table, "var", new SqliteIntVariableType());
+
+        // Test new
+        Assert.assertTrue(var.isNew());
+        var.unload();
+        var.load();
+        Assert.assertFalse(var.isNew());
+        // Test new
 
         receptor.get(var.getId());
 
         receptor.unload(false);
         receptor.load();
+
+        database.delete();
     }
 
     /**
@@ -128,7 +143,7 @@ public class SqliteTests {
      */
     @Test
     public void receptors() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
 
         SqliteTable table = new SqliteTableNative(database, "table");
@@ -154,7 +169,7 @@ public class SqliteTests {
      */
     @Test
     public void autoIncrement() {
-        SqliteManagerNative manager = new SqliteManagerNative(new File("."));
+        SqliteManagerNative manager = new SqliteManagerNative(new File(System.getProperty("user.dir")));
         SqliteDatabase database = new SqliteDatabaseNative(manager, "test");
         SqliteTable table = new SqliteTableNative(database, "table_test_ai");
 

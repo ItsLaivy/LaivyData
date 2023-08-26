@@ -3,6 +3,7 @@ package codes.laivy.data.sql.sqlite.natives;
 import codes.laivy.data.sql.SqlTable;
 import codes.laivy.data.sql.sqlite.*;
 import codes.laivy.data.sql.sqlite.connection.SqliteConnection;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ public class SqliteDatabaseNative implements SqliteDatabase {
     private boolean loaded = false;
 
     protected @Nullable SqliteConnection connection;
+    private final @NotNull File file;
 
     public SqliteDatabaseNative(@NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> manager, @NotNull String id) {
         this(manager, id, true);
@@ -46,6 +48,7 @@ public class SqliteDatabaseNative implements SqliteDatabase {
         }
 
         this.id = id;
+        this.file = new File(getManager().getPath(), getId() + ".db");
 
         if (autoLoad) {
             load();
@@ -54,7 +57,7 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     @Override
     public @NotNull File getFile() {
-        return new File(getManager().getPath() + File.separator + getId() + ".db");
+        return file;
     }
 
     @Override
@@ -92,11 +95,15 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     @Override
     public void delete() {
-        unload();
+        try {
+            getConnection().getConnection().close();
+            unload();
+            getManager().delete(this);
 
-        getManager().delete(this);
-        //noinspection ResultOfMethodCallIgnored
-        getFile().delete();
+            FileUtils.forceDelete(getFile());
+        } catch (Exception e) {
+            throw new IllegalStateException("Database file not deleted '" + getFile() + "'", e);
+        }
     }
 
     @Override
@@ -106,9 +113,7 @@ public class SqliteDatabaseNative implements SqliteDatabase {
 
     @Override
     public @NotNull SqliteConnection getConnection() {
-        if (!isLoaded()) {
-            throw new IllegalStateException("The database isn't loaded!");
-        } else if (connection == null) {
+        if (connection == null) {
             throw new NullPointerException("The connection instance is null!");
         }
         return connection;
@@ -128,6 +133,5 @@ public class SqliteDatabaseNative implements SqliteDatabase {
     public @NotNull SqliteManager<SqliteReceptor, SqliteVariable, SqliteDatabase, SqliteTable> getManager() {
         return manager;
     }
-
 
 }

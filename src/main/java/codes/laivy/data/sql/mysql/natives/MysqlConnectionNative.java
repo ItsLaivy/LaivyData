@@ -36,6 +36,7 @@ public abstract class MysqlConnectionNative implements MysqlConnection {
      * @author Laivy
      * @since 1.0
      */
+    @Override
     public @NotNull Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {

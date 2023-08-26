@@ -127,6 +127,7 @@ public class MysqlTableNative implements MysqlTable {
 
         MysqlResultStatement statement = getDatabase().getManager().getConnection().createStatement("SHOW TABLE STATUS FROM `" + getDatabase().getId() + "` LIKE '" + getId() + "'");
         MysqlResultData data = statement.execute();
+        statement.close();
 
         int code = 0;
         if (data != null) {

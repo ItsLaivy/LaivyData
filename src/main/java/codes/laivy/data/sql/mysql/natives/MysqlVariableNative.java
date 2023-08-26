@@ -30,6 +30,7 @@ public class MysqlVariableNative implements MysqlVariable {
     private final @Nullable SqlVariableConfiguration configuration;
 
     private boolean loaded = false;
+    private boolean isNew = false;
 
     public MysqlVariableNative(
             @NotNull MysqlTable table,
@@ -120,6 +121,16 @@ public class MysqlVariableNative implements MysqlVariable {
     @Override
     public void setId(@NotNull String id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    @Override
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

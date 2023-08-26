@@ -20,4 +20,6 @@ public interface MysqlConnection extends SqlConnection {
      */
     @NotNull Connection connect();
 
+    @NotNull Connection getConnection();
+
 }

@@ -11,13 +11,13 @@ public class SqlErrorUtils {
      * @param throwable the throwable
      * @param code the code
      */
-    public static void t(@NotNull Throwable throwable, int code) {
+    public static boolean t(@NotNull Throwable throwable, int code) {
         if (throwable instanceof SQLSyntaxErrorException) {
             SQLSyntaxErrorException s = (SQLSyntaxErrorException) throwable;
-            if (s.getErrorCode() == code) return;
+            if (s.getErrorCode() == code) return true;
         } else if (throwable.getCause() instanceof SQLSyntaxErrorException) {
             SQLSyntaxErrorException s = (SQLSyntaxErrorException) throwable.getCause();
-            if (s.getErrorCode() == code) return;
+            if (s.getErrorCode() == code) return true;
         }
 
         if (throwable instanceof RuntimeException) {

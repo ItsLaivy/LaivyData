@@ -120,7 +120,9 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
 
     @Override
     public void load(@NotNull MysqlDatabase database) {
-        getConnection().createStatement("CREATE DATABASE IF NOT EXISTS `" + database.getId() + "`").execute();
+        MysqlResultStatement statement = getConnection().createStatement("CREATE DATABASE IF NOT EXISTS `" + database.getId() + "`");
+        statement.execute();
+        statement.close();
     }
 
     @Override
@@ -131,7 +133,10 @@ public class MysqlManagerNative implements MysqlManager<MysqlReceptor, MysqlVari
     @Override
     public void delete(@NotNull MysqlDatabase database) {
         unload(database);
-        getConnection().createStatement("DROP DATABASE `" + database.getId() + "`").execute();
+
+        MysqlResultStatement statement = getConnection().createStatement("DROP DATABASE `" + database.getId() + "`");
+        statement.execute();
+        statement.close();
     }
 
     @Override

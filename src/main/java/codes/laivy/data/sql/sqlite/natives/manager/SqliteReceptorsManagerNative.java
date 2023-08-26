@@ -13,6 +13,7 @@ import codes.laivy.data.sql.sqlite.values.SqliteResultStatement;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainer;
 import codes.laivy.data.sql.variable.container.SqlActiveVariableContainerImpl;
 import codes.laivy.data.sql.variable.container.SqlInactiveVariableContainerImpl;
+import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -26,6 +26,8 @@ public class SqliteVariableNative implements SqliteVariable {
     private final @NotNull SqliteTable table;
     private @NotNull String id;
 
+    private boolean isNew = false;
+
     private final @NotNull SqliteVariableType<SqliteVariable> type;
 
     private final @Nullable SqlVariableConfiguration configuration;
@@ -118,6 +120,16 @@ public class SqliteVariableNative implements SqliteVariable {
     @Override
     public void setId(@NotNull String id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    @Override
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

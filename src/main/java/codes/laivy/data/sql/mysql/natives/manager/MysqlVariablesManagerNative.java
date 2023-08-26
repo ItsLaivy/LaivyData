@@ -17,6 +17,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.sql.SQLType;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Laivy
@@ -48,8 +49,11 @@ public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVar
         variable.getType().set(variable.getDefault(), statement.getParameters(0), statement.getMetaData());
         try {
             statement.execute();
+            variable.setNew(true);
         } catch (Throwable e) {
-            SqlErrorUtils.t(e, 1060);
+            if (SqlErrorUtils.t(e, 1060)) {
+                variable.setNew(false);
+            }
         }
         statement.close();
 
@@ -57,11 +61,13 @@ public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVar
 
         // Load inactive containers
         for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
-            for (InactiveVariableContainer container : new LinkedList<>(receptor.getInactiveContainers())) {
-                if (container.getVariable().equals(variable.getId())) {
-                    receptor.getInactiveContainers().remove(container);
-                    receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
-                }
+            @NotNull Optional<InactiveVariableContainer> containerOptional = receptor.getInactiveContainers().stream().filter(i -> i.getVariable().equals(variable.getId())).findFirst();
+            if (containerOptional.isPresent()) {
+                @NotNull InactiveVariableContainer container = containerOptional.get();
+                receptor.getInactiveContainers().remove(container);
+                receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getType().get(container.get())));
+            } else {
+                receptor.getActiveContainers().add(new SqlActiveVariableContainerImpl(variable, receptor, variable.getDefault()));
             }
         }
     }
