@@ -71,7 +71,7 @@ public class RedisLettuceTableNative implements RedisLettuceTable {
 
     @Override
     public boolean isLoaded() {
-        return false;
+        return true;
     }
 
     @Override
