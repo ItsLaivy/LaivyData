@@ -93,7 +93,7 @@ public class MysqlTextVariableType implements SqlTextVariableType<MysqlVariable>
          * </p>
          *
          * <p>
-         *     This size could store up to 4,294,967,295L bytes. It's recommended for massive variables.
+         *     This size could store up to 4.294,967,295L bytes. It's recommended for massive variables.
          *     Has a performance lower than {@link #MEDIUMTEXT}
          * </p>
          *

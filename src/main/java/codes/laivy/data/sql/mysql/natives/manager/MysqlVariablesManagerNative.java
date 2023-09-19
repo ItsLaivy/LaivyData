@@ -61,7 +61,7 @@ public class MysqlVariablesManagerNative implements SqlVariablesManager<MysqlVar
 
         // Load inactive containers
         for (SqlReceptor receptor : variable.getTable().getLoadedReceptors()) {
-            @NotNull Optional<InactiveVariableContainer> containerOptional = receptor.getInactiveContainers().stream().filter(i -> i.getVariable().equals(variable.getId())).findFirst();
+            @NotNull Optional<InactiveVariableContainer> containerOptional = receptor.getInactiveContainers().stream().filter(i -> i.getVariable().equalsIgnoreCase(variable.getId())).findFirst();
             if (containerOptional.isPresent()) {
                 @NotNull InactiveVariableContainer container = containerOptional.get();
                 receptor.getInactiveContainers().remove(container);
