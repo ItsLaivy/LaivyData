@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents an abstract data entity with common data management operations.
@@ -84,12 +85,22 @@ public abstract class Data {
      * @since 2.0
      */
     public final @NotNull CompletableFuture<Void> reload(boolean save) {
-        return CompletableFuture.runAsync(() -> {
-            if (isLoaded()) {
-                stop(save).join();
-                start().join();
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (isLoaded()) {
+                    stop(save).get(10, TimeUnit.SECONDS);
+                    start().get(10, TimeUnit.SECONDS);
+                }
+
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
             }
         });
+
+        return future;
     }
 
     /**
@@ -118,15 +129,24 @@ public abstract class Data {
      * @since 2.0
      */
     public final @NotNull CompletableFuture<Void> start() {
-        return CompletableFuture.runAsync(() -> {
-            row = load().join();
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
-            if (row < 0) {
-                throw new IllegalStateException("Invalid row value from #load method");
+        CompletableFuture.runAsync(() -> {
+            try {
+                row = load().get(10, TimeUnit.SECONDS);
+
+                if (row < 0) {
+                    throw new IllegalStateException("Invalid row value from #load method");
+                }
+
+                loaded = true;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
             }
-
-            loaded = true;
         });
+
+        return future;
     }
 
     /**
@@ -138,11 +158,20 @@ public abstract class Data {
      * @since 2.0
      */
     public final @NotNull CompletableFuture<Void> stop(boolean save) {
-        return CompletableFuture.runAsync(() -> {
-            unload(save).join();
-            row = -1;
-            loaded = false;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                unload(save).get(10, TimeUnit.SECONDS);
+                row = -1;
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     /**
@@ -153,6 +182,7 @@ public abstract class Data {
      * @since 1.0
      */
     @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Long> load();
 
     /**
@@ -163,6 +193,7 @@ public abstract class Data {
      * @since 1.0
      */
     @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Void> unload(boolean save);
 
     /**

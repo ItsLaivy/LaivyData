@@ -2,5 +2,4 @@
 /target/
 *.jar
 /test.db
-src/test/java/tests/RedisTests.java
 /old/

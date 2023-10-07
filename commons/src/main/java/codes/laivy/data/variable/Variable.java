@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -82,10 +83,18 @@ public abstract class Variable<T> {
             throw new IllegalStateException("The variable '" + getId() + "' is already loaded");
         }
 
-        return CompletableFuture.runAsync(() -> {
-            load().join();
-            loaded = true;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                load().get(10, TimeUnit.SECONDS);
+                loaded = true;
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     /**
@@ -100,10 +109,19 @@ public abstract class Variable<T> {
             throw new IllegalStateException("The variable '" + getId() + "' is not loaded");
         }
 
-        return CompletableFuture.runAsync(() -> {
-            unload().join();
-            loaded = false;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                unload().get(10, TimeUnit.SECONDS);
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     /**
@@ -138,6 +156,7 @@ public abstract class Variable<T> {
      * @since 1.0
      */
     @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Void> load();
 
     /**
@@ -147,6 +166,7 @@ public abstract class Variable<T> {
      * @since 1.0
      */
     @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Void> unload();
 
     /**

@@ -3,8 +3,11 @@ package codes.laivy.data;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -44,6 +47,7 @@ public abstract class Database {
      * @return The pattern for id validation
      * @since 2.0
      */
+    @ApiStatus.OverrideOnly
     @Contract(pure = true)
     protected abstract @NotNull Pattern getPattern();
 
@@ -70,10 +74,19 @@ public abstract class Database {
             throw new IllegalStateException("The database '" + getId() + "' is already loaded");
         }
 
-        return CompletableFuture.runAsync(() -> {
-            load().join();
-            loaded = true;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                load().get(10, TimeUnit.SECONDS);
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     /**
@@ -88,10 +101,19 @@ public abstract class Database {
             throw new IllegalStateException("The database '" + getId() + "' is not loaded");
         }
 
-        return CompletableFuture.runAsync(() -> {
-            unload().join();
-            loaded = false;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                unload().get(10, TimeUnit.SECONDS);
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     /**
@@ -115,6 +137,8 @@ public abstract class Database {
      * @return A CompletableFuture representing the asynchronous load operation
      * @since 1.0
      */
+    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Void> load();
 
     /**
@@ -123,6 +147,8 @@ public abstract class Database {
      * @return A CompletableFuture representing the asynchronous unload operation
      * @since 1.0
      */
+    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     protected abstract @NotNull CompletableFuture<Void> unload();
 
     /**
@@ -144,8 +170,24 @@ public abstract class Database {
     }
 
     @Override
-    public abstract boolean equals(Object obj);
+    public boolean equals(@Nullable Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Database)) return false;
+        Database database = (Database) object;
+        return Objects.equals(getId(), database.getId());
+    }
 
     @Override
-    public abstract int hashCode();
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "Database{" +
+                "id='" + id + '\'' +
+                ", isNew=" + isNew +
+                ", loaded=" + loaded +
+                '}';
+    }
 }
