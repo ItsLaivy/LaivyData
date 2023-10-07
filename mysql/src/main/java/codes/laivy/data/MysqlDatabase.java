@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.PreparedStatement;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
@@ -42,19 +43,31 @@ public class MysqlDatabase extends Database {
         }
 
         return CompletableFuture.runAsync(() -> {
-            getAuthentication().load();
+
         });
     }
 
     @Override
     protected @NotNull CompletableFuture<Void> unload() {
-        if (!getAuthentication().isConnected()) {
+        if (getAuthentication().getConnection() == null) {
             throw new IllegalStateException("This authentication aren't connected");
         }
 
-        return CompletableFuture.runAsync(() -> {
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
+        CompletableFuture.runAsync(() -> {
+            try {
+                @NotNull PreparedStatement statement = getAuthentication().getConnection().prepareStatement("CREATE DATABASE IF NOT EXISTS `" + getId() + "`");
+                statement.execute();
+                statement.close();
+
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     @Override

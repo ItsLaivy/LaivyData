@@ -3,10 +3,7 @@ package codes.laivy.data;
 import org.jetbrains.annotations.*;
 
 import java.net.InetAddress;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,6 +23,7 @@ public class MysqlAuthentication {
     private @Nullable Connection connection;
 
     protected @Nullable ScheduledExecutorService keepAliveExecutor;
+    protected @Nullable MysqlVersion version;
 
     public MysqlAuthentication(@NotNull String username, @Nullable String password, @NotNull InetAddress hostname, @Range(from = 0, to = 65535) int port) {
         this.username = username;
@@ -66,6 +64,10 @@ public class MysqlAuthentication {
         return port;
     }
 
+    protected boolean isAutoCommit() {
+        return true;
+    }
+
     /**
      * Connects to the mysql with the provided authentication details.
      *
@@ -83,15 +85,31 @@ public class MysqlAuthentication {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Class<Driver> driver = getDriver();
+                Class<Driver> ignore = getDriver();
                 this.connection = load().get(10, TimeUnit.SECONDS);
+                this.connection.setAutoCommit(isAutoCommit());
+
+                version = MysqlVersion.of(version());
+
                 future.complete(connection);
             } catch (Throwable throwable) {
+                try {
+                    if (isConnected()) {
+                        disconnect().get(3, TimeUnit.SECONDS);
+                    }
+                } catch (Throwable ignore) {
+                }
+
                 future.completeExceptionally(throwable);
             }
         });
 
         return future;
+    }
+
+    // TODO: 07/10/2023 Javadocs
+    public @Nullable MysqlVersion getVersion() {
+        return version;
     }
 
     public @NotNull Class<Driver> getDriver() {
@@ -163,10 +181,31 @@ public class MysqlAuthentication {
         return future;
     }
 
+    private @NotNull String version() throws SQLException {
+        if (isConnected()) {
+            @NotNull PreparedStatement statement = getConnection().prepareStatement("SELECT @@version");
+            @NotNull ResultSet set = statement.executeQuery();
+            set.next();
+
+            return set.getString(1);
+        } else {
+            throw new SQLException("The authentication aren't connected");
+        }
+    }
+
     // TODO: 07/10/2023 Javadocs
     private void checkConnection() {
-        // TODO: 07/10/2023 Connection check
-        System.out.println("Check connection");
+        if (isConnected()) {
+            try {
+                boolean valid = getConnection().isValid(2);
+
+                if (!valid) {
+                    reconnect().get(5, TimeUnit.SECONDS);
+                }
+            } catch (Throwable throwable) {
+                throw new RuntimeException("Connection closed by server-side or is not valid anymore", throwable);
+            }
+        }
     }
 
     /**
@@ -202,6 +241,25 @@ public class MysqlAuthentication {
 
             return future;
         }
+    }
+
+    public @NotNull CompletableFuture<Void> reconnect() {
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (isConnected()) {
+                    disconnect().get(5, TimeUnit.SECONDS);
+                }
+                connect().get(5, TimeUnit.SECONDS);
+
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
 
 }

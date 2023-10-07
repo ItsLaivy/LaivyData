@@ -1,4 +1,5 @@
 import codes.laivy.data.MysqlAuthentication;
+import codes.laivy.data.MysqlVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.junit.Assert;
@@ -9,14 +10,14 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 @TestOnly
-public class Authentication {
+public class AuthenticationTest {
 
     public final @NotNull String USERNAME;
     public final @NotNull String PASSWORD;
     public final @NotNull InetAddress ADDRESS;
     public final int PORT;
 
-    public Authentication() {
+    public AuthenticationTest() {
         PASSWORD = "";
         USERNAME = "root";
         PORT = 3306;
@@ -34,7 +35,13 @@ public class Authentication {
         authentication.connect().get(5, TimeUnit.SECONDS);
 
         Assert.assertNotNull("Cannot load authentication connection", authentication.getConnection());
+        Assert.assertNotNull("Cannot load mysql server version", authentication.getVersion());
         Assert.assertFalse("Cannot validate authentication", authentication.getConnection().isClosed());
+
+        @NotNull MysqlVersion version = authentication.getVersion();
+        if (version.getMajor() < 5) {
+            throw new IllegalStateException("The LaivyData-Java/Mysql has only compatible with MySQL 5 or higher");
+        }
 
         authentication.disconnect().get(5, TimeUnit.SECONDS);
 
