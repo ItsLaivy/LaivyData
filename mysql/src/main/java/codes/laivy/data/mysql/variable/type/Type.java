@@ -1,5 +1,7 @@
-package codes.laivy.data.mysql.variable;
+package codes.laivy.data.mysql.variable.type;
 
+import codes.laivy.data.mysql.variable.MysqlVariable;
+import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,10 +14,10 @@ public interface Type<T> {
 
     /**
      * You can change the query for the variable here.
-     * @param object the object that will be stored
+     * @param value the object that will be stored
      * @param parameter the parameter of a variable
      */
-    void set(@NotNull Parameter parameter, @Nullable T object);
+    void set(@NotNull Parameter parameter, @Nullable T value);
 
     /**
      * Here, you will convert the param object into the variable object again.
@@ -27,10 +29,10 @@ public interface Type<T> {
     boolean isNullSupported();
 
     /**
-     * Configures a {@link Variable} for the use of this variable type.
+     * Configures a {@link MysqlVariable} for the use of this variable type.
      * Changes the variable type for the required type, changes variable configurations in the database, and everything it needs.
      * @param variable the sql variable
      */
-    @NotNull CompletableFuture<Void> configure(@NotNull Variable<T> variable);
+    @NotNull CompletableFuture<Void> configure(@NotNull MysqlVariable<T> variable);
 
 }
