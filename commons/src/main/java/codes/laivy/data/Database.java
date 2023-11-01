@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Represents an abstract database responsible for storing variables and their dependencies.
@@ -35,21 +34,7 @@ public abstract class Database {
      */
     protected Database(@NotNull String id) {
         this.id = id;
-
-        if (!getPattern().matcher(id).matches()) {
-            throw new UnsupportedOperationException("The database id '" + id + "' doesn't matches the regex '" + getPattern().pattern() + "'");
-        }
     }
-
-    /**
-     * Gets the main pattern used for validating database ids.
-     *
-     * @return The pattern for id validation
-     * @since 2.0
-     */
-    @ApiStatus.OverrideOnly
-    @Contract(pure = true)
-    protected abstract @NotNull Pattern getPattern();
 
     /**
      * Gets the unique id of the database.
@@ -79,7 +64,7 @@ public abstract class Database {
         CompletableFuture.runAsync(() -> {
             try {
                 load().get(10, TimeUnit.SECONDS);
-                loaded = false;
+                loaded = true;
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -158,6 +143,9 @@ public abstract class Database {
      * @since 1.0
      */
     public abstract @NotNull CompletableFuture<Void> delete();
+
+    // TODO: 07/10/2023 Javadocs
+    public abstract @NotNull CompletableFuture<Void> save();
 
     /**
      * Checks if the database is loaded.

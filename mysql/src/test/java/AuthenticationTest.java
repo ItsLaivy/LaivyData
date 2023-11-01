@@ -1,5 +1,5 @@
-import codes.laivy.data.MysqlAuthentication;
-import codes.laivy.data.MysqlVersion;
+import codes.laivy.data.mysql.MysqlAuthentication;
+import codes.laivy.data.mysql.MysqlVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.junit.Assert;
@@ -17,16 +17,11 @@ public class AuthenticationTest {
     public final @NotNull InetAddress ADDRESS;
     public final int PORT;
 
-    public AuthenticationTest() {
+    public AuthenticationTest() throws Throwable {
         PASSWORD = "";
         USERNAME = "root";
         PORT = 3306;
-
-        try {
-            ADDRESS = InetAddress.getByName("localhost");
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
+        ADDRESS = InetAddress.getByName("localhost");
     }
 
     @Test
@@ -39,12 +34,11 @@ public class AuthenticationTest {
         Assert.assertFalse("Cannot validate authentication", authentication.getConnection().isClosed());
 
         @NotNull MysqlVersion version = authentication.getVersion();
-        if (version.getMajor() < 5) {
-            throw new IllegalStateException("The LaivyData-Java/Mysql has only compatible with MySQL 5 or higher");
+        if (version.getMajor() < 5 || version.getMinor() < 1) {
+            throw new IllegalStateException("The LaivyData-Java/Mysql has only compatible with MySQL 5.1 or higher");
         }
 
         authentication.disconnect().get(5, TimeUnit.SECONDS);
-
         Assert.assertNull("Cannot unload authentication connection", authentication.getConnection());
     }
 

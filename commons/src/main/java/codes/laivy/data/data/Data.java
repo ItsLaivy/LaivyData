@@ -33,7 +33,7 @@ public abstract class Data {
      * @param database The database instance
      * @since 1.0
      */
-    public Data(@NotNull Database database) {
+    protected Data(@NotNull Database database) {
         this.database = database;
     }
 

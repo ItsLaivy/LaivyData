@@ -1,6 +1,5 @@
 package codes.laivy.data.variable;
 
-import codes.laivy.data.Database;
 import codes.laivy.data.data.Receptor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -20,7 +19,6 @@ import java.util.function.Function;
 public abstract class Variable<T> {
 
     private final @NotNull String id;
-    private final @NotNull Database database;
 
     protected volatile boolean isNew = false;
 
@@ -31,12 +29,10 @@ public abstract class Variable<T> {
      * Constructs a Variable instance with the specified id and associated database.
      *
      * @param id       The unique id of the variable
-     * @param database The database instance
      * @since 1.0
      */
-    public Variable(@NotNull String id, @NotNull Database database) {
+    protected Variable(@NotNull String id) {
         this.id = id;
-        this.database = database;
     }
 
     /**
@@ -58,17 +54,6 @@ public abstract class Variable<T> {
     @Contract(pure = true)
     public final @NotNull String getId() {
         return this.id;
-    }
-
-    /**
-     * Gets the database associated with the variable.
-     *
-     * @return The database
-     * @since 1.0
-     */
-    @Contract(pure = true)
-    public final @NotNull Database getDatabase() {
-        return this.database;
     }
 
     /**
@@ -140,15 +125,6 @@ public abstract class Variable<T> {
     }
 
     /**
-     * Gets the VariableType responsible for controlling the value of this variable.
-     *
-     * @return The variable's type controller
-     * @since 1.0
-     */
-    @Contract(pure = true)
-    public abstract @NotNull VariableType<T> getType();
-
-    /**
      * Loads the variable from the database.
      * You cannot load if a variable is loaded at this database with this same id.
      *
@@ -171,11 +147,12 @@ public abstract class Variable<T> {
 
     /**
      * Deletes the variable from the database.
+     * The future will return true if the variable has successfully deleted, false otherwise.
      *
      * @return A CompletableFuture representing the asynchronous delete operation
      * @since 1.0
      */
-    public abstract @NotNull CompletableFuture<Void> delete();
+    public abstract @NotNull CompletableFuture<Boolean> delete();
 
     /**
      * Checks if this variable is loaded or not.

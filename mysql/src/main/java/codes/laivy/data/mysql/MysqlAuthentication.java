@@ -1,9 +1,11 @@
-package codes.laivy.data;
+package codes.laivy.data.mysql;
 
 import org.jetbrains.annotations.*;
 
 import java.net.InetAddress;
 import java.sql.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,11 +27,24 @@ public class MysqlAuthentication {
     protected @Nullable ScheduledExecutorService keepAliveExecutor;
     protected @Nullable MysqlVersion version;
 
+    // Cache
+    protected @Nullable Set<@NotNull MysqlDatabase> databases;
+    //
+
     public MysqlAuthentication(@NotNull String username, @Nullable String password, @NotNull InetAddress hostname, @Range(from = 0, to = 65535) int port) {
         this.username = username;
         this.password = password;
         this.hostname = hostname;
         this.port = port;
+    }
+
+    @Unmodifiable
+    public @NotNull MysqlDatabase @NotNull [] getDatabases() {
+        if (databases == null) {
+            throw new IllegalStateException("This authentication already are connected!");
+        }
+
+        return databases.toArray(new MysqlDatabase[0]);
     }
 
     /**
@@ -90,6 +105,7 @@ public class MysqlAuthentication {
                 this.connection.setAutoCommit(isAutoCommit());
 
                 version = MysqlVersion.of(version());
+                databases = loadDatabases();
 
                 future.complete(connection);
             } catch (Throwable throwable) {
@@ -107,7 +123,33 @@ public class MysqlAuthentication {
         return future;
     }
 
-    // TODO: 07/10/2023 Javadocs
+    @Blocking
+    private @NotNull Set<MysqlDatabase> loadDatabases() throws Throwable {
+        if (getConnection() == null) {
+            throw new IllegalStateException("This authentication already are connected!");
+        }
+
+        try (PreparedStatement statement = getConnection().prepareStatement("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA;")) {
+            @NotNull ResultSet set = statement.executeQuery();
+            @NotNull Set<MysqlDatabase> databases = new LinkedHashSet<>();
+
+            while (set.next()) {
+                @NotNull MysqlDatabase database = new MysqlDatabase(this, set.getString(1));
+                database.start().get(2, TimeUnit.SECONDS);
+
+                databases.add(database);
+            }
+
+            return databases;
+        }
+    }
+
+    /**
+     * Gets the MySQL version associated with this instance.
+     *
+     * @return The MySQL version, or null if not available
+     * @since 2.0
+     */
     public @Nullable MysqlVersion getVersion() {
         return version;
     }
@@ -144,6 +186,7 @@ public class MysqlAuthentication {
             try {
                 unload().get(10, TimeUnit.SECONDS);
                 connection = null;
+                databases = null;
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -183,17 +226,26 @@ public class MysqlAuthentication {
 
     private @NotNull String version() throws SQLException {
         if (isConnected()) {
-            @NotNull PreparedStatement statement = getConnection().prepareStatement("SELECT @@version");
-            @NotNull ResultSet set = statement.executeQuery();
-            set.next();
+            try (PreparedStatement statement = getConnection().prepareStatement("SELECT @@version")) {
+                @NotNull ResultSet set = statement.executeQuery();
+                set.next();
 
-            return set.getString(1);
+                return set.getString(1);
+            }
         } else {
             throw new SQLException("The authentication aren't connected");
         }
     }
 
-    // TODO: 07/10/2023 Javadocs
+    /**
+     * Checks the connection's validity and attempts reconnection if necessary.
+     * <p>
+     * This method is called periodically to verify the connection's state.
+     * If the connection is closed or not valid, it attempts reconnection within a timeout.
+     *
+     * @throws RuntimeException If the connection is closed by the server-side or is no longer valid
+     * @since 1.0
+     */
     private void checkConnection() {
         if (isConnected()) {
             try {
