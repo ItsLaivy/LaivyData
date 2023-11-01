@@ -1,11 +1,11 @@
 package codes.laivy.data.mysql.data;
 
 import codes.laivy.data.data.Data;
-import codes.laivy.data.mysql.MysqlDatabase;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.Parameter;
-import codes.laivy.data.mysql.variable.Type;
+import codes.laivy.data.mysql.variable.type.Type;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -53,8 +52,7 @@ public final class MysqlData extends Data {
         }
 
         final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
-
-        @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
+        final @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
