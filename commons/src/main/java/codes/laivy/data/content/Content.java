@@ -67,7 +67,9 @@ public interface Content<T> extends Iterable<T> {
 
         @Override
         public void clear() {
-            list.clear();
+            for (T element : new ArrayList<>(list)) {
+                remove(element);
+            }
         }
 
         @Override
@@ -136,8 +138,10 @@ public interface Content<T> extends Iterable<T> {
         }
 
         @Override
-        public void clear() {
-            set.clear();
+        public synchronized void clear() {
+            for (T element : new HashSet<>(set)) {
+                remove(element);
+            }
         }
 
         @Override

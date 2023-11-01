@@ -38,18 +38,11 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
     @Override
     public boolean remove(@NotNull MysqlVariable<?> object) {
         if (!getTable().isLoaded()) {
-            throw new IllegalStateException("The table aren't loaded");
+            throw new IllegalStateException("The variable aren't loaded");
         }
 
         synchronized (this) {
             return super.remove(object);
-        }
-    }
-
-    @Override
-    public synchronized void clear() {
-        for (MysqlVariable<?> variable : toCollection()) {
-            remove(variable);
         }
     }
 
