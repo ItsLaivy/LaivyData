@@ -16,14 +16,28 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
 
     // Static methods
 
     private static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
-    
-    public static @NotNull CompletableFuture<Data[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
+
+    public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, long row) {
+        if (CACHED_LOADED_DATAS.containsKey(table)) {
+            @NotNull Optional<MysqlData> optional = CACHED_LOADED_DATAS.get(table).stream().filter(data -> data.getRow() == row).findFirst();
+
+            if (optional.isPresent()) {
+                return optional.get();
+            }
+        }
+
+        @NotNull MysqlData data = new MysqlData(table, row);
+        CACHED_LOADED_DATAS.computeIfAbsent(table, k -> new ArrayList<>()).add(data);
+        return data;
+    }
+    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
         if (conditions.length == 0) {
@@ -38,9 +52,9 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
 
-        // TODO: 01/11/2023 Verificar se há dois conditions com a mesma variável
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
 
-        @NotNull CompletableFuture<Data[]> future = new CompletableFuture<>();
+        @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -53,7 +67,7 @@ public final class MysqlData extends Data {
                         if (data.isLoaded()) {
                             excluded.add(data.getRow());
 
-                            if (data.matches(conditions)) {
+                            if (data.matches(finalConditions)) {
                                 datas.put(data.getRow(), data);
                             }
                         }
@@ -62,9 +76,9 @@ public final class MysqlData extends Data {
 
                 // Retrieving on database
 
-                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getName() + "` " + SqlUtils.buildWhereCondition(excluded, conditions))) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getName() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
                     int index = 0;
-                    for (@NotNull Condition<?> condition : conditions) {
+                    for (@NotNull Condition<?> condition : finalConditions) {
                         //noinspection rawtypes
                         @NotNull Type type = condition.getVariable().getType();
                         //noinspection unchecked
@@ -84,7 +98,7 @@ public final class MysqlData extends Data {
                     }
                 }
 
-                future.complete(datas.values().toArray(new Data[0]));
+                future.complete(datas.values().toArray(new MysqlData[0]));
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
