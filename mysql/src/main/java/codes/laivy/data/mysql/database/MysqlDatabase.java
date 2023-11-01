@@ -1,7 +1,9 @@
-package codes.laivy.data.mysql;
+package codes.laivy.data.mysql.database;
 
 import codes.laivy.data.Database;
+import codes.laivy.data.mysql.authentication.MysqlAuthentication;
 import codes.laivy.data.mysql.table.MysqlTable;
+import codes.laivy.data.mysql.utils.SqlUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,14 +12,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
-public class MysqlDatabase extends Database {
+public final class MysqlDatabase extends Database {
 
     /**
      * Retrieves an active database in this authentication,
@@ -28,17 +27,17 @@ public class MysqlDatabase extends Database {
      * @return An Optional containing the MysqlDatabase if found, else an empty Optional
      */
     public static @NotNull Optional<MysqlDatabase> get(@NotNull MysqlAuthentication authentication, @NotNull String id) {
-        if (authentication.databases == null) {
+        if (!authentication.isConnected()) {
             throw new IllegalStateException("This authentication is not connected");
         }
 
-        return authentication.databases.stream()
+        return authentication.getDatabases().stream()
                 .filter(db -> db.getId().equalsIgnoreCase(id))
                 .findFirst();
     }
 
     public static @NotNull MysqlDatabase getOrCreate(@NotNull MysqlAuthentication authentication, @NotNull String id) {
-        if (authentication.databases == null) {
+        if (!authentication.isConnected()) {
             throw new IllegalStateException("This authentication is not connected");
         }
 
@@ -47,14 +46,13 @@ public class MysqlDatabase extends Database {
             return databaseOptional.get();
         } else {
             @NotNull MysqlDatabase database = new MysqlDatabase(authentication, id);
-            authentication.databases.add(database);
+            authentication.getDatabases().add(database);
             return database;
         }
     }
 
     private final @NotNull MysqlAuthentication authentication;
-
-    private @Nullable Set<MysqlTable> tables;
+    private final @NotNull Tables tables;
 
     /**
      * Constructs a MysqlDatabase instance with the specified id.
@@ -64,18 +62,78 @@ public class MysqlDatabase extends Database {
      * @throws UnsupportedOperationException If the id does not match the pattern
      * @since 1.0
      */
-    protected MysqlDatabase(@NotNull MysqlAuthentication authentication, @NotNull String id) {
+    private MysqlDatabase(@NotNull MysqlAuthentication authentication, @NotNull String id) {
         super(id);
+
         this.authentication = authentication;
+        this.tables = new Tables(this);
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This database id '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
         }
     }
 
-    @Contract(pure = true)
-    public final @NotNull MysqlAuthentication getAuthentication() {
+    public @NotNull MysqlAuthentication getAuthentication() {
         return authentication;
+    }
+
+    public @NotNull Tables getTables() {
+        return tables;
+    }
+
+    int loadedtimes = 0;
+
+    @Override
+    public @NotNull CompletableFuture<Boolean> start() {
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        if (isLoaded()) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (!exists().join()) create().join();
+
+                load().join();
+
+                loaded = true;
+                future.complete(true);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Void> stop() {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The database '" + getId() + "' is not loaded");
+        }
+
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                unload().join();
+
+                for (MysqlTable table : getTables()) {
+                    if (table.isLoaded()) {
+                        table.stop().join();
+                    }
+                }
+                getTables().clear();
+
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
 
     @Override
@@ -84,11 +142,6 @@ public class MysqlDatabase extends Database {
 
         CompletableFuture.runAsync(() -> {
             try {
-                if (!exists().get(5, TimeUnit.SECONDS)) {
-                    create().get(5, TimeUnit.SECONDS);
-                }
-
-                tables = new LinkedHashSet<>();
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -108,7 +161,6 @@ public class MysqlDatabase extends Database {
 
         CompletableFuture.runAsync(() -> {
             try {
-                tables = null;
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -118,19 +170,28 @@ public class MysqlDatabase extends Database {
         return future;
     }
 
-    public final @NotNull CompletableFuture<Void> create() {
+    public @NotNull CompletableFuture<Boolean> create() {
         if (getAuthentication().getConnection() == null) {
             throw new IllegalStateException("This authentication aren't connected");
         }
 
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement statement = getAuthentication().getConnection().prepareStatement("CREATE DATABASE IF NOT EXISTS " + getId())) {
                 statement.execute();
-                future.complete(null);
+
+                if (!getAuthentication().getDatabases().contains(this)) {
+                    getAuthentication().getDatabases().add(this);
+                }
+
+                future.complete(true);
             } catch (Throwable throwable) {
-                future.completeExceptionally(throwable);
+                if (SqlUtils.getErrorCode(throwable) == 1007) {
+                    future.complete(false);
+                } else {
+                    future.completeExceptionally(throwable);
+                }
             }
         });
 
@@ -147,7 +208,13 @@ public class MysqlDatabase extends Database {
 
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement statement = getAuthentication().getConnection().prepareStatement("DROP DATABASE " + getId())) {
+                if (isLoaded()) {
+                    stop().join();
+                }
+
                 statement.execute();
+                getAuthentication().getDatabases().remove(this);
+
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -164,7 +231,7 @@ public class MysqlDatabase extends Database {
 
     @Override
     @Contract(pure = true)
-    public final boolean equals(@Nullable Object object) {
+    public boolean equals(@Nullable Object object) {
         if (this == object) return true;
         if (!(object instanceof MysqlDatabase)) return false;
         if (!super.equals(object)) return false;
@@ -173,7 +240,7 @@ public class MysqlDatabase extends Database {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hash(super.hashCode(), getAuthentication());
     }
 
@@ -184,7 +251,7 @@ public class MysqlDatabase extends Database {
                 '}';
     }
 
-    public final @NotNull CompletableFuture<Boolean> exists() throws SQLException {
+    public @NotNull CompletableFuture<Boolean> exists() throws SQLException {
         @Nullable Connection connection = getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");

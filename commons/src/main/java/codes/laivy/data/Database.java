@@ -23,7 +23,7 @@ public abstract class Database {
     protected boolean isNew = false;
 
     @ApiStatus.Internal
-    private volatile boolean loaded = false;
+    protected boolean loaded = false;
 
     /**
      * Constructs a Database instance with the specified id.
@@ -54,18 +54,19 @@ public abstract class Database {
      * @throws IllegalStateException If the database is already loaded
      * @since 2.0
      */
-    public final @NotNull CompletableFuture<Void> start() {
-        if (isLoaded()) {
-            throw new IllegalStateException("The database '" + getId() + "' is already loaded");
-        }
+    public @NotNull CompletableFuture<Boolean> start() {
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+        if (isLoaded()) {
+            return CompletableFuture.completedFuture(false);
+        }
 
         CompletableFuture.runAsync(() -> {
             try {
                 load().get(10, TimeUnit.SECONDS);
+
                 loaded = true;
-                future.complete(null);
+                future.complete(true);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
@@ -81,7 +82,7 @@ public abstract class Database {
      * @throws IllegalStateException If the database is not loaded
      * @since 2.0
      */
-    public final @NotNull CompletableFuture<Void> stop() {
+    public @NotNull CompletableFuture<Void> stop() {
         if (!isLoaded()) {
             throw new IllegalStateException("The database '" + getId() + "' is not loaded");
         }
