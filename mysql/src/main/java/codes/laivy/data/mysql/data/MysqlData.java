@@ -22,11 +22,7 @@ public final class MysqlData extends Data {
     // Static methods
 
     private static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
-
-    // TODO: 01/11/2023 This
-//    public static @NotNull CompletableFuture<Data> retrieve(@NotNull MysqlTable table, long row) {
-//
-//    }
+    
     public static @NotNull CompletableFuture<Data[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
@@ -48,17 +44,25 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Map<Long, MysqlData> datas = new TreeMap<>(Long::compare);
+                @NotNull Set<Long> excluded = new HashSet<>();
+                @NotNull Map<Long, MysqlData> datas = new TreeMap<>(Long::compare);
 
                 if (CACHED_LOADED_DATAS.containsKey(table)) {
-                    for (MysqlData data : CACHED_LOADED_DATAS.get(table).stream().filter(data -> data.isLoaded() && data.matches(conditions)).collect(Collectors.toList())) {
-                        datas.put(data.getRow(), data);
+
+                    for (MysqlData data : CACHED_LOADED_DATAS.get(table)) {
+                        if (data.isLoaded()) {
+                            excluded.add(data.getRow());
+
+                            if (data.matches(conditions)) {
+                                datas.put(data.getRow(), data);
+                            }
+                        }
                     }
                 }
 
                 // Retrieving on database
 
-                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getName() + "` " + SqlUtils.buildWhereCondition(datas.keySet(), conditions))) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getName() + "` " + SqlUtils.buildWhereCondition(excluded, conditions))) {
                     int index = 0;
                     for (@NotNull Condition<?> condition : conditions) {
                         //noinspection rawtypes
@@ -156,4 +160,24 @@ public final class MysqlData extends Data {
         return true;
     }
 
+    @Override
+    public boolean equals(@Nullable Object object) {
+        if (this == object) return true;
+        if (!(object instanceof MysqlData)) return false;
+        MysqlData data = (MysqlData) object;
+        return getRow() == data.getRow() && Objects.equals(getTable(), data.getTable());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTable(), getRow());
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "MysqlData{" +
+                "table=" + table +
+                ", row=" + row +
+                '}';
+    }
 }
