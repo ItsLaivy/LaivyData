@@ -4,8 +4,10 @@ import codes.laivy.data.data.Data;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
+import codes.laivy.data.mysql.variable.MysqlVariable;
 import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.mysql.variable.type.Type;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,12 +109,24 @@ public final class MysqlData extends Data {
 
     // Object
 
+    private final @NotNull Map<@NotNull MysqlVariable<?>, @Nullable Object> data = new HashMap<>();
+    private final @NotNull Map<@NotNull String, @Nullable Object> cache = new HashMap<>();
+
     private final @NotNull MysqlTable table;
     private long row;
 
     private MysqlData(@NotNull MysqlTable table, long row) {
         this.table = table;
         this.row = row;
+    }
+
+    @ApiStatus.Internal
+    public @NotNull Map<MysqlVariable<?>, Object> getData() {
+        return data;
+    }
+    @ApiStatus.Internal
+    public @NotNull Map<String, Object> getCache() {
+        return cache;
     }
 
     public long getRow() {
@@ -143,11 +157,43 @@ public final class MysqlData extends Data {
 
     @Override
     protected @NotNull CompletableFuture<Void> load() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (exists().join()) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                        ResultSet set = statement.executeQuery();
+                        set.next();
 
+                        for (int row = 1; row <= set.getMetaData().getColumnCount(); row++) {
+                            @NotNull String columnName = set.getMetaData().getColumnName(row);
+                            @Nullable Object object = set.getObject(row);
+
+                            @NotNull Optional<MysqlVariable<?>> variableOptional = getTable().getVariables().getById(columnName);
+                            if (variableOptional.isPresent()) {
+                                data.put(variableOptional.get(), object);
+                            } else {
+                                cache.put(columnName, object);
+                            }
+                        }
+
+                        if (set.next()) {
+                            throw new IllegalStateException("Multiples datas with the same id '" + getRow() + "' on table '" + getTable() + "'");
+                        }
+                    }
+                }
+
+                for (MysqlVariable<?> variable : getTable().getVariables()) {
+                    if (!data.containsKey(variable)) {
+                        data.put(variable, variable.getDefaultValue());
+                    }
+                }
 
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
@@ -160,6 +206,11 @@ public final class MysqlData extends Data {
 
     @Override
     protected @NotNull CompletableFuture<Void> unload(boolean save) {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
@@ -177,12 +228,24 @@ public final class MysqlData extends Data {
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
+                boolean exists = exists().join();
 
+                if (!exists) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (id) VALUES (" + getRow() + ")")) {
+                        statement.execute();
+                    }
+                }
 
+                isNew = !exists;
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
