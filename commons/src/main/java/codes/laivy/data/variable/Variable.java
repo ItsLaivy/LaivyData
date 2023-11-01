@@ -38,14 +38,6 @@ public abstract class Variable<T> {
     }
 
     /**
-     * Returns the function responsible for collecting default values for a receptor.
-     *
-     * @return A function that collects default values for the receptor
-     * @since 2.0
-     */
-    public abstract @NotNull Function<? super Receptor, T> getDefaultValue();
-
-    /**
      * Gets the id of the variable.
      * <p>
      * The id of variables must follow the database regexes; not all characters will be allowed here.
@@ -74,8 +66,10 @@ public abstract class Variable<T> {
 
         CompletableFuture.runAsync(() -> {
             try {
-                load().get(10, TimeUnit.SECONDS);
+                load().join();
                 loaded = true;
+
+                future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }

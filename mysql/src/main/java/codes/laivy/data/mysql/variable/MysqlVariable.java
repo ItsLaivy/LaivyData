@@ -1,8 +1,9 @@
 package codes.laivy.data.mysql.variable;
 
-import codes.laivy.data.mysql.MysqlDatabase;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
+import codes.laivy.data.mysql.variable.type.Type;
 import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -10,9 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class MysqlVariable<T> extends Variable<T> {
+public class MysqlVariable<T> extends Variable<T> {
 
     private final @NotNull MysqlTable table;
     private final @NotNull Type<T> type;
@@ -54,6 +56,8 @@ public abstract class MysqlVariable<T> extends Variable<T> {
         CompletableFuture.runAsync(() -> {
             try {
                 getType().configure(this).join();
+                getTable().getVariables().add(this);
+
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -66,7 +70,7 @@ public abstract class MysqlVariable<T> extends Variable<T> {
     @Override
     protected @NotNull CompletableFuture<Void> unload() {
         return CompletableFuture.runAsync(() -> {
-
+            getTable().getVariables().remove(this);
         });
     }
 
@@ -82,7 +86,7 @@ public abstract class MysqlVariable<T> extends Variable<T> {
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("ALTER TABLE `" + getDatabase().getId() + "`.`" + getTable().getName() + "` DROP COLUMN `" + getId() + "`")) {
                 if (isLoaded()) {
-                    unload().join();
+                    stop().join();
                 }
 
                 statement.execute();
@@ -90,6 +94,35 @@ public abstract class MysqlVariable<T> extends Variable<T> {
                 future.complete(true);
             } catch (@NotNull Throwable throwable) {
                 if (SqlUtils.getErrorCode(throwable) == 1091) {
+                    future.complete(false);
+                } else {
+                    future.completeExceptionally(throwable);
+                }
+            }
+        });
+
+        return future;
+    }
+
+    public @NotNull CompletableFuture<Boolean> exists() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` LIMIT 0")) {
+                @NotNull ResultSet set = statement.executeQuery();
+
+                if (set.findColumn(getId()) > 0) {
+                    future.complete(true);
+                } else {
+                    future.complete(false);
+                }
+            } catch (@NotNull Throwable throwable) {
+                if (SqlUtils.getErrorCode(throwable) == 0) {
                     future.complete(false);
                 } else {
                     future.completeExceptionally(throwable);
