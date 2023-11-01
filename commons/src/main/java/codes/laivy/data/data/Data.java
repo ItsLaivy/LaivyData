@@ -50,7 +50,7 @@ public abstract class Data {
         return future;
     }
 
-    public abstract @Nullable <T> T get(@NotNull String id);
+    public abstract @Nullable Object get(@NotNull String id);
 
     public abstract void set(@NotNull String id, @Nullable Object object);
 
