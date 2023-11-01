@@ -1,5 +1,7 @@
-import codes.laivy.data.mysql.MysqlAuthentication;
-import codes.laivy.data.mysql.MysqlDatabase;
+package codes.laivy.data.mysql;
+
+import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,11 +46,18 @@ public class MysqlDatabaseTest {
     public void testDelete() throws Exception {
         @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
         authentication.connect().get(5, TimeUnit.SECONDS);
-
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
         database.delete().get(5, TimeUnit.SECONDS);
 
-        Assert.assertFalse("Cannot correctly start mysql database", database.exists().get(1, TimeUnit.SECONDS));
+        Assert.assertFalse(database.isLoaded());
+        Assert.assertFalse(database.exists().get(2, TimeUnit.SECONDS));
+
+        database.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(database.isLoaded());
+
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+
+        Assert.assertFalse(database.isLoaded());
     }
 
 }

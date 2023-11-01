@@ -1,4 +1,6 @@
-import codes.laivy.data.mysql.MysqlAuthentication;
+package codes.laivy.data.mysql;
+
+import codes.laivy.data.mysql.authentication.MysqlAuthentication;
 import codes.laivy.data.mysql.MysqlVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
@@ -6,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 @TestOnly

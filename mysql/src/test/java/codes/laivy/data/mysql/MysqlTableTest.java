@@ -1,5 +1,7 @@
-import codes.laivy.data.mysql.MysqlAuthentication;
-import codes.laivy.data.mysql.MysqlDatabase;
+package codes.laivy.data.mysql;
+
+import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
@@ -55,9 +57,18 @@ public class MysqlTableTest {
         table.delete().get(2, TimeUnit.SECONDS);
 
         Assert.assertFalse(table.isLoaded());
+        Assert.assertFalse(table.exists().get(2, TimeUnit.SECONDS));
+
+        table.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(table.isLoaded());
+        Assert.assertTrue(table.exists().get(2, TimeUnit.SECONDS));
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
+
+        Assert.assertFalse(table.isLoaded());
+        Assert.assertFalse(table.exists().get(2, TimeUnit.SECONDS));
+
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 
