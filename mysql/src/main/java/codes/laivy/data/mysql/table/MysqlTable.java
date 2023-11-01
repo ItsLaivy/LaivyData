@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -147,6 +148,24 @@ public final class MysqlTable {
                 } else {
                     future.completeExceptionally(throwable);
                 }
+            }
+        });
+
+        return future;
+    }
+    public @NotNull CompletableFuture<Boolean> exists() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try (@NotNull ResultSet resultSet = connection.getMetaData().getTables(getDatabase().getId(), null, getName(), null)) {
+                future.complete(resultSet.next());
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
             }
         });
 

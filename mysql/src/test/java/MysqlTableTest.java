@@ -36,8 +36,6 @@ public class MysqlTableTest {
 
         table.stop().get(2, TimeUnit.SECONDS);
         Assert.assertFalse(table.isLoaded());
-
-        // TODO: 01/11/2023 Adicionar um exists pra Tble
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
