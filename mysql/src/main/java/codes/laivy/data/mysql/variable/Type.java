@@ -13,10 +13,9 @@ public interface Type<T> {
     /**
      * You can change the query for the variable here.
      * @param object the object that will be stored
-     * @param parameters the parameter manager of a variable
-     * @param metadata the statement metadata
+     * @param parameter the parameter of a variable
      */
-    void set(@Nullable T object, @NotNull ResultSet parameters, @Nullable ResultSetMetaData metadata);
+    void set(@NotNull Parameter parameter, @Nullable T object);
 
     /**
      * Here, you will convert the param object into the variable object again.
@@ -24,6 +23,8 @@ public interface Type<T> {
      * @return the variable final object
      */
     @Nullable T get(@Nullable Object object);
+
+    boolean isNullSupported();
 
     /**
      * Configures a {@link Variable} for the use of this variable type.

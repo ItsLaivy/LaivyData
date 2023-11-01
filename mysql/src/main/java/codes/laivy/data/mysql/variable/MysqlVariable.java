@@ -1,7 +1,7 @@
 package codes.laivy.data.mysql.variable;
 
 import codes.laivy.data.mysql.MysqlDatabase;
-import codes.laivy.data.mysql.MysqlTable;
+import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.Contract;
