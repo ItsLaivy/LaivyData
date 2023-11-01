@@ -4,7 +4,9 @@ import codes.laivy.data.data.Receptor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -162,5 +164,27 @@ public abstract class Variable<T> {
      */
     public final boolean isLoaded() {
         return loaded;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Variable)) return false;
+        Variable<?> variable = (Variable<?>) object;
+        return Objects.equals(getId(), variable.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "Variable{" +
+                "id='" + id + '\'' +
+                ", isNew=" + isNew +
+                ", loaded=" + loaded +
+                '}';
     }
 }

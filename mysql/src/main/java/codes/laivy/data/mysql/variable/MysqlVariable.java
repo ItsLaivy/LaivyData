@@ -45,8 +45,7 @@ public abstract class MysqlVariable<T> extends Variable<T> {
 
     @Override
     protected @NotNull CompletableFuture<Void> load() {
-        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
-        if (connection == null) {
+        if (getDatabase().getAuthentication().getConnection() == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
         }
 
