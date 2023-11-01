@@ -5,7 +5,6 @@ import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import codes.laivy.data.mysql.variable.type.MysqlTinyTextType;
-import jdk.nashorn.internal.scripts.JO;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -73,6 +72,8 @@ public class MysqlVariableTest {
 
         Assert.assertFalse(variable.isLoaded());
         Assert.assertFalse(variable.exists().get(2, TimeUnit.SECONDS));
+
+        variable.start().get(2, TimeUnit.SECONDS);
         //
 
         database.delete().get(2, TimeUnit.SECONDS);

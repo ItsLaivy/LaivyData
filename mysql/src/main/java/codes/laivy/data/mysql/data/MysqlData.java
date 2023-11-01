@@ -115,19 +115,19 @@ public final class MysqlData extends Data {
         this.row = row;
     }
 
-    public final long getRow() {
+    public long getRow() {
         return row;
     }
 
     // TODO: 01/11/2023 setRow
 
     @Contract(pure = true)
-    public final @NotNull MysqlDatabase getDatabase() {
+    public @NotNull MysqlDatabase getDatabase() {
         return getTable().getDatabase();
     }
 
     @Contract(pure = true)
-    public final @NotNull MysqlTable getTable() {
+    public @NotNull MysqlTable getTable() {
         return table;
     }
 
@@ -143,17 +143,82 @@ public final class MysqlData extends Data {
 
     @Override
     protected @NotNull CompletableFuture<Void> load() {
-        return null;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
 
     @Override
     protected @NotNull CompletableFuture<Void> unload(boolean save) {
-        return null;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
-        return null;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
+    public @NotNull CompletableFuture<Boolean> exists() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                boolean tableExists = getTable().exists().join();
+
+                if (tableExists) {
+                    try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                        ResultSet set = statement.executeQuery();
+                        future.complete(set.next());
+                        return;
+                    }
+                }
+
+                future.complete(false);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
 
     public boolean matches(@NotNull Condition<?> @NotNull [] conditions) {

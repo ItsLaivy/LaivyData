@@ -170,8 +170,17 @@ public final class MysqlTable {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (@NotNull ResultSet resultSet = connection.getMetaData().getTables(getDatabase().getId(), null, getName(), null)) {
-                future.complete(resultSet.next());
+            try {
+                boolean databaseExists = getDatabase().exists().join();
+
+                if (databaseExists) {
+                    try (@NotNull ResultSet resultSet = connection.getMetaData().getTables(getDatabase().getId(), null, getName(), null)) {
+                        future.complete(resultSet.next());
+                        return;
+                    }
+                }
+
+                future.complete(databaseExists);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
