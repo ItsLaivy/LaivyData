@@ -1,7 +1,8 @@
 package codes.laivy.data.mysql.table;
 
-import codes.laivy.data.mysql.MysqlDatabase;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.utils.SqlUtils;
+import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public final class MysqlTable {
 
@@ -43,11 +43,11 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                getVariables().clear();
-                load().get(10, TimeUnit.SECONDS);
+                load().join();
+
+                getDatabase().getTables().add(this);
 
                 loaded = true;
-
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -65,10 +65,18 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                unload().get(10, TimeUnit.SECONDS);
-                getVariables().clear();
-                loaded = false;
+                unload().join();
 
+                for (MysqlVariable<?> variable : getVariables()) {
+                    if (variable.isLoaded()) {
+                        variable.stop().join();
+                    }
+                }
+                getVariables().clear();
+
+                getDatabase().getTables().remove(this);
+
+                loaded = false;
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -173,12 +181,12 @@ public final class MysqlTable {
     }
 
     @Contract(pure = true)
-    public final @NotNull String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
     @Contract(pure = true)
-    public final @NotNull MysqlDatabase getDatabase() {
+    public @NotNull MysqlDatabase getDatabase() {
         return database;
     }
 
@@ -192,7 +200,7 @@ public final class MysqlTable {
 
     @Override
     @Contract(pure = true)
-    public final boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (this == object) return true;
         if (!(object instanceof MysqlTable)) return false;
         MysqlTable that = (MysqlTable) object;
@@ -200,7 +208,7 @@ public final class MysqlTable {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hash(getName(), getDatabase());
     }
 
