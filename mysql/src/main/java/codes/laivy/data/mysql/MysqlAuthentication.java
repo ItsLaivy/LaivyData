@@ -79,6 +79,7 @@ public class MysqlAuthentication {
         return port;
     }
 
+    // TODO: 01/11/2023 Javadoc
     protected boolean isAutoCommit() {
         return true;
     }
@@ -96,7 +97,6 @@ public class MysqlAuthentication {
         }
 
         @NotNull CompletableFuture<Connection> future = new CompletableFuture<>();
-        // future.orTimeout(10, TimeUnit.SECONDS); // Not available in Java 8
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -104,8 +104,10 @@ public class MysqlAuthentication {
                 this.connection = load().get(10, TimeUnit.SECONDS);
                 this.connection.setAutoCommit(isAutoCommit());
 
-                version = MysqlVersion.of(version());
-                databases = loadDatabases();
+                @NotNull DatabaseMetaData metadata = getConnection().getMetaData();
+
+                version = MysqlVersion.of(metadata.getDatabaseMinorVersion(), metadata.getDatabaseMajorVersion(), metadata.getDatabaseProductVersion());
+                databases = loadDatabases(metadata);
 
                 future.complete(connection);
             } catch (Throwable throwable) {
@@ -124,24 +126,19 @@ public class MysqlAuthentication {
     }
 
     @Blocking
-    private @NotNull Set<MysqlDatabase> loadDatabases() throws Throwable {
-        if (getConnection() == null) {
-            throw new IllegalStateException("This authentication already are connected!");
+    private @NotNull Set<MysqlDatabase> loadDatabases(@NotNull DatabaseMetaData metaData) throws Throwable {
+        @NotNull ResultSet set = metaData.getCatalogs();
+        @NotNull Set<MysqlDatabase> databases = new LinkedHashSet<>();
+
+        while (set.next()) {
+            @NotNull String databaseName = set.getString(1);
+            @NotNull MysqlDatabase database = new MysqlDatabase(this, databaseName);
+
+            database.start().get(2, TimeUnit.SECONDS);
+            databases.add(database);
         }
 
-        try (PreparedStatement statement = getConnection().prepareStatement("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA;")) {
-            @NotNull ResultSet set = statement.executeQuery();
-            @NotNull Set<MysqlDatabase> databases = new LinkedHashSet<>();
-
-            while (set.next()) {
-                @NotNull MysqlDatabase database = new MysqlDatabase(this, set.getString(1));
-                database.start().get(2, TimeUnit.SECONDS);
-
-                databases.add(database);
-            }
-
-            return databases;
-        }
+        return databases;
     }
 
     /**
@@ -205,7 +202,6 @@ public class MysqlAuthentication {
     @ApiStatus.OverrideOnly
     protected @NotNull CompletableFuture<Connection> load() {
         @NotNull CompletableFuture<Connection> future = new CompletableFuture<>();
-        // future.orTimeout(10, TimeUnit.SECONDS); // Not available in Java 8
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -224,19 +220,6 @@ public class MysqlAuthentication {
         return future;
     }
 
-    private @NotNull String version() throws SQLException {
-        if (isConnected()) {
-            try (PreparedStatement statement = getConnection().prepareStatement("SELECT @@version")) {
-                @NotNull ResultSet set = statement.executeQuery();
-                set.next();
-
-                return set.getString(1);
-            }
-        } else {
-            throw new SQLException("The authentication aren't connected");
-        }
-    }
-
     /**
      * Checks the connection's validity and attempts reconnection if necessary.
      * <p>
@@ -246,7 +229,7 @@ public class MysqlAuthentication {
      * @throws RuntimeException If the connection is closed by the server-side or is no longer valid
      * @since 1.0
      */
-    private void checkConnection() {
+    protected void checkConnection() {
         if (isConnected()) {
             try {
                 boolean valid = getConnection().isValid(2);

@@ -41,24 +41,12 @@ public final class MysqlVersion {
      * @since 2.0
      */
     @Contract(pure = true)
-    public static @NotNull MysqlVersion of(@NotNull String fullVersion) {
+    public static @NotNull MysqlVersion of(int minor, int major, @NotNull String fullVersion) {
         if (fullVersion.length() > 256) {
             throw new IllegalStateException("Invalid version size");
         }
 
-        if (!fullVersion.matches("[0-9]+(\\.[0-9]+)?")) {
-            try {
-                String[] split = fullVersion.split("\\.");
-                int major = Integer.parseInt(split[0]);
-                int minor = Integer.parseInt(split[1]);
-
-                return new MysqlVersion(fullVersion, major, minor);
-            } catch (Throwable throwable) {
-                throw new IllegalStateException("Cannot extract major and minor version from '" + fullVersion + "'");
-            }
-        } else {
-            throw new IllegalStateException("This isn't a valid MySQL version '" + fullVersion + "'");
-        }
+        return new MysqlVersion(fullVersion, major, minor);
     }
 
     /**
