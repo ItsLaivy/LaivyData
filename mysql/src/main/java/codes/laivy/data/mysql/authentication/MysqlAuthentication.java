@@ -1,5 +1,7 @@
-package codes.laivy.data.mysql;
+package codes.laivy.data.mysql.authentication;
 
+import codes.laivy.data.mysql.MysqlVersion;
+import codes.laivy.data.mysql.database.MysqlDatabase;
 import org.jetbrains.annotations.*;
 
 import java.net.InetAddress;
@@ -21,30 +23,26 @@ public class MysqlAuthentication {
     @Range(from = 0, to = 65535)
     private final int port;
 
+    private final @NotNull Databases databases;
+
     @ApiStatus.Internal
     private @Nullable Connection connection;
 
     protected @Nullable ScheduledExecutorService keepAliveExecutor;
     protected @Nullable MysqlVersion version;
 
-    // Cache
-    protected @Nullable Set<@NotNull MysqlDatabase> databases;
-    //
-
     public MysqlAuthentication(@NotNull String username, @Nullable String password, @NotNull InetAddress hostname, @Range(from = 0, to = 65535) int port) {
         this.username = username;
         this.password = password;
         this.hostname = hostname;
         this.port = port;
+
+        this.databases = new Databases(this);
     }
 
     @Unmodifiable
-    public @NotNull MysqlDatabase @NotNull [] getDatabases() {
-        if (databases == null) {
-            throw new IllegalStateException("This authentication already are connected!");
-        }
-
-        return databases.toArray(new MysqlDatabase[0]);
+    public @NotNull Databases getDatabases() {
+        return databases;
     }
 
     /**
@@ -79,6 +77,8 @@ public class MysqlAuthentication {
         return port;
     }
 
+
+
     // TODO: 01/11/2023 Javadoc
     protected boolean isAutoCommit() {
         return true;
@@ -107,7 +107,10 @@ public class MysqlAuthentication {
                 @NotNull DatabaseMetaData metadata = getConnection().getMetaData();
 
                 version = MysqlVersion.of(metadata.getDatabaseMinorVersion(), metadata.getDatabaseMajorVersion(), metadata.getDatabaseProductVersion());
-                databases = loadDatabases(metadata);
+
+                for (@NotNull MysqlDatabase database : loadDatabases(metadata)) {
+                    getDatabases().add(database);
+                }
 
                 future.complete(connection);
             } catch (Throwable throwable) {
@@ -132,7 +135,7 @@ public class MysqlAuthentication {
 
         while (set.next()) {
             @NotNull String databaseName = set.getString(1);
-            @NotNull MysqlDatabase database = new MysqlDatabase(this, databaseName);
+            @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(this, databaseName);
 
             database.start().get(2, TimeUnit.SECONDS);
             databases.add(database);
@@ -181,9 +184,18 @@ public class MysqlAuthentication {
 
         CompletableFuture.runAsync(() -> {
             try {
-                unload().get(10, TimeUnit.SECONDS);
+                unload().join();
+
+                for (MysqlDatabase database : getDatabases()) {
+                    if (database.isLoaded()) {
+                        database.stop().join();
+                    }
+                }
+                getDatabases().clear();
+
+                connection.close();
                 connection = null;
-                databases = null;
+
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -221,29 +233,6 @@ public class MysqlAuthentication {
     }
 
     /**
-     * Checks the connection's validity and attempts reconnection if necessary.
-     * <p>
-     * This method is called periodically to verify the connection's state.
-     * If the connection is closed or not valid, it attempts reconnection within a timeout.
-     *
-     * @throws RuntimeException If the connection is closed by the server-side or is no longer valid
-     * @since 1.0
-     */
-    protected void checkConnection() {
-        if (isConnected()) {
-            try {
-                boolean valid = getConnection().isValid(2);
-
-                if (!valid) {
-                    reconnect().get(5, TimeUnit.SECONDS);
-                }
-            } catch (Throwable throwable) {
-                throw new RuntimeException("Connection closed by server-side or is not valid anymore", throwable);
-            }
-        }
-    }
-
-    /**
      * Unloads the authentication, releasing resources.
      *
      * @return A CompletableFuture representing the asynchronous unload operation
@@ -267,7 +256,6 @@ public class MysqlAuthentication {
                         connection.commit();
                     }
 
-                    connection.close();
                     future.complete(null);
                 } catch (Throwable throwable) {
                     future.completeExceptionally(throwable);
@@ -275,6 +263,29 @@ public class MysqlAuthentication {
             });
 
             return future;
+        }
+    }
+
+    /**
+     * Checks the connection's validity and attempts reconnection if necessary.
+     * <p>
+     * This method is called periodically to verify the connection's state.
+     * If the connection is closed or not valid, it attempts reconnection within a timeout.
+     *
+     * @throws RuntimeException If the connection is closed by the server-side or is no longer valid
+     * @since 1.0
+     */
+    protected void checkConnection() {
+        if (isConnected()) {
+            try {
+                boolean valid = getConnection().isValid(2);
+
+                if (!valid) {
+                    reconnect().get(5, TimeUnit.SECONDS);
+                }
+            } catch (Throwable throwable) {
+                throw new RuntimeException("Connection closed by server-side or is not valid anymore", throwable);
+            }
         }
     }
 
