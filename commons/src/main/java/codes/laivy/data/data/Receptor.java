@@ -1,6 +1,5 @@
 package codes.laivy.data.data;
 
-import codes.laivy.data.Database;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,14 +20,12 @@ public abstract class Receptor extends Data {
      * Constructs a Receptor instance with the specified id and associated database.
      *
      * @param id       The unique id of the receptor
-     * @param database The database instance
      * @throws UnsupportedOperationException If the id does not match the pattern
      *
      * @author Laivy
      * @since 1.0
      */
-    protected Receptor(@NotNull String id, @NotNull Database database) {
-        super(database);
+    protected Receptor(@NotNull String id) {
         this.id = id;
 
         if (!getPattern().matcher(id).matches()) {

@@ -42,9 +42,13 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
+                getVariables().clear();
                 load().get(10, TimeUnit.SECONDS);
+
                 loaded = true;
-            } catch (Throwable throwable) {
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
@@ -61,9 +65,11 @@ public final class MysqlTable {
         CompletableFuture.runAsync(() -> {
             try {
                 unload().get(10, TimeUnit.SECONDS);
+                getVariables().clear();
                 loaded = false;
+
                 future.complete(null);
-            } catch (Throwable throwable) {
+            } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
@@ -75,7 +81,13 @@ public final class MysqlTable {
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            create().join();
+            try {
+                create().join();
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
 
         return future;
@@ -123,7 +135,7 @@ public final class MysqlTable {
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("DROP TABLE `" + getDatabase().getId() + "`.`" + getName() + "`")) {
                 if (isLoaded()) {
-                    unload().join();
+                    stop().join();
                 }
 
                 statement.execute();

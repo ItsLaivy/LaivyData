@@ -1,5 +1,6 @@
 import codes.laivy.data.mysql.MysqlAuthentication;
 import codes.laivy.data.mysql.MysqlDatabase;
+import codes.laivy.data.mysql.table.MysqlTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,14 +8,14 @@ import org.junit.Test;
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
-public class MysqlDatabaseTest {
+public class MysqlTableTest {
 
     public final @NotNull String USERNAME;
     public final @NotNull String PASSWORD;
     public final @NotNull InetAddress ADDRESS;
     public final int PORT;
 
-    public MysqlDatabaseTest() throws Throwable {
+    public MysqlTableTest() throws Throwable {
         PASSWORD = "";
         USERNAME = "root";
         PORT = 3306;
@@ -25,18 +26,21 @@ public class MysqlDatabaseTest {
     public void testLoadAndUnload() throws Exception {
         @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
         authentication.connect().get(5, TimeUnit.SECONDS);
-
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
-        if (!database.isLoaded()) {
-            database.start().get(2, TimeUnit.SECONDS);
-        }
+        database.start().get(2, TimeUnit.SECONDS);
 
-        Assert.assertTrue("Cannot check if mysql database exists after created", database.exists().get(1, TimeUnit.SECONDS));
-        Assert.assertTrue("Cannot correctly start mysql database", database.isLoaded());
+        // Table code
+        MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(table.isLoaded());
 
-        database.stop().get(5, TimeUnit.SECONDS);
-        Assert.assertFalse("Cannot correctly stop mysql database", database.isLoaded());
+        table.stop().get(2, TimeUnit.SECONDS);
+        Assert.assertFalse(table.isLoaded());
 
+        // TODO: 01/11/2023 Adicionar um exists pra Tble
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 
@@ -44,11 +48,19 @@ public class MysqlDatabaseTest {
     public void testDelete() throws Exception {
         @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
         authentication.connect().get(5, TimeUnit.SECONDS);
-
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
-        database.delete().get(5, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
 
-        Assert.assertFalse("Cannot correctly start mysql database", database.exists().get(1, TimeUnit.SECONDS));
+        // Table code
+        MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+        table.delete().get(2, TimeUnit.SECONDS);
+
+        Assert.assertFalse(table.isLoaded());
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 
 }
