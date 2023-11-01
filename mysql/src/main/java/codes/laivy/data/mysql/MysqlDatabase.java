@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -184,18 +185,25 @@ public class MysqlDatabase extends Database {
     }
 
     public final @NotNull CompletableFuture<Boolean> exists() throws SQLException {
-        if (getAuthentication().getConnection() == null) {
-            throw new IllegalStateException("This authentication aren't connected");
+        @Nullable Connection connection = getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
         }
 
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getAuthentication().getConnection().prepareStatement("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?;")) {
-                statement.setString(1, getId());
-                @NotNull ResultSet set = statement.executeQuery();
-                future.complete(set.next());
-            } catch (Throwable throwable) {
+            try (@NotNull ResultSet resultSet = connection.getMetaData().getCatalogs()) {
+                while (resultSet.next()) {
+                    @NotNull String databaseName = resultSet.getString(1);
+                    if (databaseName.equalsIgnoreCase(getId())) {
+                        future.complete(true);
+                        return;
+                    }
+                }
+
+                future.complete(false);
+            } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
