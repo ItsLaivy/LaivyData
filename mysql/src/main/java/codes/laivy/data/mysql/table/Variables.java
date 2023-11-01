@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 
 public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
 
@@ -22,6 +23,10 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
     @Contract(pure = true)
     public @NotNull MysqlTable getTable() {
         return table;
+    }
+
+    public @NotNull Optional<MysqlVariable<?>> getById(@NotNull String id) {
+        return stream().filter(v -> v.getId().equalsIgnoreCase(id)).findFirst();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class MysqlVariableTest {
         table.start().get(2, TimeUnit.SECONDS);
 
         // Variable code
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType());
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType(), null);
         variable.start().get(2, TimeUnit.SECONDS);
         Assert.assertTrue(table.isLoaded());
 
@@ -62,7 +62,7 @@ public class MysqlVariableTest {
         table.start().get(2, TimeUnit.SECONDS);
 
         // Table code
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType());
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType(), null);
         variable.start().get(2, TimeUnit.SECONDS);
 
         Assert.assertTrue(variable.isLoaded());

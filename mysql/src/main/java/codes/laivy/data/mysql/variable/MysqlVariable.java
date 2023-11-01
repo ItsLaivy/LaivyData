@@ -19,11 +19,14 @@ public class MysqlVariable<T> extends Variable<T> {
     private final @NotNull MysqlTable table;
     private final @NotNull Type<T> type;
 
-    public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type) {
+    private final @Nullable T defaultValue;
+
+    public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @Nullable T defaultValue) {
         super(id);
 
         this.table = table;
         this.type = type;
+        this.defaultValue = defaultValue;
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This variable id '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
@@ -43,6 +46,10 @@ public class MysqlVariable<T> extends Variable<T> {
     @Contract(pure = true)
     public final @NotNull Type<T> getType() {
         return type;
+    }
+
+    public final @Nullable T getDefaultValue() {
+        return defaultValue;
     }
 
     @Override
