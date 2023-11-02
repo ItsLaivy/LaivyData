@@ -47,7 +47,7 @@ public class MysqlTextType extends AbstractType<String> {
 
         @NotNull String string;
         if (object instanceof String) {
-            return (String) object;
+            string = (String) object;
         } else {
             string = String.valueOf(object);
         }
