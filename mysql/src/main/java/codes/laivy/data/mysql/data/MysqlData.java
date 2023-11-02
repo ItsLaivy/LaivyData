@@ -291,26 +291,20 @@ public final class MysqlData extends Data {
                     throw new IllegalStateException("The table of this data aren't loaded or created");
                 }
 
-                if (!exists().join()) {
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getId() + "` (`row`) VALUES (" + getRow() + ")")) {
-                        statement.execute();
-                    }
-                }
-
                 @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
 
-                if (!variables.isEmpty()) {
-                    @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
+                if (!exists().join()) {
+                    @NotNull StringBuilder variableString = new StringBuilder();
+                    @NotNull StringBuilder valueString = new StringBuilder();
 
-                    int row = 0;
                     for (MysqlVariable<?> variable : variables) {
-                        if (row > 0) builder.append(",");
-                        builder.append("`").append(variable.getId()).append("` = ?");
-                        row++;
+                        variableString.append(",");
+                        variableString.append("`").append(variable.getId()).append("`");
+                        valueString.append(",?");
                     }
 
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
-                        row = 0;
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getId() + "` (`row`" + variableString + ") VALUES (" + getRow() + valueString + ")")) {
+                        int row = 0;
                         //noinspection rawtypes
                         for (MysqlVariable variable : variables) {
                             //noinspection unchecked
@@ -320,7 +314,31 @@ public final class MysqlData extends Data {
 
                         statement.execute();
                     }
+                } else {
+                    if (!variables.isEmpty()) {
+                        @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
+
+                        int row = 0;
+                        for (MysqlVariable<?> variable : variables) {
+                            if (row > 0) builder.append(",");
+                            builder.append("`").append(variable.getId()).append("` = ?");
+                            row++;
+                        }
+
+                        try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
+                            row = 0;
+                            //noinspection rawtypes
+                            for (MysqlVariable variable : variables) {
+                                //noinspection unchecked
+                                variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), get(variable));
+                                row++;
+                            }
+
+                            statement.execute();
+                        }
+                    }
                 }
+
 
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
