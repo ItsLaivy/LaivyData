@@ -21,6 +21,8 @@ public final class MysqlTable {
     private final @NotNull MysqlDatabase database;
     private final @NotNull Variables variables;
 
+    private final @NotNull AutoIncrement autoIncrement = AutoIncrement.of(this);
+
     @ApiStatus.Internal
     private boolean loaded = false;
 
@@ -196,28 +198,10 @@ public final class MysqlTable {
 
         return future;
     }
-    public @NotNull CompletableFuture<Long> getAutoIncrement() {
-        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
-        if (connection == null) {
-            throw new IllegalStateException("The database's authentication aren't connected");
-        }
 
-        @NotNull CompletableFuture<Long> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + getDatabase().getId() + "` LIKE '" + getName() + "'")) {
-                    @NotNull ResultSet set = statement.executeQuery();
-                    set.next();
-
-                    future.complete(set.getLong("auto_increment"));
-                }
-            } catch (@NotNull Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
+    @Contract(pure = true)
+    public @NotNull AutoIncrement getAutoIncrement() {
+        return autoIncrement;
     }
 
     @Contract(pure = true)

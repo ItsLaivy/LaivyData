@@ -82,13 +82,13 @@ public class MysqlTableTest {
         // Table code
         MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
-        Assert.assertEquals((Long) 1L, table.getAutoIncrement().get(2, TimeUnit.SECONDS));
+        Assert.assertEquals((Long) 1L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
 
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
         data.stop(true).get(2, TimeUnit.SECONDS);
 
-        Assert.assertEquals((Long) 2L, table.getAutoIncrement().get(2, TimeUnit.SECONDS));
+        Assert.assertEquals((Long) 2L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
