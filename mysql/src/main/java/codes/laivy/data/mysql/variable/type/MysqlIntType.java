@@ -6,17 +6,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlFloatType extends AbstractType<Float> {
+public class MysqlIntType extends AbstractType<Integer> {
 
-    public MysqlFloatType() {
-        super("FLOAT");
+    public MysqlIntType() {
+        super("INT");
     }
 
     @Override
-    public void set(@NotNull Parameter parameter, @Nullable Float value) {
+    public void set(@NotNull Parameter parameter, @Nullable Integer value) {
         try {
             if (value != null) {
-                parameter.setFloat(value);
+                parameter.setInt(value);
             } else {
                 parameter.setNull();
             }
@@ -26,16 +26,16 @@ public class MysqlFloatType extends AbstractType<Float> {
     }
 
     @Override
-    public @Nullable Float get(@Nullable Object object) {
+    public @Nullable Integer get(@Nullable Object object) {
         if (object == null) {
             return null;
         }
 
-        float value;
-        if (object instanceof Float) {
-            value = (Float) object;
+        int value;
+        if (object instanceof Integer) {
+            value = (Integer) object;
         } else {
-            value = Float.parseFloat(String.valueOf(object));
+            value = Integer.parseInt(String.valueOf(object));
         }
 
         return value;

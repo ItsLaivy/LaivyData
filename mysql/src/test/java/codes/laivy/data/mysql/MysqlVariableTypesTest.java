@@ -136,5 +136,24 @@ public class MysqlVariableTypesTest {
             }
         }));
     }
+    @Test
+    public void testIntType() throws Exception {
+        generate((table -> {
+            try {
+                int expected = 100;
+
+                @NotNull MysqlVariable<Integer> variable = new MysqlVariable<>("test_var", table, new MysqlIntType(), expected);
+                variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals((Integer) expected, data.get(variable));
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        }));
+    }
 
 }
