@@ -5,7 +5,7 @@ import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
-import codes.laivy.data.mysql.variable.type.MysqlTinyTextType;
+import codes.laivy.data.mysql.variable.type.MysqlTextType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class MysqlDataTest {
 
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType(), null);
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), null);
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
@@ -75,7 +75,7 @@ public class MysqlDataTest {
 
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType(), null);
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), null);
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
@@ -107,7 +107,7 @@ public class MysqlDataTest {
 
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTinyTextType(), expected);
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
