@@ -94,7 +94,12 @@ public final class MysqlDatabase extends Database {
 
         CompletableFuture.runAsync(() -> {
             try {
-                if (!exists().join()) create().join();
+                if (!exists().join()) {
+                    isNew = true;
+                    create().join();
+                } else {
+                    isNew = false;
+                }
 
                 load().join();
 
@@ -139,36 +144,12 @@ public final class MysqlDatabase extends Database {
 
     @Override
     protected @NotNull CompletableFuture<Void> load() {
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                future.complete(null);
-            } catch (@NotNull Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     protected @NotNull CompletableFuture<Void> unload() {
-        if (getAuthentication().getConnection() == null) {
-            throw new IllegalStateException("This authentication aren't connected");
-        }
-
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                future.complete(null);
-            } catch (Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
+        return CompletableFuture.completedFuture(null);
     }
 
     public @NotNull CompletableFuture<Boolean> create() {

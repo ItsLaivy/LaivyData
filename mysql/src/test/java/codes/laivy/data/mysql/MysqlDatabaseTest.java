@@ -31,13 +31,20 @@ public class MysqlDatabaseTest {
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
         database.start().get(2, TimeUnit.SECONDS);
 
-        Assert.assertTrue("Cannot check if mysql database exists after created", database.exists().get(1, TimeUnit.SECONDS));
-        Assert.assertTrue("Cannot correctly start mysql database", database.isLoaded());
+        Assert.assertTrue(database.isNew());
+        Assert.assertTrue(database.exists().get(1, TimeUnit.SECONDS));
+        Assert.assertTrue(database.isLoaded());
 
         database.stop().get(5, TimeUnit.SECONDS);
-        Assert.assertFalse("Cannot correctly stop mysql database", database.isLoaded());
+        Assert.assertFalse(database.isLoaded());
+
+        database.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(database.isLoaded());
+        Assert.assertFalse(database.isNew());
 
         authentication.disconnect().get(5, TimeUnit.SECONDS);
+
+        Assert.assertFalse(database.isLoaded());
     }
 
     @Test
