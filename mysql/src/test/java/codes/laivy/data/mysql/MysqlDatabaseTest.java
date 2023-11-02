@@ -29,9 +29,7 @@ public class MysqlDatabaseTest {
         authentication.connect().get(5, TimeUnit.SECONDS);
 
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
-        if (!database.isLoaded()) {
-            database.start().get(2, TimeUnit.SECONDS);
-        }
+        database.start().get(2, TimeUnit.SECONDS);
 
         Assert.assertTrue("Cannot check if mysql database exists after created", database.exists().get(1, TimeUnit.SECONDS));
         Assert.assertTrue("Cannot correctly start mysql database", database.isLoaded());

@@ -147,12 +147,39 @@ public final class MysqlData extends Data {
 
     @Override
     public @Nullable Object get(@NotNull String id) {
-        return null;
+        @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
+
+        if (!optional.isPresent() || !data.containsKey(optional.get())) {
+            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+        }
+
+        return data.get(optional.get());
+    }
+    public <T> @Nullable T set(@NotNull MysqlVariable<T> variable) {
+        if (!data.containsKey(variable)) {
+            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+        }
+
+        //noinspection unchecked
+        return (T) data.get(variable);
     }
 
     @Override
     public void set(@NotNull String id, @Nullable Object object) {
+        @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
 
+        if (!optional.isPresent() || !data.containsKey(optional.get())) {
+            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+        }
+
+        data.put(optional.get(), object);
+    }
+    public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
+        if (!data.containsKey(variable)) {
+            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+        }
+
+        data.put(variable, object);
     }
 
     @Override
@@ -177,7 +204,8 @@ public final class MysqlData extends Data {
 
                             @NotNull Optional<MysqlVariable<?>> variableOptional = getTable().getVariables().getById(columnName);
                             if (variableOptional.isPresent()) {
-                                data.put(variableOptional.get(), object);
+                                @NotNull MysqlVariable<?> variable = variableOptional.get();
+                                data.put(variableOptional.get(), variable.getType().get(object));
                             } else {
                                 cache.put(columnName, object);
                             }
@@ -215,7 +243,12 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (save) {
+                    save().join();
+                }
 
+                data.clear();
+                cache.clear();
 
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
@@ -240,7 +273,7 @@ public final class MysqlData extends Data {
                 boolean exists = exists().join();
 
                 if (!exists) {
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (id) VALUES (" + getRow() + ")")) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (`row`) VALUES (" + getRow() + ")")) {
                         statement.execute();
                     }
                 }
@@ -270,7 +303,8 @@ public final class MysqlData extends Data {
                 if (tableExists) {
                     try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
-                        future.complete(set.next());
+
+                        future.complete(set.getFetchSize() > 0);
                         return;
                     }
                 }

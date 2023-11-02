@@ -85,6 +85,7 @@ public abstract class Data {
         CompletableFuture.runAsync(() -> {
             try {
                 unload(save).get(10, TimeUnit.SECONDS);
+
                 loaded = false;
                 future.complete(null);
             } catch (Throwable throwable) {
