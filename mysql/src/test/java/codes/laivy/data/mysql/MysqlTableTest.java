@@ -1,6 +1,7 @@
 package codes.laivy.data.mysql;
 
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +70,28 @@ public class MysqlTableTest {
         Assert.assertFalse(table.isLoaded());
         Assert.assertFalse(table.exists().get(2, TimeUnit.SECONDS));
 
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+    @Test
+    public void testAutoIncrement() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        // Table code
+        MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+        Assert.assertEquals((Long) 1L, table.getAutoIncrement().get(2, TimeUnit.SECONDS));
+
+        @NotNull MysqlData data = MysqlData.retrieve(table, 1);
+        data.start().get(2, TimeUnit.SECONDS);
+        data.stop(true).get(2, TimeUnit.SECONDS);
+
+        Assert.assertEquals((Long) 2L, table.getAutoIncrement().get(2, TimeUnit.SECONDS));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 

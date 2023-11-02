@@ -9,10 +9,13 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public final class MysqlTable {
@@ -189,6 +192,29 @@ public final class MysqlTable {
                 }
 
                 future.complete(false);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+    public @NotNull CompletableFuture<Long> getAutoIncrement() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Long> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + getDatabase().getId() + "` LIKE '" + getName() + "'")) {
+                    @NotNull ResultSet set = statement.executeQuery();
+                    set.next();
+
+                    future.complete(set.getLong("auto_increment"));
+                }
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
