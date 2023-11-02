@@ -38,12 +38,14 @@ public class MysqlVariableTest {
         // Variable code
         @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), null);
         variable.start().get(2, TimeUnit.SECONDS);
-        Assert.assertTrue(table.isLoaded());
+        Assert.assertTrue(variable.isLoaded());
+        Assert.assertTrue(variable.isNew());
 
         variable.stop().get(2, TimeUnit.SECONDS);
         Assert.assertFalse(variable.isLoaded());
         variable.start().get(2, TimeUnit.SECONDS);
         Assert.assertTrue(variable.isLoaded());
+        Assert.assertFalse(variable.isNew());
         //
 
         database.delete().get(2, TimeUnit.SECONDS);

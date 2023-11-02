@@ -22,10 +22,10 @@ public abstract class Variable<T> {
 
     private final @NotNull String id;
 
-    protected volatile boolean isNew = false;
+    protected boolean isNew = false;
 
     @ApiStatus.Internal
-    private volatile boolean loaded = false;
+    private boolean loaded = false;
 
     /**
      * Constructs a Variable instance with the specified id and associated database.

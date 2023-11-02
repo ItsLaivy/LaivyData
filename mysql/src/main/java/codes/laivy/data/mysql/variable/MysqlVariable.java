@@ -22,9 +22,6 @@ public class MysqlVariable<T> extends Variable<T> {
 
     private final @Nullable T defaultValue;
 
-    @ApiStatus.Internal
-    private boolean isNew = false;
-
     public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @Nullable T defaultValue) {
         super(id);
 
@@ -66,6 +63,7 @@ public class MysqlVariable<T> extends Variable<T> {
 
         CompletableFuture.runAsync(() -> {
             try {
+                isNew = !exists().join();
                 getType().configure(this).join();
                 getTable().getVariables().add(this);
 
