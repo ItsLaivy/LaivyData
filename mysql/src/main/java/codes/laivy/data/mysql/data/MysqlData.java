@@ -23,8 +23,6 @@ public final class MysqlData extends Data {
 
     // Static methods
 
-    public static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
-
     public static @NotNull CompletableFuture<MysqlData> create(@NotNull MysqlTable table) {
         @NotNull CompletableFuture<MysqlData> future = new CompletableFuture<>();
 
@@ -39,24 +37,15 @@ public final class MysqlData extends Data {
 
         return future;
     }
-    public static @NotNull MysqlData[] getDatas(@NotNull MysqlTable table) {
-        if (CACHED_LOADED_DATAS.containsKey(table)) {
-            return CACHED_LOADED_DATAS.get(table).toArray(new MysqlData[0]);
-        } else {
-            return new MysqlData[0];
-        }
-    }
     public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, long row) {
-        if (CACHED_LOADED_DATAS.containsKey(table)) {
-            @NotNull Optional<MysqlData> optional = CACHED_LOADED_DATAS.get(table).stream().filter(data -> data.getRow() == row).findFirst();
+        @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
 
-            if (optional.isPresent()) {
-                return optional.get();
-            }
+        if (optional.isPresent()) {
+             return optional.get();
         }
 
         @NotNull MysqlData data = new MysqlData(table, row);
-        CACHED_LOADED_DATAS.computeIfAbsent(table, k -> new ArrayList<>()).add(data);
+        table.getDatas().add(data);
         return data;
     }
     public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
@@ -82,15 +71,12 @@ public final class MysqlData extends Data {
                 @NotNull Set<Long> excluded = new HashSet<>();
                 @NotNull Map<Long, MysqlData> datas = new TreeMap<>(Long::compare);
 
-                if (CACHED_LOADED_DATAS.containsKey(table)) {
+                for (MysqlData data : table.getDatas()) {
+                    if (data.isLoaded()) {
+                        excluded.add(data.getRow());
 
-                    for (MysqlData data : CACHED_LOADED_DATAS.get(table)) {
-                        if (data.isLoaded()) {
-                            excluded.add(data.getRow());
-
-                            if (data.matches(finalConditions)) {
-                                datas.put(data.getRow(), data);
-                            }
+                        if (data.matches(finalConditions)) {
+                            datas.put(data.getRow(), data);
                         }
                     }
                 }
@@ -111,7 +97,7 @@ public final class MysqlData extends Data {
                     while (set.next()) {
                         long row = set.getInt("row");
                         @NotNull MysqlData data = new MysqlData(table, row);
-                        CACHED_LOADED_DATAS.computeIfAbsent(table, k -> new ArrayList<>()).add(data);
+                        table.getDatas().add(data);
 
                         if (!datas.containsKey(row)) {
                             datas.put(row, data);

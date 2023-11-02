@@ -19,7 +19,9 @@ public final class MysqlTable {
 
     private final @NotNull String name;
     private final @NotNull MysqlDatabase database;
+
     private final @NotNull Variables variables;
+    private final @NotNull Datas datas;
 
     private final @NotNull AutoIncrement autoIncrement = AutoIncrement.of(this);
 
@@ -33,6 +35,7 @@ public final class MysqlTable {
         this.database = database;
 
         this.variables = new Variables(this);
+        this.datas = new Datas(this);
 
         if (!name.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This table name '" + name + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
@@ -86,7 +89,7 @@ public final class MysqlTable {
                     }
                 }
 
-                MysqlData.CACHED_LOADED_DATAS.remove(this);
+                getDatas().clear();
                 getVariables().clear();
 
                 getDatabase().getTables().remove(this);
@@ -198,8 +201,8 @@ public final class MysqlTable {
     public @NotNull Variables getVariables() {
         return variables;
     }
-    public @NotNull MysqlData[] getDatas() {
-        return MysqlData.getDatas(this);
+    public @NotNull Datas getDatas() {
+        return datas;
     }
 
     public boolean isNew() {
