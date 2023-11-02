@@ -213,6 +213,10 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (!getTable().isLoaded() || !getTable().exists().join()) {
+                    throw new IllegalStateException("The table of this data aren't loaded or created");
+                }
+
                 if (exists().join()) {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
@@ -297,6 +301,10 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (!getTable().isLoaded() || !getTable().exists().join()) {
+                    throw new IllegalStateException("The table of this data aren't loaded or created");
+                }
+
                 if (!exists().join()) {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (`row`) VALUES (" + getRow() + ")")) {
                         statement.execute();

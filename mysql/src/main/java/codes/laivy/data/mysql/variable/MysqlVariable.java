@@ -64,6 +64,10 @@ public class MysqlVariable<T> extends Variable<T> {
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (!getTable().isLoaded() || !getTable().exists().join()) {
+                    throw new IllegalStateException("The table of this variable aren't loaded or created");
+                }
+
                 isNew = !exists().join();
                 getType().configure(this).join();
                 getTable().getVariables().add(this);
