@@ -26,7 +26,18 @@ public final class MysqlData extends Data {
     public static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
 
     public static @NotNull CompletableFuture<MysqlData> create(@NotNull MysqlTable table) {
-        return CompletableFuture.completedFuture(null);
+        @NotNull CompletableFuture<MysqlData> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                long increment = table.getAutoIncrement().join();
+                future.complete(retrieve(table, increment));
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
     }
     public static @NotNull MysqlData[] getDatas(@NotNull MysqlTable table) {
         if (CACHED_LOADED_DATAS.containsKey(table)) {
