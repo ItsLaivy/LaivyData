@@ -1,36 +1,21 @@
 package codes.laivy.data.mysql.variable.type;
 
 import codes.laivy.data.mysql.variable.Parameter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlTextType extends AbstractType<String> {
-
-    private final @NotNull Size size;
-
-    public MysqlTextType() {
-        this(Size.TEXT);
-    }
-    public MysqlTextType(@NotNull Size size) {
-        super(size.name());
-        this.size = size;
-    }
-
-    @Contract(pure = true)
-    public @NotNull Size getSize() {
-        return size;
+public class MysqlBooleanType extends AbstractType<Boolean> {
+    public MysqlBooleanType() {
+        super("BOOL");
     }
 
     @Override
-    public void set(@NotNull Parameter parameter, @Nullable String value) {
-        if (value != null && value.length() > getSize().getBytes()) {
-            throw new IllegalArgumentException("The string overflow the type size '" + getSize().name() + "'");
-        } else try {
+    public void set(@NotNull Parameter parameter, @Nullable Boolean value) {
+        try {
             if (value != null) {
-                parameter.setString(value);
+                parameter.setBoolean(value);
             } else {
                 parameter.setNull();
             }
@@ -40,13 +25,17 @@ public class MysqlTextType extends AbstractType<String> {
     }
 
     @Override
-    public @Nullable String get(@Nullable Object object) {
+    public @Nullable Boolean get(@Nullable Object object) {
         if (object == null) {
             return null;
         }
 
-        @NotNull String string = String.valueOf(object);
-        return string.substring(0, (int) Math.min(string.length(), getSize().getBytes()));
+        try {
+            int integer = Integer.parseInt(String.valueOf(object));
+            return integer != 0;
+        } catch (NumberFormatException ignore) {
+            return Boolean.valueOf(object.toString());
+        }
     }
 
     @Override
