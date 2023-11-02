@@ -30,7 +30,7 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                long increment = table.getAutoIncrement().join();
+                long increment = table.getAutoIncrement().getAndIncrement(1).join();
                 future.complete(retrieve(table, increment));
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
