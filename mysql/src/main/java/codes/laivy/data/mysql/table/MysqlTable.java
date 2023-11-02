@@ -23,6 +23,8 @@ public final class MysqlTable {
 
     private final @NotNull AutoIncrement autoIncrement = AutoIncrement.of(this);
 
+    private boolean isNew = false;
+
     @ApiStatus.Internal
     private boolean loaded = false;
 
@@ -101,6 +103,7 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
+                isNew = !exists().join();
                 create().join();
 
                 future.complete(null);
@@ -219,6 +222,14 @@ public final class MysqlTable {
     }
     public @NotNull MysqlData[] getDatas() {
         return MysqlData.getDatas(this);
+    }
+
+    public boolean isNew() {
+        if (isLoaded()) {
+            return this.isNew;
+        } else {
+            throw new IllegalStateException("To check if the table is new, it needs to be loaded");
+        }
     }
 
     public boolean isLoaded() {

@@ -36,12 +36,19 @@ public class MysqlTableTest {
         MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
         Assert.assertTrue(table.isLoaded());
+        Assert.assertTrue(table.isNew());
 
         table.stop().get(2, TimeUnit.SECONDS);
         Assert.assertFalse(table.isLoaded());
+
+        table.start().get(2, TimeUnit.SECONDS);
+        Assert.assertFalse(table.isNew());
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
+
+        Assert.assertFalse(table.isLoaded());
+
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 
