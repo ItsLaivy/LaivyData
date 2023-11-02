@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.table;
 
+import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.MysqlVariable;
@@ -72,6 +73,13 @@ public final class MysqlTable {
                         variable.stop().join();
                     }
                 }
+                for (@NotNull MysqlData data : getReceptors()) {
+                    if (data.isLoaded()) {
+                        data.stop(true).join();
+                    }
+                }
+
+                MysqlData.CACHED_LOADED_DATAS.remove(this);
                 getVariables().clear();
 
                 getDatabase().getTables().remove(this);
@@ -180,7 +188,7 @@ public final class MysqlTable {
                     }
                 }
 
-                future.complete(databaseExists);
+                future.complete(false);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
@@ -201,6 +209,9 @@ public final class MysqlTable {
 
     public @NotNull Variables getVariables() {
         return variables;
+    }
+    public @NotNull MysqlData[] getReceptors() {
+        return MysqlData.getDatas(this);
     }
 
     public boolean isLoaded() {
