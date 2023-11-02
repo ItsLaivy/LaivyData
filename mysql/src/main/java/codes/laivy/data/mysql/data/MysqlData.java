@@ -23,8 +23,15 @@ public final class MysqlData extends Data {
 
     // Static methods
 
-    private static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
+    public static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
 
+    public static @NotNull MysqlData[] getDatas(@NotNull MysqlTable table) {
+        if (CACHED_LOADED_DATAS.containsKey(table)) {
+            return CACHED_LOADED_DATAS.get(table).toArray(new MysqlData[0]);
+        } else {
+            return new MysqlData[0];
+        }
+    }
     public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, long row) {
         if (CACHED_LOADED_DATAS.containsKey(table)) {
             @NotNull Optional<MysqlData> optional = CACHED_LOADED_DATAS.get(table).stream().filter(data -> data.getRow() == row).findFirst();
@@ -303,8 +310,7 @@ public final class MysqlData extends Data {
                 if (tableExists) {
                     try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
-
-                        future.complete(set.getFetchSize() > 0);
+                        future.complete(set.next());
                         return;
                     }
                 }

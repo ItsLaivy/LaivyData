@@ -51,11 +51,13 @@ public class MysqlDataTest {
         Assert.assertTrue(data.isLoaded());
 
         data.stop(true).join();
-        Assert.assertFalse(data.exists().get(2, TimeUnit.SECONDS));
+        Assert.assertTrue(data.exists().get(2, TimeUnit.SECONDS));
+        data.start().get(2, TimeUnit.SECONDS);
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
 
+        Assert.assertFalse(data.exists().get(2, TimeUnit.SECONDS));
         Assert.assertFalse(data.isLoaded());
 
         authentication.disconnect().get(5, TimeUnit.SECONDS);
