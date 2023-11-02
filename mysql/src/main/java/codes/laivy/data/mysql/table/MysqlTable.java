@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class MysqlTable {
 
-    private final @NotNull String name;
+    private final @NotNull String id;
     private final @NotNull MysqlDatabase database;
 
     private final @NotNull Variables variables;
@@ -30,21 +30,21 @@ public final class MysqlTable {
     @ApiStatus.Internal
     private boolean loaded = false;
 
-    public MysqlTable(@NotNull String name, @NotNull MysqlDatabase database) {
-        this.name = name;
+    public MysqlTable(@NotNull String id, @NotNull MysqlDatabase database) {
+        this.id = id;
         this.database = database;
 
         this.variables = new Variables(this);
         this.datas = new Datas(this);
 
-        if (!name.matches("^[a-zA-Z0-9_]{0,63}$")) {
-            throw new IllegalStateException("This table name '" + name + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
+        if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
+            throw new IllegalStateException("This table name '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
         }
     }
 
     public @NotNull CompletableFuture<Void> start() {
         if (isLoaded()) {
-            throw new IllegalStateException("The mysql table '" + getName() + "' is already loaded");
+            throw new IllegalStateException("The mysql table '" + getId() + "' is already loaded");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -71,7 +71,7 @@ public final class MysqlTable {
     }
     public @NotNull CompletableFuture<Void> stop() {
         if (!isLoaded()) {
-            throw new IllegalStateException("The mysql table '" + getName() + "' is not loaded");
+            throw new IllegalStateException("The mysql table '" + getId() + "' is not loaded");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -113,7 +113,7 @@ public final class MysqlTable {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS `" + getDatabase().getId() + "`.`" + getName() + "` (`row` INT AUTO_INCREMENT PRIMARY KEY);")) {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS `" + getDatabase().getId() + "`.`" + getId() + "` (`row` INT AUTO_INCREMENT PRIMARY KEY);")) {
                 statement.execute();
                 future.complete(true);
             } catch (@NotNull Throwable throwable) {
@@ -136,7 +136,7 @@ public final class MysqlTable {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("DROP TABLE `" + getDatabase().getId() + "`.`" + getName() + "`")) {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("DROP TABLE `" + getDatabase().getId() + "`.`" + getId() + "`")) {
                 if (isLoaded()) {
                     stop().join();
                 }
@@ -168,7 +168,7 @@ public final class MysqlTable {
                 boolean databaseExists = getDatabase().exists().join();
 
                 if (databaseExists) {
-                    try (@NotNull ResultSet resultSet = connection.getMetaData().getTables(getDatabase().getId(), null, getName(), null)) {
+                    try (@NotNull ResultSet resultSet = connection.getMetaData().getTables(getDatabase().getId(), null, getId(), null)) {
                         future.complete(resultSet.next());
                         return;
                     }
@@ -189,8 +189,8 @@ public final class MysqlTable {
     }
 
     @Contract(pure = true)
-    public @NotNull String getName() {
-        return name;
+    public @NotNull String getId() {
+        return id;
     }
 
     @Contract(pure = true)
@@ -223,18 +223,18 @@ public final class MysqlTable {
         if (this == object) return true;
         if (!(object instanceof MysqlTable)) return false;
         MysqlTable that = (MysqlTable) object;
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getDatabase(), that.getDatabase());
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getDatabase(), that.getDatabase());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getDatabase());
+        return Objects.hash(getId(), getDatabase());
     }
 
     @Override
     public @NotNull String toString() {
         return "MysqlTable{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
                 ", database=" + database +
                 ", variables=" + variables +
                 '}';

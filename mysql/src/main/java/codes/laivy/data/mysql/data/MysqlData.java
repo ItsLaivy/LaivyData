@@ -58,7 +58,7 @@ public final class MysqlData extends Data {
         } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
             throw new IllegalStateException("This table or database aren't loaded");
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
-            throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getName() + "'");
+            throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
@@ -83,7 +83,7 @@ public final class MysqlData extends Data {
 
                 // Retrieving on database
 
-                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getName() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
                     int index = 0;
                     for (@NotNull Condition<?> condition : finalConditions) {
                         //noinspection rawtypes
@@ -155,14 +155,14 @@ public final class MysqlData extends Data {
         @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
 
         if (!optional.isPresent() || !data.containsKey(optional.get())) {
-            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
         return data.get(optional.get());
     }
     public <T> @Nullable T get(@NotNull MysqlVariable<T> variable) {
         if (!data.containsKey(variable)) {
-            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
         //noinspection unchecked
@@ -174,14 +174,14 @@ public final class MysqlData extends Data {
         @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
 
         if (!optional.isPresent() || !data.containsKey(optional.get())) {
-            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+            throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
         data.put(optional.get(), object);
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
         if (!data.containsKey(variable)) {
-            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
+            throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
         data.put(variable, object);
@@ -204,7 +204,7 @@ public final class MysqlData extends Data {
                 }
 
                 if (exists().join()) {
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
                         set.next();
 
@@ -292,7 +292,7 @@ public final class MysqlData extends Data {
                 }
 
                 if (!exists().join()) {
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (`row`) VALUES (" + getRow() + ")")) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getId() + "` (`row`) VALUES (" + getRow() + ")")) {
                         statement.execute();
                     }
                 }
@@ -300,7 +300,7 @@ public final class MysqlData extends Data {
                 @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
 
                 if (!variables.isEmpty()) {
-                    @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getName() + "` SET ");
+                    @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
 
                     int row = 0;
                     for (MysqlVariable<?> variable : variables) {
@@ -344,7 +344,7 @@ public final class MysqlData extends Data {
                 boolean tableExists = getTable().exists().join();
 
                 if (tableExists) {
-                    try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                    try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
                         future.complete(set.next());
                         return;
@@ -373,7 +373,7 @@ public final class MysqlData extends Data {
                 stop(false).join();
 
                 if (getTable().exists().join()) {
-                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {
                         statement.execute();
                         future.complete(true);
                         return;

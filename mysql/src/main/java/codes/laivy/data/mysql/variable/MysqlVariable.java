@@ -128,7 +128,7 @@ public class MysqlVariable<T> extends Variable<T> {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("ALTER TABLE `" + getDatabase().getId() + "`.`" + getTable().getName() + "` DROP COLUMN `" + getId() + "`")) {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("ALTER TABLE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` DROP COLUMN `" + getId() + "`")) {
                 if (isLoaded()) {
                     stop().join();
                 }
@@ -157,7 +157,7 @@ public class MysqlVariable<T> extends Variable<T> {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` LIMIT 0")) {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` LIMIT 0")) {
                 @NotNull ResultSet set = statement.executeQuery();
 
                 if (set.findColumn(getId()) > 0) {

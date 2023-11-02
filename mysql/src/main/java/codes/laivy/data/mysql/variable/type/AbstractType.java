@@ -36,10 +36,10 @@ public abstract class AbstractType<T> implements Type<T> {
                 boolean exists = variable.exists().join();
 
                 if (!exists) {
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getName() + "` ADD COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` ADD COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
                         statement.execute();
                     }
-                } else try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getName() + "` MODIFY COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
+                } else try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` MODIFY COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
                     statement.execute();
                 }
 

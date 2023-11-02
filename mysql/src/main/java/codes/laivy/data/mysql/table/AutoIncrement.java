@@ -48,7 +48,7 @@ public interface AutoIncrement {
 
                 CompletableFuture.runAsync(() -> {
                     try {
-                        try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + table.getDatabase().getId() + "` LIKE '" + table.getName() + "'")) {
+                        try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + table.getDatabase().getId() + "` LIKE '" + table.getId() + "'")) {
                             @NotNull ResultSet set = statement.executeQuery();
                             set.next();
 
@@ -73,7 +73,7 @@ public interface AutoIncrement {
 
                 CompletableFuture.runAsync(() -> {
                     try {
-                        try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + table.getDatabase().getId() + "`.`" + table.getName() + "` AUTO_INCREMENT = " + value + ";")) {
+                        try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + table.getDatabase().getId() + "`.`" + table.getId() + "` AUTO_INCREMENT = " + value + ";")) {
                             statement.execute();
                         }
 
