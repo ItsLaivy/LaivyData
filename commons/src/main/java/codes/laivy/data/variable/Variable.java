@@ -1,6 +1,5 @@
 package codes.laivy.data.variable;
 
-import codes.laivy.data.data.Receptor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,8 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * Represents an abstract variable, acting as a container for values.

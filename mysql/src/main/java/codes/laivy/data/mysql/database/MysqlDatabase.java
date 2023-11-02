@@ -52,6 +52,8 @@ public final class MysqlDatabase extends Database {
         }
     }
 
+    // Object
+
     private final @NotNull MysqlAuthentication authentication;
     private final @NotNull Tables tables;
 
@@ -81,8 +83,6 @@ public final class MysqlDatabase extends Database {
     public @NotNull Tables getTables() {
         return tables;
     }
-
-    int loadedtimes = 0;
 
     @Override
     public @NotNull CompletableFuture<Boolean> start() {

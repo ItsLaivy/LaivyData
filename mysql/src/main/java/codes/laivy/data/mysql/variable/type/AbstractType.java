@@ -39,11 +39,11 @@ public abstract class AbstractType<T> implements Type<T> {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getName() + "` ADD COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
                         statement.execute();
                     }
-                    future.complete(true);
-                } else {
-                    // TODO: 02/11/2023 Alterar o tipo de variável aqui
-                    future.complete(false);
+                } else try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getName() + "` MODIFY COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
+                    statement.execute();
                 }
+
+                future.complete(!exists);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }

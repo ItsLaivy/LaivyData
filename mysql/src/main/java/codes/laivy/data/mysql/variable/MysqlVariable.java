@@ -76,11 +76,13 @@ public class MysqlVariable<T> extends Variable<T> {
                 for (MysqlData data : getTable().getDatas()) {
                     if (isNew) {
                         data.getData().put(this, getDefaultValue());
-                    } else if (data.getCache().keySet().stream().anyMatch(v -> v.equalsIgnoreCase(getId()))) {
-                        @NotNull Optional<String> optional = data.getCache().keySet().stream().filter(v -> v.equalsIgnoreCase(getId())).findFirst();
+                    } else {
+                        @NotNull Optional<String> optional = data.getCache().keySet().stream().filter(name -> name.equalsIgnoreCase(getId())).findFirst();
 
                         if (optional.isPresent()) {
                             @Nullable Object o = data.getCache().get(optional.get());
+                            data.getCache().keySet().removeIf(name -> name.equalsIgnoreCase(getId()));
+
                             data.getData().put(this, o);
                         }
                     }

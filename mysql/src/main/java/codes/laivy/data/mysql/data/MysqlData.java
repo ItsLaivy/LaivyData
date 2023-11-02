@@ -215,9 +215,9 @@ public final class MysqlData extends Data {
                             @NotNull Optional<MysqlVariable<?>> variableOptional = getTable().getVariables().getById(columnName);
                             if (variableOptional.isPresent()) {
                                 @NotNull MysqlVariable<?> variable = variableOptional.get();
-                                data.put(variableOptional.get(), variable.getType().get(object));
+                                getData().put(variableOptional.get(), variable.getType().get(object));
                             } else {
-                                cache.put(columnName, object);
+                                getCache().put(columnName, object);
                             }
                         }
 
@@ -261,8 +261,8 @@ public final class MysqlData extends Data {
             try {
                 if (save) save().join();
 
-                data.clear();
-                cache.clear();
+                getData().clear();
+                getCache().clear();
 
                 loaded = false;
                 future.complete(null);

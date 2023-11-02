@@ -38,6 +38,9 @@ public class MysqlTableTest {
         Assert.assertTrue(table.isLoaded());
         Assert.assertTrue(table.isNew());
 
+        table.getAutoIncrement().setAmount(100).get(2, TimeUnit.SECONDS);
+        Assert.assertEquals((Long) 100L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
+
         table.stop().get(2, TimeUnit.SECONDS);
         Assert.assertFalse(table.isLoaded());
 
