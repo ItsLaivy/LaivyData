@@ -121,7 +121,7 @@ public class MysqlDataTest {
         Assert.assertFalse(data.isNew());
         Assert.assertEquals(expected, data.get(variable));
         //
-        
+
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
@@ -179,6 +179,33 @@ public class MysqlDataTest {
 
         @NotNull MysqlData[] datas = MysqlData.retrieve(table, Condition.of(variable, expected)).get(2, TimeUnit.SECONDS);
         Assert.assertTrue(datas.length == 1 && datas[0].getRow() == row);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        // Data code
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+        data.save().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(data.exists().get(2, TimeUnit.SECONDS));
+        data.delete().get(2, TimeUnit.SECONDS);
+        Assert.assertFalse(data.exists().get(2, TimeUnit.SECONDS));
+        Assert.assertFalse(data.isLoaded());
+        //
 
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);

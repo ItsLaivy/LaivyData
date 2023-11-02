@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -154,8 +155,6 @@ public final class MysqlData extends Data {
         return row;
     }
 
-    // TODO: 01/11/2023 setRow
-
     @Contract(pure = true)
     public @NotNull MysqlDatabase getDatabase() {
         return getTable().getDatabase();
@@ -245,7 +244,6 @@ public final class MysqlData extends Data {
                 }
 
                 isNew = !exists().join();
-
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -349,6 +347,35 @@ public final class MysqlData extends Data {
                     try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
                         ResultSet set = statement.executeQuery();
                         future.complete(set.next());
+                        return;
+                    }
+                }
+
+                future.complete(false);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
+    public @NotNull CompletableFuture<Boolean> delete() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                stop(false).join();
+
+                if (getTable().exists().join()) {
+                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + getDatabase().getId() + "`.`" + getTable().getName() + "` WHERE `row` = " + getRow())) {
+                        statement.execute();
+                        future.complete(true);
                         return;
                     }
                 }
