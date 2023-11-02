@@ -104,5 +104,27 @@ public class MysqlTableTest {
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
+    @Test
+    public void testRows() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        // Table code
+        MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+        Assert.assertEquals((Long) 0L, table.getRows().get(2, TimeUnit.SECONDS));
+
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+        data.stop(true).get(2, TimeUnit.SECONDS);
+
+        Assert.assertEquals((Long) 1L, table.getRows().get(2, TimeUnit.SECONDS));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
 
 }

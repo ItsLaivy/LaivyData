@@ -205,6 +205,30 @@ public final class MysqlTable {
         return datas;
     }
 
+    public @NotNull CompletableFuture<Long> getRows() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Long> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + getDatabase().getId() + "` LIKE '" + getId() + "'")) {
+                    @NotNull ResultSet set = statement.executeQuery();
+                    set.next();
+
+                    future.complete(set.getLong("rows"));
+                }
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
     public boolean isNew() {
         if (isLoaded()) {
             return this.isNew;
