@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.variable;
 
+import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class MysqlVariable<T> extends Variable<T> {
@@ -65,6 +67,20 @@ public class MysqlVariable<T> extends Variable<T> {
                 isNew = !exists().join();
                 getType().configure(this).join();
                 getTable().getVariables().add(this);
+
+                // Sync with cache data for the receptors
+                for (MysqlData data : getTable().getDatas()) {
+                    if (isNew) {
+                        data.getData().put(this, getDefaultValue());
+                    } else if (data.getCache().keySet().stream().anyMatch(v -> v.equalsIgnoreCase(getId()))) {
+                        @NotNull Optional<String> optional = data.getCache().keySet().stream().filter(v -> v.equalsIgnoreCase(getId())).findFirst();
+
+                        if (optional.isPresent()) {
+                            @Nullable Object o = data.getCache().get(optional.get());
+                            data.getData().put(this, o);
+                        }
+                    }
+                }
 
                 loaded = true;
                 future.complete(null);
