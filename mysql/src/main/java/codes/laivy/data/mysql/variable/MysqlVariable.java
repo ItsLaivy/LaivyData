@@ -5,6 +5,7 @@ import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.type.Type;
 import codes.laivy.data.variable.Variable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,9 @@ public class MysqlVariable<T> extends Variable<T> {
     private final @NotNull Type<T> type;
 
     private final @Nullable T defaultValue;
+
+    @ApiStatus.Internal
+    private boolean isNew = false;
 
     public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @Nullable T defaultValue) {
         super(id);

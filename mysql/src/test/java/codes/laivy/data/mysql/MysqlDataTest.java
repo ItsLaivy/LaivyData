@@ -113,10 +113,36 @@ public class MysqlDataTest {
         // Data code
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(data.isNew());
         Assert.assertEquals(expected, data.get(variable));
         data.stop(true).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
+        Assert.assertFalse(data.isNew());
         Assert.assertEquals(expected, data.get(variable));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testWithoutVariables() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        // Data code
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+        data.stop(true).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
         //
 
         database.delete().get(2, TimeUnit.SECONDS);

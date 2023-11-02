@@ -244,6 +244,8 @@ public final class MysqlData extends Data {
                     }
                 }
 
+                isNew = !exists().join();
+
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -291,9 +293,7 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                boolean exists = exists().join();
-
-                if (!exists) {
+                if (!exists().join()) {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (`row`) VALUES (" + getRow() + ")")) {
                         statement.execute();
                     }
@@ -324,7 +324,6 @@ public final class MysqlData extends Data {
                     }
                 }
 
-                isNew = !exists;
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
