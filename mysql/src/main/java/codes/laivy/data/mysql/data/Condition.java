@@ -9,7 +9,7 @@ import java.util.Objects;
 public final class Condition<T> {
 
     public static <E> @NotNull Condition<E> of(@NotNull MysqlVariable<E> variable, @Nullable E value) {
-        return new Condition<E>(variable, value);
+        return new Condition<>(variable, value);
     }
 
     private final @NotNull MysqlVariable<T> variable;

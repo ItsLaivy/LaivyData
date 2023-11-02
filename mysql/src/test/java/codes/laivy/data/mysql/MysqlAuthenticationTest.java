@@ -1,7 +1,6 @@
 package codes.laivy.data.mysql;
 
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
-import codes.laivy.data.mysql.MysqlVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.junit.Assert;
@@ -11,14 +10,14 @@ import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 @TestOnly
-public class AuthenticationTest {
+public class MysqlAuthenticationTest {
 
     public final @NotNull String USERNAME;
     public final @NotNull String PASSWORD;
     public final @NotNull InetAddress ADDRESS;
     public final int PORT;
 
-    public AuthenticationTest() throws Throwable {
+    public MysqlAuthenticationTest() throws Throwable {
         PASSWORD = "";
         USERNAME = "root";
         PORT = 3306;
