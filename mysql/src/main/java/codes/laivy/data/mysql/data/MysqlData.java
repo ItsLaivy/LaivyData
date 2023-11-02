@@ -25,6 +25,9 @@ public final class MysqlData extends Data {
 
     public static final @NotNull Map<@NotNull MysqlTable, @NotNull List<@NotNull MysqlData>> CACHED_LOADED_DATAS = new HashMap<>();
 
+    public static @NotNull CompletableFuture<MysqlData> create(@NotNull MysqlTable table) {
+        return CompletableFuture.completedFuture(null);
+    }
     public static @NotNull MysqlData[] getDatas(@NotNull MysqlTable table) {
         if (CACHED_LOADED_DATAS.containsKey(table)) {
             return CACHED_LOADED_DATAS.get(table).toArray(new MysqlData[0]);
@@ -162,7 +165,7 @@ public final class MysqlData extends Data {
 
         return data.get(optional.get());
     }
-    public <T> @Nullable T set(@NotNull MysqlVariable<T> variable) {
+    public <T> @Nullable T get(@NotNull MysqlVariable<T> variable) {
         if (!data.containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getName() + "'");
         }
@@ -281,6 +284,31 @@ public final class MysqlData extends Data {
 
                 if (!exists) {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + getDatabase().getId() + "`.`" + getTable().getName() + "` (`row`) VALUES (" + getRow() + ")")) {
+                        statement.execute();
+                    }
+                }
+
+                @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
+
+                if (!variables.isEmpty()) {
+                    @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getName() + "` SET ");
+
+                    int row = 0;
+                    for (MysqlVariable<?> variable : variables) {
+                        if (row > 0) builder.append(",");
+                        builder.append("`").append(variable.getId()).append("` = ?");
+                        row++;
+                    }
+
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
+                        row = 0;
+                        //noinspection rawtypes
+                        for (MysqlVariable variable : variables) {
+                            //noinspection unchecked
+                            variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), get(variable));
+                            row++;
+                        }
+
                         statement.execute();
                     }
                 }
