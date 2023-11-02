@@ -23,13 +23,13 @@ public abstract class AbstractType<T> implements Type<T> {
     }
 
     @Override
-    public final @NotNull CompletableFuture<Void> configure(@NotNull MysqlVariable<T> variable) {
+    public final @NotNull CompletableFuture<Boolean> configure(@NotNull MysqlVariable<T> variable) {
         @Nullable Connection connection = variable.getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The variable's authentication aren't connected");
         }
 
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -39,9 +39,10 @@ public abstract class AbstractType<T> implements Type<T> {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getName() + "` ADD COLUMN `" + variable.getId() + "` " + getSqlName() + ";")) {
                         statement.execute();
                     }
+                    future.complete(true);
+                } else {
+                    future.complete(false);
                 }
-
-                future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }

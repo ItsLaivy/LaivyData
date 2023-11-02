@@ -17,7 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -135,7 +134,7 @@ public final class MysqlData extends Data {
     private final @NotNull Map<@NotNull String, @Nullable Object> cache = new HashMap<>();
 
     private final @NotNull MysqlTable table;
-    private long row;
+    private final long row;
 
     private MysqlData(@NotNull MysqlTable table, long row) {
         this.table = table;
@@ -282,6 +281,10 @@ public final class MysqlData extends Data {
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The data must be loaded to be saved!");
+        }
+
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");

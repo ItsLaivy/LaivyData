@@ -77,8 +77,6 @@ public class MysqlAuthentication {
         return port;
     }
 
-
-
     // TODO: 01/11/2023 Javadoc
     protected boolean isAutoCommit() {
         return true;

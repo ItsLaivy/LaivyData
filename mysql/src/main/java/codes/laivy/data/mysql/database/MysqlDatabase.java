@@ -2,6 +2,7 @@ package codes.laivy.data.mysql.database;
 
 import codes.laivy.data.Database;
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import org.jetbrains.annotations.Contract;
@@ -226,7 +227,19 @@ public final class MysqlDatabase extends Database {
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
-        return null;
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            for (MysqlTable table : getTables()) {
+                if (table.isLoaded()) {
+                    for (MysqlData data : table.getDatas()) {
+                        data.save().join();
+                    }
+                }
+            }
+        });
+
+        return future;
     }
 
     @Override

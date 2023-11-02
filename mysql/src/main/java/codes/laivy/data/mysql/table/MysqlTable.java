@@ -75,7 +75,7 @@ public final class MysqlTable {
                         variable.stop().join();
                     }
                 }
-                for (@NotNull MysqlData data : getReceptors()) {
+                for (@NotNull MysqlData data : getDatas()) {
                     if (data.isLoaded()) {
                         data.stop(true).join();
                     }
@@ -217,7 +217,7 @@ public final class MysqlTable {
     public @NotNull Variables getVariables() {
         return variables;
     }
-    public @NotNull MysqlData[] getReceptors() {
+    public @NotNull MysqlData[] getDatas() {
         return MysqlData.getDatas(this);
     }
 

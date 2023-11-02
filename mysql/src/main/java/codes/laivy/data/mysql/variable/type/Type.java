@@ -2,12 +2,9 @@ package codes.laivy.data.mysql.variable.type;
 
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import codes.laivy.data.mysql.variable.Parameter;
-import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.concurrent.CompletableFuture;
 
 public interface Type<T> {
@@ -31,8 +28,9 @@ public interface Type<T> {
     /**
      * Configures a {@link MysqlVariable} for the use of this variable type.
      * Changes the variable type for the required type, changes variable configurations in the database, and everything it needs.
+     *
      * @param variable the sql variable
      */
-    @NotNull CompletableFuture<Void> configure(@NotNull MysqlVariable<T> variable);
+    @NotNull CompletableFuture<Boolean> configure(@NotNull MysqlVariable<T> variable);
 
 }
