@@ -5,10 +5,7 @@ import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
-import codes.laivy.data.mysql.variable.type.MysqlBlobType;
-import codes.laivy.data.mysql.variable.type.MysqlBooleanType;
-import codes.laivy.data.mysql.variable.type.MysqlDoubleType;
-import codes.laivy.data.mysql.variable.type.MysqlTextType;
+import codes.laivy.data.mysql.variable.type.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -115,6 +112,25 @@ public class MysqlVariableTypesTest {
                 data.save().get(2, TimeUnit.SECONDS);
 
                 Assert.assertEquals((Double) expected, data.get(variable));
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        }));
+    }
+    @Test
+    public void testFloatType() throws Exception {
+        generate((table -> {
+            try {
+                float expected = 100F;
+
+                @NotNull MysqlVariable<Float> variable = new MysqlVariable<>("test_var", table, new MysqlFloatType(), expected);
+                variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals((Float) expected, data.get(variable));
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }
