@@ -1,9 +1,11 @@
 package codes.laivy.data.mysql;
 
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
+import codes.laivy.data.mysql.variable.type.MysqlBlobType;
 import codes.laivy.data.mysql.variable.type.MysqlBooleanType;
 import codes.laivy.data.mysql.variable.type.MysqlTextType;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -46,8 +49,16 @@ public class MysqlVariableTypesTest {
     public void testTextType() throws Exception {
         generate((table -> {
             try {
-                @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), "Just a cool test :)");
+                @NotNull String expected = "Just a cool test :)";
+
+                @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
                 variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals(expected, data.get(variable));
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }
@@ -59,6 +70,31 @@ public class MysqlVariableTypesTest {
             try {
                 @NotNull MysqlVariable<Boolean> variable = new MysqlVariable<>("test_var", table, new MysqlBooleanType(), true);
                 variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals(true, data.get(variable));
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        }));
+    }
+    @Test
+    public void testBlobType() throws Exception {
+        generate((table -> {
+            try {
+                byte[] expected = "abc".getBytes(StandardCharsets.UTF_8);
+
+                @NotNull MysqlVariable<byte[]> variable = new MysqlVariable<>("test_var", table, new MysqlBlobType(), expected);
+                variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals(expected, data.get(variable));
             } catch (Throwable throwable) {
                 throw new RuntimeException(throwable);
             }
