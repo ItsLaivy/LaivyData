@@ -43,7 +43,7 @@ public class MysqlDataTest {
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
-        @NotNull MysqlData data = MysqlData.retrieve(table, 1);
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         Assert.assertFalse(data.exists().get(2, TimeUnit.SECONDS));
 
         data.start().get(2, TimeUnit.SECONDS);
@@ -79,7 +79,7 @@ public class MysqlDataTest {
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
-        @NotNull MysqlData data = MysqlData.retrieve(table, 1);
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
 
         @NotNull String expected = "Just a cool test :)";
@@ -111,7 +111,7 @@ public class MysqlDataTest {
         variable.start().get(2, TimeUnit.SECONDS);
 
         // Data code
-        @NotNull MysqlData data = MysqlData.retrieve(table, 1);
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
         Assert.assertEquals(expected, data.get(variable));
         data.stop(true).get(2, TimeUnit.SECONDS);

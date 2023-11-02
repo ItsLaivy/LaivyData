@@ -84,7 +84,7 @@ public class MysqlTableTest {
         table.start().get(2, TimeUnit.SECONDS);
         Assert.assertEquals((Long) 1L, table.getAutoIncrement().get(2, TimeUnit.SECONDS));
 
-        @NotNull MysqlData data = MysqlData.retrieve(table, 1);
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
         data.stop(true).get(2, TimeUnit.SECONDS);
 
