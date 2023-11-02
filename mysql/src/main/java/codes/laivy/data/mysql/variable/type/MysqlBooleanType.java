@@ -30,6 +30,10 @@ public class MysqlBooleanType extends AbstractType<Boolean> {
             return null;
         }
 
+        if (object instanceof Boolean) {
+            return (Boolean) object;
+        }
+
         try {
             int integer = Integer.parseInt(String.valueOf(object));
             return integer != 0;
