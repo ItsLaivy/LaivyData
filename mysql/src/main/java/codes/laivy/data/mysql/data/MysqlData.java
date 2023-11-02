@@ -201,11 +201,12 @@ public final class MysqlData extends Data {
         data.put(variable, object);
     }
 
-    @Override
-    protected @NotNull CompletableFuture<Void> load() {
+    public @NotNull CompletableFuture<Void> start() {
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
+        } else if (isLoaded()) {
+            throw new IllegalStateException("You cannot start the data because it's already start");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -234,6 +235,10 @@ public final class MysqlData extends Data {
                             throw new IllegalStateException("Multiples datas with the same id '" + getRow() + "' on table '" + getTable() + "'");
                         }
                     }
+
+                    isNew = false;
+                } else {
+                    isNew = true;
                 }
 
                 for (MysqlVariable<?> variable : getTable().getVariables()) {
@@ -242,9 +247,9 @@ public final class MysqlData extends Data {
                     }
                 }
 
-                isNew = !exists().join();
+                loaded = true;
                 future.complete(null);
-            } catch (@NotNull Throwable throwable) {
+            } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
@@ -252,26 +257,26 @@ public final class MysqlData extends Data {
         return future;
     }
 
-    @Override
-    protected @NotNull CompletableFuture<Void> unload(boolean save) {
+    public @NotNull CompletableFuture<Void> stop(boolean save) {
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
+        } else if (!isLoaded()) {
+            throw new IllegalStateException("You cannot stop the data because it's already stopped");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
-                if (save) {
-                    save().join();
-                }
+                if (save) save().join();
 
                 data.clear();
                 cache.clear();
 
+                loaded = false;
                 future.complete(null);
-            } catch (@NotNull Throwable throwable) {
+            } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
@@ -281,13 +286,11 @@ public final class MysqlData extends Data {
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
-        if (!isLoaded()) {
-            throw new IllegalStateException("The data must be loaded to be saved!");
-        }
-
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
+        } else if (!isLoaded()) {
+            throw new IllegalStateException("The data must be loaded to be saved!");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -392,7 +395,7 @@ public final class MysqlData extends Data {
         return future;
     }
 
-    public boolean matches(@NotNull Condition<?> @NotNull [] conditions) {
+    public boolean matches(@NotNull Condition<?> @NotNull ... conditions) {
         if (!isLoaded()) {
             throw new IllegalStateException("The mysql data must be loaded to use the #matches");
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(getTable()))) {
@@ -424,8 +427,8 @@ public final class MysqlData extends Data {
     @Override
     public @NotNull String toString() {
         return "MysqlData{" +
-                "table=" + table +
-                ", row=" + row +
+                "row=" + row + "," +
+                "is new=" + isNew +
                 '}';
     }
 }

@@ -11,6 +11,39 @@ import java.sql.SQLException;
 
 public abstract class Parameter {
 
+    @Range(from = 0, to = Integer.MAX_VALUE)
+    private final int index;
+
+    private Parameter(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
+        this.index = index;
+    }
+
+    /**
+     * Gets the replacement index for this parameter manager
+     * @return the replacement index
+     */
+    @Contract(pure = true)
+    @Range(from = 0, to = Integer.MAX_VALUE)
+    public final int getIndex() {
+        return index;
+    }
+
+    public abstract void setString(@NotNull String string) throws SQLException;
+
+    public abstract void setBoolean(boolean bool) throws SQLException;
+    public abstract void setInt(int i) throws SQLException;
+    public abstract void setFloat(float f) throws SQLException;
+    public abstract void setDouble(double d) throws SQLException;
+    public abstract void setByte(byte b) throws SQLException;
+    public abstract void setBytes(byte[] bytes) throws SQLException;
+    public abstract void setBlob(@NotNull InputStream stream) throws SQLException;
+    public abstract void setLong(long l) throws SQLException;
+    public abstract void setShort(short s) throws SQLException;
+    public abstract void setObject(@NotNull Object o) throws SQLException;
+    public abstract void setNull() throws SQLException, UnsupportedOperationException;
+
+    // Static initializers
+
     public static @NotNull Parameter of(@NotNull PreparedStatement statement, boolean nullSupported, int index) {
         return new Parameter(index) {
             @Override
@@ -78,35 +111,4 @@ public abstract class Parameter {
             }
         };
     }
-
-    @Range(from = 0, to = Integer.MAX_VALUE)
-    private final int index;
-
-    private Parameter(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
-        this.index = index;
-    }
-
-    /**
-     * Gets the replacement index for this parameter manager
-     * @return the replacement index
-     */
-    @Contract(pure = true)
-    @Range(from = 0, to = Integer.MAX_VALUE)
-    public final int getIndex() {
-        return index;
-    }
-
-    public abstract void setString(@NotNull String string) throws SQLException;
-    public abstract void setBoolean(boolean bool) throws SQLException;
-    public abstract void setInt(int i) throws SQLException;
-    public abstract void setFloat(float f) throws SQLException;
-    public abstract void setDouble(double d) throws SQLException;
-    public abstract void setByte(byte b) throws SQLException;
-    public abstract void setBytes(byte[] bytes) throws SQLException;
-    public abstract void setBlob(@NotNull InputStream stream) throws SQLException;
-    public abstract void setLong(long l) throws SQLException;
-    public abstract void setShort(short s) throws SQLException;
-    public abstract void setObject(@NotNull Object o) throws SQLException;
-    public abstract void setNull() throws SQLException, UnsupportedOperationException;
-
 }

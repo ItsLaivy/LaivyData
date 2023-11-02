@@ -41,6 +41,7 @@ public abstract class AbstractType<T> implements Type<T> {
                     }
                     future.complete(true);
                 } else {
+                    // TODO: 02/11/2023 Alterar o tipo de variável aqui
                     future.complete(false);
                 }
             } catch (@NotNull Throwable throwable) {

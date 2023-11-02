@@ -5,7 +5,6 @@ import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.type.Type;
 import codes.laivy.data.variable.Variable;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,9 +53,9 @@ public class MysqlVariable<T> extends Variable<T> {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Void> load() {
-        if (getDatabase().getAuthentication().getConnection() == null) {
-            throw new IllegalStateException("The database's authentication aren't connected");
+    public @NotNull CompletableFuture<Void> start() {
+        if (isLoaded()) {
+            throw new IllegalStateException("The variable '" + getId() + "' is already loaded");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -67,8 +66,9 @@ public class MysqlVariable<T> extends Variable<T> {
                 getType().configure(this).join();
                 getTable().getVariables().add(this);
 
+                loaded = true;
                 future.complete(null);
-            } catch (@NotNull Throwable throwable) {
+            } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
         });
@@ -77,10 +77,23 @@ public class MysqlVariable<T> extends Variable<T> {
     }
 
     @Override
-    protected @NotNull CompletableFuture<Void> unload() {
-        return CompletableFuture.runAsync(() -> {
-            getTable().getVariables().remove(this);
+    public @NotNull CompletableFuture<Void> stop() {
+        if (!isLoaded()) {
+            throw new IllegalStateException("The variable '" + getId() + "' is not loaded");
+        }
+
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                loaded = false;
+                future.complete(null);
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
         });
+
+        return future;
     }
 
     @Override

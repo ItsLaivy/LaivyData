@@ -48,7 +48,12 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                load().join();
+                if (!exists().join()) {
+                    isNew = true;
+                    create().join();
+                } else {
+                    isNew = false;
+                }
 
                 getDatabase().getTables().add(this);
 
@@ -70,8 +75,6 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                unload().join();
-
                 for (MysqlVariable<?> variable : getVariables()) {
                     if (variable.isLoaded()) {
                         variable.stop().join();
@@ -98,26 +101,6 @@ public final class MysqlTable {
         return future;
     }
 
-    private @NotNull CompletableFuture<Void> load() {
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                isNew = !exists().join();
-                create().join();
-
-                future.complete(null);
-            } catch (@NotNull Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
-    }
-    private @NotNull CompletableFuture<Void> unload() {
-        return CompletableFuture.completedFuture(null);
-    }
-
     public @NotNull CompletableFuture<Boolean> create() {
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
@@ -128,12 +111,7 @@ public final class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS `" + getDatabase().getId() + "`.`" + getName() + "` (`row` INT AUTO_INCREMENT PRIMARY KEY);")) {
-                if (isLoaded()) {
-                    unload().join();
-                }
-
                 statement.execute();
-
                 future.complete(true);
             } catch (@NotNull Throwable throwable) {
                 if (SqlUtils.getErrorCode(throwable) == 1051) {

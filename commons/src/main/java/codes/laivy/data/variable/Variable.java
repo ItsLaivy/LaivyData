@@ -25,7 +25,7 @@ public abstract class Variable<T> {
     protected boolean isNew = false;
 
     @ApiStatus.Internal
-    private boolean loaded = false;
+    protected boolean loaded = false;
 
     /**
      * Constructs a Variable instance with the specified id and associated database.
@@ -50,60 +50,9 @@ public abstract class Variable<T> {
         return this.id;
     }
 
-    /**
-     * Starts the variable.
-     *
-     * @return A CompletableFuture representing the asynchronous start operation
-     * @throws IllegalStateException If the variable is already loaded
-     * @since 2.0
-     */
-    public final @NotNull CompletableFuture<Void> start() {
-        if (isLoaded()) {
-            throw new IllegalStateException("The variable '" + getId() + "' is already loaded");
-        }
+    public abstract @NotNull CompletableFuture<Void> start();
 
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                load().join();
-                loaded = true;
-
-                future.complete(null);
-            } catch (Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
-    }
-
-    /**
-     * Stops the variable.
-     *
-     * @return A CompletableFuture representing the asynchronous stop operation
-     * @throws IllegalStateException If the variable is not loaded
-     * @since 2.0
-     */
-    public final @NotNull CompletableFuture<Void> stop() {
-        if (!isLoaded()) {
-            throw new IllegalStateException("The variable '" + getId() + "' is not loaded");
-        }
-
-        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                unload().get(10, TimeUnit.SECONDS);
-                loaded = false;
-                future.complete(null);
-            } catch (Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
-    }
+    public abstract @NotNull CompletableFuture<Void> stop();
 
     /**
      * Checks if the variable is new.
@@ -119,27 +68,6 @@ public abstract class Variable<T> {
             throw new IllegalStateException("To check if the variable is new, it needs to be loaded");
         }
     }
-
-    /**
-     * Loads the variable from the database.
-     * You cannot load if a variable is loaded at this database with this same id.
-     *
-     * @return A CompletableFuture representing the asynchronous load operation
-     * @since 1.0
-     */
-    @ApiStatus.OverrideOnly
-    @ApiStatus.Internal
-    protected abstract @NotNull CompletableFuture<Void> load();
-
-    /**
-     * Unloads the variable and all its components from the database.
-     *
-     * @return A CompletableFuture representing the asynchronous unload operation
-     * @since 1.0
-     */
-    @ApiStatus.OverrideOnly
-    @ApiStatus.Internal
-    protected abstract @NotNull CompletableFuture<Void> unload();
 
     /**
      * Deletes the variable from the database.

@@ -103,7 +103,6 @@ public class MysqlAuthentication {
                 this.connection.setAutoCommit(isAutoCommit());
 
                 @NotNull DatabaseMetaData metadata = getConnection().getMetaData();
-
                 version = MysqlVersion.of(metadata.getDatabaseMinorVersion(), metadata.getDatabaseMajorVersion(), metadata.getDatabaseProductVersion());
 
                 for (@NotNull MysqlDatabase database : loadDatabases(metadata)) {
@@ -127,6 +126,7 @@ public class MysqlAuthentication {
     }
 
     @Blocking
+    @ApiStatus.Internal
     private @NotNull Set<MysqlDatabase> loadDatabases(@NotNull DatabaseMetaData metaData) throws Throwable {
         @NotNull ResultSet set = metaData.getCatalogs();
         @NotNull Set<MysqlDatabase> databases = new LinkedHashSet<>();
@@ -134,22 +134,18 @@ public class MysqlAuthentication {
         while (set.next()) {
             @NotNull String databaseName = set.getString(1);
             @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(this, databaseName);
-
-            database.start().get(2, TimeUnit.SECONDS);
             databases.add(database);
         }
 
         return databases;
     }
 
-    /**
-     * Gets the MySQL version associated with this instance.
-     *
-     * @return The MySQL version, or null if not available
-     * @since 2.0
-     */
-    public @Nullable MysqlVersion getVersion() {
-        return version;
+    public final @NotNull MysqlVersion getVersion() {
+        if (version != null) {
+            return version;
+        } else {
+            throw new IllegalStateException("To retrieve mysql version the authentication needs to be connected!");
+        }
     }
 
     public @NotNull Class<Driver> getDriver() {
@@ -193,6 +189,7 @@ public class MysqlAuthentication {
 
                 connection.close();
                 connection = null;
+                version = null;
 
                 future.complete(null);
             } catch (Throwable throwable) {
