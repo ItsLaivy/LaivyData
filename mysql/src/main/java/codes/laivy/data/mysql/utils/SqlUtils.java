@@ -47,7 +47,7 @@ public final class SqlUtils {
             }
             builder.append(")");
         }
-        
+
         return builder.toString();
     }
 

@@ -23,6 +23,98 @@ public final class MysqlData extends Data {
 
     // Static methods
 
+    public static @NotNull CompletableFuture<Boolean> exists(@NotNull MysqlTable table, final long row) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                boolean tableExists = table.exists().join();
+
+                if (tableExists) {
+                    try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE `row` = " + row)) {
+                        ResultSet set = statement.executeQuery();
+                        future.complete(set.next());
+                        return;
+                    }
+                }
+
+                future.complete(false);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+    public static @NotNull CompletableFuture<Integer> exists(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        if (conditions.length == 0) {
+            throw new IllegalStateException("The conditions array cannot be empty");
+        } else if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
+            throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
+        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
+            throw new IllegalStateException("There's conditions with variables that hasn't loaded");
+        }
+
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+        final @NotNull CompletableFuture<Integer> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (!table.exists().join()) {
+                    future.complete(-1);
+                    return;
+                }
+
+                int amount = 0;
+
+                @NotNull Set<Long> excluded = new HashSet<>();
+
+                for (MysqlData data : table.getDatas()) {
+                    if (data.isLoaded()) {
+                        excluded.add(data.getRow());
+
+                        if (data.matches(finalConditions)) {
+                            amount++;
+                        }
+                    }
+                }
+
+                // Retrieving on database
+
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
+                    int index = 0;
+                    for (@NotNull Condition<?> condition : finalConditions) {
+                        //noinspection rawtypes
+                        @NotNull Type type = condition.getVariable().getType();
+                        //noinspection unchecked
+                        type.set(Parameter.of(statement, type.isNullSupported(), index), condition.getValue());
+                        index++;
+                    }
+
+                    @NotNull ResultSet set = statement.executeQuery();
+                    while (set.next()) amount++;
+                }
+
+                future.complete(amount);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
     public static @NotNull CompletableFuture<MysqlData> create(@NotNull MysqlTable table) {
         @NotNull CompletableFuture<MysqlData> future = new CompletableFuture<>();
 
@@ -37,7 +129,7 @@ public final class MysqlData extends Data {
 
         return future;
     }
-    public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, long row) {
+    public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, final long row) {
         @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
 
         if (optional.isPresent()) {
@@ -48,7 +140,7 @@ public final class MysqlData extends Data {
         table.getDatas().add(data);
         return data;
     }
-    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
+    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
         if (conditions.length == 0) {
@@ -276,6 +368,8 @@ public final class MysqlData extends Data {
 
     @Override
     public @NotNull CompletableFuture<Void> save() {
+        // TODO: 03/11/2023 Not mandatory be loaded to save a data
+
         @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
@@ -350,32 +444,7 @@ public final class MysqlData extends Data {
     }
 
     public @NotNull CompletableFuture<Boolean> exists() {
-        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
-        if (connection == null) {
-            throw new IllegalStateException("The database's authentication aren't connected");
-        }
-
-        @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                boolean tableExists = getTable().exists().join();
-
-                if (tableExists) {
-                    try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {
-                        ResultSet set = statement.executeQuery();
-                        future.complete(set.next());
-                        return;
-                    }
-                }
-
-                future.complete(false);
-            } catch (@NotNull Throwable throwable) {
-                future.completeExceptionally(throwable);
-            }
-        });
-
-        return future;
+        return exists(getTable(), getRow());
     }
 
     public @NotNull CompletableFuture<Boolean> delete() {
