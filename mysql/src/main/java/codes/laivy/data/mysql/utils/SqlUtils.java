@@ -33,7 +33,7 @@ public final class SqlUtils {
         }
 
         if (!excluded.isEmpty()) {
-            builder.append(" && WHERE `id` NOT IN (");
+            builder.append(" && `row` NOT IN (");
 
             index = 0;
             for (@NotNull Long row : excluded) {
@@ -47,7 +47,7 @@ public final class SqlUtils {
             }
             builder.append(")");
         }
-
+        
         return builder.toString();
     }
 
