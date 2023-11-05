@@ -9,6 +9,7 @@ import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,14 +22,20 @@ public class MysqlVariable<T> extends Variable<T> {
     private final @NotNull MysqlTable table;
     private final @NotNull Type<T> type;
 
-    private final @Nullable T defaultValue;
+    private final @UnknownNullability T defaultValue;
+    private final boolean nullable;
 
-    public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @Nullable T defaultValue) {
+    public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @UnknownNullability T defaultValue) {
+        this(id, table, type, defaultValue, true);
+    }
+    public MysqlVariable(@NotNull String id, @NotNull MysqlTable table, @NotNull Type<T> type, @UnknownNullability T defaultValue, boolean nullable) {
         super(id);
 
         this.table = table;
         this.type = type;
         this.defaultValue = defaultValue;
+
+        this.nullable = nullable;
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This variable id '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
@@ -50,8 +57,12 @@ public class MysqlVariable<T> extends Variable<T> {
         return type;
     }
 
-    public final @Nullable T getDefaultValue() {
+    public final @UnknownNullability T getDefaultValue() {
         return defaultValue;
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 
     @Override
