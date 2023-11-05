@@ -2,24 +2,18 @@ package codes.laivy.data.mysql.data;
 
 import codes.laivy.data.data.Data;
 import codes.laivy.data.mysql.database.MysqlDatabase;
-import codes.laivy.data.mysql.table.Datas;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.mysql.variable.type.Type;
-import codes.laivy.data.variable.Variable;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -262,19 +256,27 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
+        @UnknownNullability Object value = get(variable.getId());
+
+        if (value == null && !variable.isNullable()) {
+            throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
+        }
+
         //noinspection unchecked
-        return (T) data.get(variable);
+        return (T) value;
     }
 
     @Override
     public void set(@NotNull String id, @Nullable Object object) {
-        @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
+        @Nullable MysqlVariable<?> variable = getTable().getVariables().getById(id).orElse(null);
 
-        if (!optional.isPresent() || !data.containsKey(optional.get())) {
+        if (variable == null || !data.containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
+        } else if (object == null && !variable.isNullable()) {
+            throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
         }
 
-        data.put(optional.get(), object);
+        data.put(variable, object);
         changed.add(id);
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {

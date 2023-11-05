@@ -39,6 +39,8 @@ public class MysqlVariable<T> extends Variable<T> {
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This variable id '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
+        } else if (getDefaultValue() == null && !isNullable()) {
+            throw new IllegalStateException("This variable id '" + id + "' have a nullable default value, but it doesn't supports");
         }
     }
 
