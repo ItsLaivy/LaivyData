@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-public final class MysqlTable {
+public class MysqlTable {
 
     private final @NotNull String id;
     private final @NotNull MysqlDatabase database;
@@ -23,26 +23,34 @@ public final class MysqlTable {
     private final @NotNull Variables variables;
     private final @NotNull Datas datas;
 
-    private final @NotNull AutoIncrement autoIncrement = AutoIncrement.of(this);
+    private final @NotNull AutoIncrement autoIncrement;
 
-    private boolean isNew = false;
+    protected boolean isNew = false;
 
     @ApiStatus.Internal
-    private boolean loaded = false;
+    protected boolean loaded = false;
 
+    protected MysqlTable(@NotNull String id, @NotNull MysqlDatabase database, @NotNull Variables variables, @NotNull Datas datas, @NotNull AutoIncrement autoIncrement) {
+        this.id = id;
+        this.database = database;
+        this.variables = variables;
+        this.datas = datas;
+        this.autoIncrement = autoIncrement;
+    }
     public MysqlTable(@NotNull String id, @NotNull MysqlDatabase database) {
         this.id = id;
         this.database = database;
 
         this.variables = new Variables(this);
         this.datas = new Datas(this);
+        this.autoIncrement = AutoIncrement.of(this);
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
             throw new IllegalStateException("This table name '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
         }
     }
 
-    public @NotNull CompletableFuture<Void> start() {
+    public final @NotNull CompletableFuture<Void> start() {
         if (isLoaded()) {
             throw new IllegalStateException("The mysql table '" + getId() + "' is already loaded");
         }
@@ -69,7 +77,7 @@ public final class MysqlTable {
 
         return future;
     }
-    public @NotNull CompletableFuture<Void> stop() {
+    public final @NotNull CompletableFuture<Void> stop() {
         if (!isLoaded()) {
             throw new IllegalStateException("The mysql table '" + getId() + "' is not loaded");
         }
@@ -184,24 +192,24 @@ public final class MysqlTable {
     }
 
     @Contract(pure = true)
-    public @NotNull AutoIncrement getAutoIncrement() {
+    public final @NotNull AutoIncrement getAutoIncrement() {
         return autoIncrement;
     }
 
     @Contract(pure = true)
-    public @NotNull String getId() {
+    public final @NotNull String getId() {
         return id;
     }
 
     @Contract(pure = true)
-    public @NotNull MysqlDatabase getDatabase() {
+    public final @NotNull MysqlDatabase getDatabase() {
         return database;
     }
 
-    public @NotNull Variables getVariables() {
+    public final @NotNull Variables getVariables() {
         return variables;
     }
-    public @NotNull Datas getDatas() {
+    public final @NotNull Datas getDatas() {
         return datas;
     }
 
@@ -229,7 +237,7 @@ public final class MysqlTable {
         return future;
     }
 
-    public boolean isNew() {
+    public final boolean isNew() {
         if (isLoaded()) {
             return this.isNew;
         } else {
@@ -237,13 +245,13 @@ public final class MysqlTable {
         }
     }
 
-    public boolean isLoaded() {
+    public final boolean isLoaded() {
         return loaded;
     }
 
     @Override
     @Contract(pure = true)
-    public boolean equals(Object object) {
+    public final boolean equals(Object object) {
         if (this == object) return true;
         if (!(object instanceof MysqlTable)) return false;
         MysqlTable that = (MysqlTable) object;
@@ -251,7 +259,7 @@ public final class MysqlTable {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(getId(), getDatabase());
     }
 
