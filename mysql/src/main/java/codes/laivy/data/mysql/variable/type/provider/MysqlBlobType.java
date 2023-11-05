@@ -1,6 +1,7 @@
-package codes.laivy.data.mysql.variable.type;
+package codes.laivy.data.mysql.variable.type.provider;
 
 import codes.laivy.data.mysql.variable.Parameter;
+import codes.laivy.data.mysql.variable.type.AbstractType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public class MysqlBlobType extends AbstractType<byte[]> {
+public final class MysqlBlobType extends AbstractType<byte[]> {
 
     private final @NotNull Size size;
 

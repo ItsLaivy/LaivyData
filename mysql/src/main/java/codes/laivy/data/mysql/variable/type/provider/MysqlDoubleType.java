@@ -1,13 +1,14 @@
-package codes.laivy.data.mysql.variable.type;
+package codes.laivy.data.mysql.variable.type.provider;
 
 import codes.laivy.data.mysql.variable.Parameter;
+import codes.laivy.data.mysql.variable.type.AbstractType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlDoubleType extends AbstractType<Double> {
+public final class MysqlDoubleType extends AbstractType<Double> {
 
     public MysqlDoubleType() {
         super("DOUBLE");

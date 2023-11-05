@@ -61,7 +61,8 @@ public class MysqlVariable<T> extends Variable<T> {
         return defaultValue;
     }
 
-    public boolean isNullable() {
+    @Contract(pure = true)
+    public final boolean isNullable() {
         return nullable;
     }
 

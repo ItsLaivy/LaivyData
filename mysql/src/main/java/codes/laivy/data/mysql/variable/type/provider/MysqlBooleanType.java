@@ -1,12 +1,13 @@
-package codes.laivy.data.mysql.variable.type;
+package codes.laivy.data.mysql.variable.type.provider;
 
 import codes.laivy.data.mysql.variable.Parameter;
+import codes.laivy.data.mysql.variable.type.AbstractType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlBooleanType extends AbstractType<Boolean> {
+public final class MysqlBooleanType extends AbstractType<Boolean> {
     public MysqlBooleanType() {
         super("BOOL");
     }

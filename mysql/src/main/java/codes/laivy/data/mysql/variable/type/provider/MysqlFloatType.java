@@ -1,22 +1,23 @@
-package codes.laivy.data.mysql.variable.type;
+package codes.laivy.data.mysql.variable.type.provider;
 
 import codes.laivy.data.mysql.variable.Parameter;
+import codes.laivy.data.mysql.variable.type.AbstractType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlIntType extends AbstractType<Integer> {
+public final class MysqlFloatType extends AbstractType<Float> {
 
-    public MysqlIntType() {
-        super("INT");
+    public MysqlFloatType() {
+        super("FLOAT");
     }
 
     @Override
-    public void set(@NotNull Parameter parameter, @Nullable Integer value) {
+    public void set(@NotNull Parameter parameter, @Nullable Float value) {
         try {
             if (value != null) {
-                parameter.setInt(value);
+                parameter.setFloat(value);
             } else {
                 parameter.setNull();
             }
@@ -26,16 +27,16 @@ public class MysqlIntType extends AbstractType<Integer> {
     }
 
     @Override
-    public @Nullable Integer get(@Nullable Object object) {
+    public @Nullable Float get(@Nullable Object object) {
         if (object == null) {
             return null;
         }
 
-        int value;
-        if (object instanceof Integer) {
-            value = (Integer) object;
+        float value;
+        if (object instanceof Float) {
+            value = (Float) object;
         } else {
-            value = Integer.parseInt(String.valueOf(object));
+            value = Float.parseFloat(String.valueOf(object));
         }
 
         return value;
