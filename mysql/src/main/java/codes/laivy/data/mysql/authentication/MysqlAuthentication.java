@@ -1,6 +1,7 @@
 package codes.laivy.data.mysql.authentication;
 
-import codes.laivy.data.mysql.MysqlVersion;
+import codes.laivy.data.Main;
+import codes.laivy.data.mysql.utils.MysqlVersion;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import org.jetbrains.annotations.*;
 
@@ -120,7 +121,7 @@ public class MysqlAuthentication {
 
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -195,7 +196,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -222,7 +223,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -255,7 +256,7 @@ public class MysqlAuthentication {
                 } catch (Throwable throwable) {
                     future.completeExceptionally(throwable);
                 }
-            });
+            }, Main.MAIN_EXECUTOR);
 
             return future;
         }
@@ -298,7 +299,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }

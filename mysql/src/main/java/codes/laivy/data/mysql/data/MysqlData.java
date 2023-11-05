@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.data;
 
+import codes.laivy.data.Main;
 import codes.laivy.data.data.Data;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
@@ -44,7 +45,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -107,7 +108,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -122,7 +123,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -198,7 +199,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -274,6 +275,8 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         } else if (object == null && !variable.isNullable()) {
             throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
+        } else if (Objects.equals(get(variable), object)) {
+            return;
         }
 
         data.put(variable, object);
@@ -285,6 +288,10 @@ public final class MysqlData extends Data {
         }
 
         set(variable.getId(), object);
+    }
+
+    public boolean hasChanges() {
+        return !changed.isEmpty();
     }
 
     public @NotNull CompletableFuture<Void> start() {
@@ -342,7 +349,7 @@ public final class MysqlData extends Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -369,7 +376,7 @@ public final class MysqlData extends Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -448,7 +455,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -481,7 +488,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }

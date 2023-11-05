@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.table;
 
+import codes.laivy.data.Main;
 import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.utils.SqlUtils;
@@ -73,7 +74,7 @@ public class MysqlTable {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -107,7 +108,7 @@ public class MysqlTable {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -131,7 +132,7 @@ public class MysqlTable {
                     future.completeExceptionally(throwable);
                 }
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -159,7 +160,7 @@ public class MysqlTable {
                     future.completeExceptionally(throwable);
                 }
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -186,7 +187,7 @@ public class MysqlTable {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -232,7 +233,7 @@ public class MysqlTable {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }

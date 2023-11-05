@@ -1,4 +1,4 @@
-package codes.laivy.data.mysql;
+package codes.laivy.data.mysql.utils;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,7 @@
 package codes.laivy.data.mysql;
 
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.utils.MysqlVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.junit.Assert;

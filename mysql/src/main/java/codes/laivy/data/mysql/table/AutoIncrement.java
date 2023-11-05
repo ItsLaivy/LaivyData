@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.table;
 
+import codes.laivy.data.Main;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ public interface AutoIncrement {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -57,7 +58,7 @@ public interface AutoIncrement {
                     } catch (@NotNull Throwable throwable) {
                         future.completeExceptionally(throwable);
                     }
-                });
+                }, Main.MAIN_EXECUTOR);
 
                 return future;
             }
@@ -81,7 +82,7 @@ public interface AutoIncrement {
                     } catch (@NotNull Throwable throwable) {
                         future.completeExceptionally(throwable);
                     }
-                });
+                }, Main.MAIN_EXECUTOR);
 
                 return future;
             }

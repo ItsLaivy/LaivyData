@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.variable.type;
 
+import codes.laivy.data.Main;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public abstract class AbstractType<T> implements Type<T> {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }

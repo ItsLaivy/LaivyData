@@ -1,5 +1,6 @@
 package codes.laivy.data.mysql.variable;
 
+import codes.laivy.data.Main;
 import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
@@ -107,7 +108,7 @@ public class MysqlVariable<T> extends Variable<T> {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -127,7 +128,7 @@ public class MysqlVariable<T> extends Variable<T> {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -157,7 +158,7 @@ public class MysqlVariable<T> extends Variable<T> {
                     future.completeExceptionally(throwable);
                 }
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
@@ -186,7 +187,7 @@ public class MysqlVariable<T> extends Variable<T> {
                     future.completeExceptionally(throwable);
                 }
             }
-        });
+        }, Main.MAIN_EXECUTOR);
 
         return future;
     }
