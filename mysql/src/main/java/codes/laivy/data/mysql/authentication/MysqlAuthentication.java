@@ -121,7 +121,7 @@ public class MysqlAuthentication {
 
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -196,7 +196,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -223,7 +223,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -256,7 +256,7 @@ public class MysqlAuthentication {
                 } catch (Throwable throwable) {
                     future.completeExceptionally(throwable);
                 }
-            }, Main.MAIN_EXECUTOR);
+            }, Main.getExecutor(getClass()));
 
             return future;
         }
@@ -299,7 +299,7 @@ public class MysqlAuthentication {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }

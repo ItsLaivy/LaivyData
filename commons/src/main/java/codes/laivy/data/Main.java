@@ -1,15 +1,28 @@
 package codes.laivy.data;
 
+import codes.laivy.data.api.Api;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
-public class Main {
+public abstract class Main {
 
-    public static @NotNull Executor MAIN_EXECUTOR = new ForkJoinPool();
+    public static @NotNull Api api = new Api() {
 
-    public static void main(String[] args) {
+        public final @NotNull Executor executor = (ForkJoinPool.getCommonPoolParallelism() > 1) ? ForkJoinPool.commonPool() : command -> new Thread(command).start();
+
+        @Override
+        public @NotNull Executor getExecutor(@NotNull Class<?> clasz) {
+            return executor;
+        }
+    };
+
+    public static @NotNull Executor getExecutor(@NotNull Class<?> clasz) {
+        return api.getExecutor(clasz);
     }
 
+    public static void main(String[] args) {
+
+    }
 }

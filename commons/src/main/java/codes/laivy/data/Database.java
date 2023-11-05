@@ -70,7 +70,7 @@ public abstract class Database {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -97,7 +97,7 @@ public abstract class Database {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }

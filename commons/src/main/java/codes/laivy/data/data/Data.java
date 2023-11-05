@@ -46,7 +46,7 @@ public abstract class Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -65,7 +65,7 @@ public abstract class Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -80,7 +80,7 @@ public abstract class Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }

@@ -108,7 +108,7 @@ public class MysqlVariable<T> extends Variable<T> {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -128,7 +128,7 @@ public class MysqlVariable<T> extends Variable<T> {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -158,7 +158,7 @@ public class MysqlVariable<T> extends Variable<T> {
                     future.completeExceptionally(throwable);
                 }
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -187,7 +187,7 @@ public class MysqlVariable<T> extends Variable<T> {
                     future.completeExceptionally(throwable);
                 }
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }

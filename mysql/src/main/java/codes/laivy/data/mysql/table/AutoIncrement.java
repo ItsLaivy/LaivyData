@@ -24,7 +24,7 @@ public interface AutoIncrement {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -58,7 +58,7 @@ public interface AutoIncrement {
                     } catch (@NotNull Throwable throwable) {
                         future.completeExceptionally(throwable);
                     }
-                }, Main.MAIN_EXECUTOR);
+                }, Main.getExecutor(getClass()));
 
                 return future;
             }
@@ -82,7 +82,7 @@ public interface AutoIncrement {
                     } catch (@NotNull Throwable throwable) {
                         future.completeExceptionally(throwable);
                     }
-                }, Main.MAIN_EXECUTOR);
+                }, Main.getExecutor(getClass()));
 
                 return future;
             }

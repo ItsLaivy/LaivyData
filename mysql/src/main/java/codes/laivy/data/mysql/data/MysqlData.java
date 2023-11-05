@@ -45,7 +45,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(MysqlData.class));
 
         return future;
     }
@@ -108,7 +108,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(MysqlData.class));
 
         return future;
     }
@@ -123,7 +123,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(MysqlData.class));
 
         return future;
     }
@@ -199,7 +199,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(MysqlData.class));
 
         return future;
     }
@@ -349,7 +349,7 @@ public final class MysqlData extends Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -376,7 +376,7 @@ public final class MysqlData extends Data {
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -455,7 +455,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
@@ -488,7 +488,7 @@ public final class MysqlData extends Data {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }

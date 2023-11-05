@@ -48,7 +48,7 @@ public abstract class AbstractType<T> implements Type<T> {
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
-        }, Main.MAIN_EXECUTOR);
+        }, Main.getExecutor(getClass()));
 
         return future;
     }
