@@ -2,11 +2,13 @@ package codes.laivy.data.mysql.data;
 
 import codes.laivy.data.data.Data;
 import codes.laivy.data.mysql.database.MysqlDatabase;
+import codes.laivy.data.mysql.table.Datas;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.utils.SqlUtils;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.mysql.variable.type.Type;
+import codes.laivy.data.variable.Variable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -133,7 +136,7 @@ public final class MysqlData extends Data {
         @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
 
         if (optional.isPresent()) {
-             return optional.get();
+            return optional.get();
         }
 
         @NotNull MysqlData data = new MysqlData(table, row);
@@ -209,7 +212,9 @@ public final class MysqlData extends Data {
     // Object
 
     private final @NotNull Map<@NotNull MysqlVariable<?>, @Nullable Object> data = new HashMap<>();
+
     private final @NotNull Map<@NotNull String, @Nullable Object> cache = new HashMap<>();
+    private final @NotNull Set<@NotNull String> changed = new HashSet<>();
 
     private final @NotNull MysqlTable table;
     private final long row;
@@ -270,13 +275,14 @@ public final class MysqlData extends Data {
         }
 
         data.put(optional.get(), object);
+        changed.add(id);
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
         if (!data.containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
-        data.put(variable, object);
+        set(variable.getId(), object);
     }
 
     public @NotNull CompletableFuture<Void> start() {
@@ -409,6 +415,8 @@ public final class MysqlData extends Data {
                         statement.execute();
                     }
                 } else {
+                    variables.removeIf(variable -> changed.stream().noneMatch(id -> id.equalsIgnoreCase(variable.getId())));
+
                     if (!variables.isEmpty()) {
                         @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
 
@@ -433,7 +441,7 @@ public final class MysqlData extends Data {
                     }
                 }
 
-
+                changed.clear();
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);

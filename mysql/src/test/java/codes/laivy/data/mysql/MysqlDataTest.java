@@ -299,7 +299,7 @@ public class MysqlDataTest {
         Assert.assertEquals((Integer) 4, MysqlData.exists(table, Condition.of(variable, expected)).get(2, TimeUnit.SECONDS));
         //
 
-        database.delete().get(2, TimeUnit.SECONDS);
+//        database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 }
