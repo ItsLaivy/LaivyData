@@ -409,30 +409,30 @@ public final class MysqlData extends Data {
 
                 if (!exists().join()) {
                     create().join();
-                }
+                } else {
+                    variables.removeIf(variable -> changed.stream().noneMatch(id -> id.equalsIgnoreCase(variable.getId())));
 
-                variables.removeIf(variable -> changed.stream().noneMatch(id -> id.equalsIgnoreCase(variable.getId())));
+                    if (!variables.isEmpty()) {
+                        @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
 
-                if (!variables.isEmpty()) {
-                    @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
-
-                    int row = 0;
-                    for (MysqlVariable<?> variable : variables) {
-                        if (row > 0) builder.append(",");
-                        builder.append("`").append(variable.getId()).append("` = ?");
-                        row++;
-                    }
-
-                    try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
-                        row = 0;
-                        //noinspection rawtypes
-                        for (MysqlVariable variable : variables) {
-                            //noinspection unchecked
-                            variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), get(variable));
+                        int row = 0;
+                        for (MysqlVariable<?> variable : variables) {
+                            if (row > 0) builder.append(",");
+                            builder.append("`").append(variable.getId()).append("` = ?");
                             row++;
                         }
 
-                        statement.execute();
+                        try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
+                            row = 0;
+                            //noinspection rawtypes
+                            for (MysqlVariable variable : variables) {
+                                //noinspection unchecked
+                                variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), get(variable));
+                                row++;
+                            }
+
+                            statement.execute();
+                        }
                     }
                 }
 
