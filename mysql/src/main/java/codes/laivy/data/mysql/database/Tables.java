@@ -2,6 +2,7 @@ package codes.laivy.data.mysql.database;
 
 import codes.laivy.data.content.Content;
 import codes.laivy.data.mysql.table.MysqlTable;
+import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 
 public class Tables extends Content.SetProvider<MysqlTable> {
 
@@ -44,6 +46,13 @@ public class Tables extends Content.SetProvider<MysqlTable> {
         synchronized (this) {
             return super.remove(object);
         }
+    }
+
+    public boolean contains(@NotNull String id) {
+        return stream().anyMatch(table -> table.getId().equalsIgnoreCase(id));
+    }
+    public @NotNull Optional<MysqlTable> get(@NotNull String id) {
+        return stream().filter(table -> table.getId().equalsIgnoreCase(id)).findFirst();
     }
 
     @Override

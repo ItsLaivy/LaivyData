@@ -51,6 +51,14 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
         }
     }
 
+    public boolean contains(@NotNull String id) {
+        return stream().anyMatch(variable -> variable.getId().equalsIgnoreCase(id));
+    }
+
+    public @NotNull Optional<MysqlVariable<?>> get(@NotNull String id) {
+        return stream().filter(variable -> variable.getId().equalsIgnoreCase(id)).findFirst();
+    }
+
     @Override
     public @NotNull Iterator<MysqlVariable<?>> iterator() {
         synchronized (this) {
