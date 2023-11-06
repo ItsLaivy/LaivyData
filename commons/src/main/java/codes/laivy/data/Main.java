@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
-public abstract class Main {
+public final class Main {
 
     public static @NotNull Api api = new Api() {
 
@@ -23,6 +23,5 @@ public abstract class Main {
     }
 
     public static void main(String[] args) {
-
     }
 }

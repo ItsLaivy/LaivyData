@@ -284,12 +284,16 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         } else if (object == null && !variable.isNullable()) {
             throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
-        } else if (Objects.equals(get(variable), object)) {
-            return;
         }
 
-        data.put(variable, object);
-        changed.add(id);
+        synchronized (this) {
+            if (Objects.equals(get(variable), object)) {
+                return;
+            }
+
+            data.put(variable, object);
+            changed.add(id);
+        }
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
         if (!data.containsKey(variable)) {

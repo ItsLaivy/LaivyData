@@ -1,6 +1,7 @@
 package codes.laivy.data.mysql.table;
 
 import codes.laivy.data.content.Content;
+import codes.laivy.data.mysql.data.Condition;
 import codes.laivy.data.mysql.data.MysqlData;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,25 @@ public final class Datas extends Content.SetProvider<MysqlData> {
 
         synchronized (this) {
             return super.add(object);
+        }
+    }
+
+    public boolean contains(long row) {
+        if (!getTable().isLoaded()) {
+            throw new IllegalStateException("The table aren't loaded");
+        }
+
+        synchronized (this) {
+            return stream().anyMatch(d -> d.getRow() == row);
+        }
+    }
+    public boolean contains(@NotNull Condition<?> @NotNull ... conditions) {
+        if (!getTable().isLoaded()) {
+            throw new IllegalStateException("The table aren't loaded");
+        }
+
+        synchronized (this) {
+            return stream().anyMatch(d -> d.matches(conditions) );
         }
     }
 
