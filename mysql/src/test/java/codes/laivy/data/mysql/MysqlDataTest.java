@@ -299,7 +299,35 @@ public class MysqlDataTest {
         Assert.assertEquals((Integer) 4, MysqlData.exists(table, Condition.of(variable, expected)).get(2, TimeUnit.SECONDS));
         //
 
-//        database.delete().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testUnloadedSave() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected = "Just a cool test :)";
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        // Creating 4 datas
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.save().get(2, TimeUnit.SECONDS);
+        // Verifying if exists the 4 datas
+        Assert.assertEquals((Integer) 1, MysqlData.exists(table, Condition.of(variable, expected)).get(2, TimeUnit.SECONDS));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 }
