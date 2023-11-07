@@ -244,7 +244,7 @@ public final class MysqlData extends Data {
     }
 
     @Override
-    public @Nullable Object get(@NotNull String id) {
+    public @UnknownNullability Object get(@NotNull String id) {
         if (!isLoaded()) {
             throw new IllegalStateException("You cannot retrieve values of a unloaded data");
         }
@@ -257,7 +257,7 @@ public final class MysqlData extends Data {
 
         return data.get(optional.get());
     }
-    public <T> @Nullable T get(@NotNull MysqlVariable<T> variable) {
+    public <T> @UnknownNullability T get(@NotNull MysqlVariable<T> variable) {
         if (!data.containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
@@ -273,7 +273,7 @@ public final class MysqlData extends Data {
     }
 
     @Override
-    public void set(@NotNull String id, @Nullable Object object) {
+    public void set(@NotNull String id, @UnknownNullability Object object) {
         if (!isLoaded()) {
             throw new IllegalStateException("You cannot change values of a unloaded data");
         }
@@ -295,7 +295,7 @@ public final class MysqlData extends Data {
             changed.add(id.toLowerCase());
         }
     }
-    public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
+    public <T> void set(@NotNull MysqlVariable<T> variable, @UnknownNullability T object) {
         if (!data.containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
@@ -306,11 +306,15 @@ public final class MysqlData extends Data {
     public boolean hasChanges() {
         return !changed.isEmpty();
     }
-    public void setChanges(@NotNull MysqlVariable<?> variable) {
+    public void setChanges(@NotNull MysqlVariable<?> variable, boolean flag) {
         if (!getTable().getVariables().contains(variable)) {
             throw new IllegalStateException("The table of that data doesn't contains that variable");
         } else {
-            changed.add(variable.getId().toLowerCase());
+            if (flag) {
+                changed.add(variable.getId().toLowerCase());
+            } else {
+                changed.removeIf(variableId -> variableId.equalsIgnoreCase(variable.getId()));
+            }
         }
     }
 
