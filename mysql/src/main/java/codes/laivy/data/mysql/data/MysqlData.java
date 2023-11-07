@@ -292,7 +292,7 @@ public final class MysqlData extends Data {
             }
 
             data.put(variable, object);
-            changed.add(id);
+            changed.add(id.toLowerCase());
         }
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @Nullable T object) {
@@ -305,6 +305,13 @@ public final class MysqlData extends Data {
 
     public boolean hasChanges() {
         return !changed.isEmpty();
+    }
+    public void setChanges(@NotNull MysqlVariable<?> variable) {
+        if (!getTable().getVariables().contains(variable)) {
+            throw new IllegalStateException("The table of that data doesn't contains that variable");
+        } else {
+            changed.add(variable.getId().toLowerCase());
+        }
     }
 
     public @NotNull CompletableFuture<Void> start() {
@@ -322,6 +329,9 @@ public final class MysqlData extends Data {
                 if (!getTable().isLoaded() || !getTable().exists().join()) {
                     throw new IllegalStateException("The table of this data aren't loaded or created");
                 }
+
+                getData().clear();
+                getCache().clear();
 
                 if (exists().join()) {
                     try (@NotNull PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {
@@ -380,6 +390,7 @@ public final class MysqlData extends Data {
         CompletableFuture.runAsync(() -> {
             try {
                 if (save) save().join();
+                changed.clear();
 
                 getData().clear();
                 getCache().clear();
@@ -490,8 +501,6 @@ public final class MysqlData extends Data {
         });
 
         return future;
-
-
     }
 
     public @NotNull CompletableFuture<Boolean> exists() {
