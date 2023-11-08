@@ -1,0 +1,72 @@
+package codes.laivy.data.mysql;
+
+import codes.laivy.data.mysql.authentication.MysqlAuthentication;
+import codes.laivy.data.mysql.data.Condition;
+import codes.laivy.data.mysql.data.MysqlData;
+import codes.laivy.data.mysql.data.MysqlDataCache;
+import codes.laivy.data.mysql.database.MysqlDatabase;
+import codes.laivy.data.mysql.table.MysqlTable;
+import codes.laivy.data.mysql.variable.MysqlVariable;
+import codes.laivy.data.mysql.variable.type.provider.MysqlTextType;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
+
+public class MysqlCacheDataTest {
+
+    public final @NotNull String USERNAME;
+    public final @NotNull String PASSWORD;
+    public final @NotNull InetAddress ADDRESS;
+    public final int PORT;
+
+    public MysqlCacheDataTest() throws Throwable {
+        PASSWORD = "";
+        USERNAME = "root";
+        PORT = 3306;
+        ADDRESS = InetAddress.getByName("localhost");
+    }
+
+    @Test
+    public void testLoadAndUnload() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expect = "Just a cool text :)";
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expect);
+        variable.start().get(2, TimeUnit.SECONDS);
+        @NotNull MysqlVariable<String> variable2 = new MysqlVariable<>("id", table, new MysqlTextType(), null);
+        variable2.start().get(2, TimeUnit.SECONDS);
+
+        // Data code
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlDataCache cache = MysqlDataCache.copy(data);
+
+        Assert.assertEquals(expect, data.get(variable));
+        Assert.assertEquals(expect, cache.get(variable));
+        data.stop(false).get(2, TimeUnit.SECONDS);
+        // Test id
+        data.start().get(2, TimeUnit.SECONDS);
+        data.set(variable2, "test_id");
+        data.stop(true);
+
+        cache = MysqlDataCache.retrieve(table, Condition.of(variable2, "test_id")).get(2, TimeUnit.SECONDS)[0];
+        Assert.assertEquals(expect, cache.get(variable));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+}
