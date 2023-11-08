@@ -1,51 +1,48 @@
 package codes.laivy.data.mysql.data;
 
+import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Objects;
 
-public final class Condition<T> {
+public final class Condition {
 
-    public static <E> @NotNull Condition<E> of(@NotNull MysqlVariable<E> variable, @Nullable E value) {
-        return new Condition<>(variable, value);
+    public static <E> @NotNull Condition of(@NotNull MysqlVariable<E> variable, @UnknownNullability E value) {
+        return new Condition(variable.getTable(), variable.getId(), value);
+    }
+    public static @NotNull Condition of(@NotNull MysqlTable table, @NotNull String variableId, @UnknownNullability Object value) {
+        return new Condition(table, variableId, value);
     }
 
-    private final @NotNull MysqlVariable<T> variable;
-    private final @Nullable T value;
+    private final @NotNull MysqlTable table;
+    private final @NotNull String variableId;
 
-    private Condition(@NotNull MysqlVariable<T> variable, @Nullable T value) {
-        this.variable = variable;
+    private final @UnknownNullability Object value;
+
+    private Condition(@NotNull MysqlTable table, @NotNull String variableId, @UnknownNullability Object value) {
+        this.table = table;
+        this.variableId = variableId;
+
         this.value = value;
     }
 
-    public @NotNull MysqlVariable<T> getVariable() {
-        return variable;
+    public @NotNull String getVariableId() {
+        return variableId;
     }
 
-    public @Nullable T getValue() {
+    public @NotNull MysqlTable getTable() {
+        return table;
+    }
+
+    public @NotNull MysqlVariable<?> getVariable() {
+        return getTable().getVariables().get(getVariableId()).orElseThrow(() -> new NullPointerException("There's no variable with id '" + getVariableId() + "' at table '" + getTable().getId() + "'"));
+    }
+
+    public @UnknownNullability Object getValue() {
         return value;
     }
 
-    @Override
-    public boolean equals(@Nullable Object object) {
-        if (this == object) return true;
-        if (!(object instanceof Condition)) return false;
-        Condition<?> condition = (Condition<?>) object;
-        return Objects.equals(getVariable(), condition.getVariable()) && Objects.equals(getValue(), condition.getValue());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getVariable(), getValue());
-    }
-
-    @Override
-    public @NotNull String toString() {
-        return "Condition{" +
-                "variable=" + variable +
-                ", value=" + value +
-                '}';
-    }
 }

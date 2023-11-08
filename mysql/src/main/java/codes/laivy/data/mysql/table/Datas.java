@@ -47,7 +47,7 @@ public final class Datas extends Content.SetProvider<MysqlData> {
             return stream().anyMatch(d -> d.getRow() == row);
         }
     }
-    public boolean contains(@NotNull Condition<?> @NotNull ... conditions) {
+    public boolean contains(@NotNull Condition @NotNull ... conditions) {
         if (!getTable().isLoaded()) {
             throw new IllegalStateException("The table aren't loaded");
         }
