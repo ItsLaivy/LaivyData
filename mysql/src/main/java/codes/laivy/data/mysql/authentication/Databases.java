@@ -26,10 +26,6 @@ public class Databases extends Content.SetProvider<MysqlDatabase> {
 
     @Override
     public boolean add(@NotNull MysqlDatabase object) {
-        if (!getAuthentication().isConnected()) {
-            throw new IllegalStateException("The authentication aren't connected");
-        }
-
         synchronized (this) {
             return super.add(object);
         }
@@ -37,10 +33,6 @@ public class Databases extends Content.SetProvider<MysqlDatabase> {
 
     @Override
     public boolean remove(@NotNull MysqlDatabase object) {
-        if (!getAuthentication().isConnected()) {
-            throw new IllegalStateException("The authentication aren't connected");
-        }
-
         synchronized (this) {
             return super.remove(object);
         }

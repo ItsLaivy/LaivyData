@@ -29,28 +29,14 @@ public final class MysqlDatabase extends Database {
      * @return An Optional containing the MysqlDatabase if found, else an empty Optional
      */
     public static @NotNull Optional<MysqlDatabase> get(@NotNull MysqlAuthentication authentication, @NotNull String id) {
-        if (!authentication.isConnected()) {
-            throw new IllegalStateException("This authentication is not connected");
-        }
-
         return authentication.getDatabases().stream()
                 .filter(db -> db.getId().equalsIgnoreCase(id))
                 .findFirst();
     }
 
     public static @NotNull MysqlDatabase getOrCreate(@NotNull MysqlAuthentication authentication, @NotNull String id) {
-        if (!authentication.isConnected()) {
-            throw new IllegalStateException("This authentication is not connected");
-        }
-
         @NotNull Optional<MysqlDatabase> databaseOptional = get(authentication, id);
-        if (databaseOptional.isPresent()) {
-            return databaseOptional.get();
-        } else {
-            @NotNull MysqlDatabase database = new MysqlDatabase(authentication, id);
-            authentication.getDatabases().add(database);
-            return database;
-        }
+        return databaseOptional.orElseGet(() -> new MysqlDatabase(authentication, id));
     }
 
     // Object
