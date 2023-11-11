@@ -99,6 +99,8 @@ public class MysqlVariable<T> extends Variable<T> {
                             data.getCache().keySet().removeIf(name -> name.equalsIgnoreCase(getId()));
 
                             data.getData().put(this, o);
+                        } else {
+                            data.getData().put(this, getDefaultValue());
                         }
                     }
                 }
@@ -123,6 +125,8 @@ public class MysqlVariable<T> extends Variable<T> {
 
         CompletableFuture.runAsync(() -> {
             try {
+                getTable().getVariables().remove(this);
+
                 loaded = false;
                 future.complete(null);
             } catch (Throwable throwable) {

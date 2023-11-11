@@ -182,7 +182,6 @@ public final class MysqlDatabase extends Database {
                 }
 
                 statement.execute();
-                getAuthentication().getDatabases().remove(this);
 
                 future.complete(null);
             } catch (Throwable throwable) {

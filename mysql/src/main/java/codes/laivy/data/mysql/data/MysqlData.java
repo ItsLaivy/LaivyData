@@ -262,14 +262,8 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
-        @UnknownNullability Object value = get(variable.getId());
-
-        if (value == null && !variable.isNullable()) {
-            throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
-        }
-
         //noinspection unchecked
-        return (T) value;
+        return (T) get(variable.getId());
     }
 
     @Override

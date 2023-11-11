@@ -269,6 +269,34 @@ public class MysqlDataTest {
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
+    @Test
+    public void testStartVariableAfterDataWithoutCreatingLoading() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected = "Just a cool test :)";
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
+
+        // Data code
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        Assert.assertEquals(data.get(variable), expected);
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
 
     @Test
     public void testExistsWithCondition() throws Exception {

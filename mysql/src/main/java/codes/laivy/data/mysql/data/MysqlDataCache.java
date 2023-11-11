@@ -147,8 +147,7 @@ public final class MysqlDataCache {
         } else if (!getData().containsKey(variable.getId().toLowerCase())) {
             throw new IllegalStateException("This data cache doesn't have information about the variable '" + variable.getId() + "'");
         } else {
-            //noinspection unchecked
-            return (T) getData().get(variable.getId().toLowerCase());
+            return variable.getType().get(getData().get(variable.getId().toLowerCase()));
         }
     }
 }

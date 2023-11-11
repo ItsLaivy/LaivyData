@@ -33,6 +33,10 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
     public boolean add(@NotNull MysqlVariable<?> object) {
         if (!getTable().isLoaded()) {
             throw new IllegalStateException("The table aren't loaded");
+        } else if (stream().anyMatch(var -> var.getId().equalsIgnoreCase(object.getId()))) {
+            throw new IllegalStateException("A variable with id '" + object.getId() + "' already are added at table '" + getTable().getId() + "'");
+        } else if (!object.getTable().equals(getTable())) {
+            throw new IllegalStateException("Illegal variable table '" + object.getId() + "'");
         }
 
         synchronized (this) {
@@ -44,6 +48,8 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
     public boolean remove(@NotNull MysqlVariable<?> object) {
         if (!getTable().isLoaded()) {
             throw new IllegalStateException("The variable aren't loaded");
+        } else if (!object.getTable().equals(getTable())) {
+            throw new IllegalStateException("Illegal variable table '" + object.getId() + "'");
         }
 
         synchronized (this) {

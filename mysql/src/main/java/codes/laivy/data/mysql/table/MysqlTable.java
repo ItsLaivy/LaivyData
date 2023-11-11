@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -87,7 +88,7 @@ public class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                for (MysqlVariable<?> variable : getVariables()) {
+                for (MysqlVariable<?> variable : new HashSet<>(getVariables().toCollection())) {
                     if (variable.isLoaded()) {
                         variable.stop().join();
                     }
