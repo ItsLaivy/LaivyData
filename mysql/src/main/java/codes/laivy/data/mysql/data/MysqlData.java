@@ -50,7 +50,7 @@ public final class MysqlData extends Data {
 
         return future;
     }
-    public static @NotNull CompletableFuture<Integer> exists(@NotNull MysqlTable table, final @NotNull Condition @NotNull ... conditions) {
+    public static @NotNull CompletableFuture<Integer> exists(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
         if (conditions.length == 0) {
@@ -65,7 +65,7 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
 
-        final @NotNull Condition[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
         final @NotNull CompletableFuture<Integer> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
@@ -93,7 +93,7 @@ public final class MysqlData extends Data {
 
                 try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
                     int index = 0;
-                    for (@NotNull Condition condition : finalConditions) {
+                    for (@NotNull Condition<?> condition : finalConditions) {
                         //noinspection rawtypes
                         @NotNull Type type = condition.getVariable().getType();
                         //noinspection unchecked
@@ -139,7 +139,7 @@ public final class MysqlData extends Data {
         table.getDatas().add(data);
         return data;
     }
-    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, final @NotNull Condition @NotNull ... conditions) {
+    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
         if (conditions.length == 0) {
@@ -154,7 +154,7 @@ public final class MysqlData extends Data {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
 
-        final @NotNull Condition[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
         final @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
@@ -176,7 +176,7 @@ public final class MysqlData extends Data {
 
                 try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
                     int index = 0;
-                    for (@NotNull Condition condition : finalConditions) {
+                    for (@NotNull Condition<?> condition : finalConditions) {
                         //noinspection rawtypes
                         @NotNull Type type = condition.getVariable().getType();
                         //noinspection unchecked
@@ -540,14 +540,14 @@ public final class MysqlData extends Data {
         return future;
     }
 
-    public boolean matches(@NotNull Condition @NotNull ... conditions) {
+    public boolean matches(@NotNull Condition<?> @NotNull ... conditions) {
         if (!isLoaded()) {
             throw new IllegalStateException("The mysql data must be loaded to use the #matches");
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(getTable()))) {
             throw new IllegalStateException("There's conditions with variables that aren't from this data");
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
-        } else for (@NotNull Condition condition : conditions) {
+        } else for (@NotNull Condition<?> condition : conditions) {
             if (!Objects.equals(get(condition.getVariable().getId()), condition.getValue())) {
                 return false;
             }

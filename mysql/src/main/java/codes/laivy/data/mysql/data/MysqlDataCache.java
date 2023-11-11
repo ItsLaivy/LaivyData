@@ -38,7 +38,7 @@ public final class MysqlDataCache {
 
     // TODO: 08/11/2023 Add a retrieve method that limits the columns
 
-    public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, @NotNull Condition @NotNull ... conditions) {
+    public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
 
         if (conditions.length == 0) {
@@ -52,7 +52,7 @@ public final class MysqlDataCache {
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         } else {
-            final @NotNull Condition[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+            final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
             final @NotNull CompletableFuture<MysqlDataCache[]> future = new CompletableFuture<>();
 
             CompletableFuture.runAsync(() -> {
@@ -76,7 +76,7 @@ public final class MysqlDataCache {
 
                     try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
                         int index = 0;
-                        for (@NotNull Condition condition : finalConditions) {
+                        for (@NotNull Condition<?> condition : finalConditions) {
                             //noinspection rawtypes
                             @NotNull Type type = condition.getVariable().getType();
                             //noinspection unchecked

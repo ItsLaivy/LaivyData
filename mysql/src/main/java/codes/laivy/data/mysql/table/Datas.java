@@ -3,7 +3,6 @@ package codes.laivy.data.mysql.table;
 import codes.laivy.data.content.Content;
 import codes.laivy.data.mysql.data.Condition;
 import codes.laivy.data.mysql.data.MysqlData;
-import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
 
 public final class Datas extends Content.SetProvider<MysqlData> {
 
@@ -47,7 +45,7 @@ public final class Datas extends Content.SetProvider<MysqlData> {
             return stream().anyMatch(d -> d.getRow() == row);
         }
     }
-    public boolean contains(@NotNull Condition @NotNull ... conditions) {
+    public boolean contains(@NotNull Condition<?> @NotNull ... conditions) {
         if (!getTable().isLoaded()) {
             throw new IllegalStateException("The table aren't loaded");
         }

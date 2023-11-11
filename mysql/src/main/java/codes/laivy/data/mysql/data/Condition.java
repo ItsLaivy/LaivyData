@@ -1,47 +1,28 @@
 package codes.laivy.data.mysql.data;
 
-import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
-import java.util.Objects;
+public final class Condition<T> {
 
-public final class Condition {
-
-    public static <E> @NotNull Condition of(@NotNull MysqlVariable<E> variable, @UnknownNullability E value) {
-        return new Condition(variable.getTable(), variable.getId(), value);
-    }
-    public static @NotNull Condition of(@NotNull MysqlTable table, @NotNull String variableId, @UnknownNullability Object value) {
-        return new Condition(table, variableId, value);
+    public static <T> @NotNull Condition<T> of(@NotNull MysqlVariable<T> variable, @UnknownNullability T value) {
+        return new Condition<>(variable, value);
     }
 
-    private final @NotNull MysqlTable table;
-    private final @NotNull String variableId;
+    private final @NotNull MysqlVariable<T> variable;
+    private final @UnknownNullability T value;
 
-    private final @UnknownNullability Object value;
-
-    private Condition(@NotNull MysqlTable table, @NotNull String variableId, @UnknownNullability Object value) {
-        this.table = table;
-        this.variableId = variableId;
-
+    private Condition(@NotNull MysqlVariable<T> variable, @UnknownNullability T value) {
+        this.variable = variable;
         this.value = value;
     }
 
-    public @NotNull String getVariableId() {
-        return variableId;
+    public @NotNull MysqlVariable<T> getVariable() {
+        return variable;
     }
 
-    public @NotNull MysqlTable getTable() {
-        return table;
-    }
-
-    public @NotNull MysqlVariable<?> getVariable() {
-        return getTable().getVariables().get(getVariableId()).orElseThrow(() -> new NullPointerException("There's no variable with id '" + getVariableId() + "' at table '" + getTable().getId() + "'"));
-    }
-
-    public @UnknownNullability Object getValue() {
+    public @UnknownNullability T getValue() {
         return value;
     }
 

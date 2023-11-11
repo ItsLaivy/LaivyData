@@ -2,7 +2,6 @@ package codes.laivy.data.mysql.database;
 
 import codes.laivy.data.content.Content;
 import codes.laivy.data.mysql.table.MysqlTable;
-import codes.laivy.data.mysql.variable.MysqlVariable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
