@@ -23,12 +23,12 @@ public final class SqlUtils {
 
     @ApiStatus.Internal
     public static @NotNull String buildWhereCondition(@NotNull Set<Long> excluded, @NotNull Condition<?> @NotNull ... conditions) {
-        @NotNull StringBuilder builder = new StringBuilder();
+        @NotNull StringBuilder builder = new StringBuilder("WHERE");
 
         int index = 0;
         for (@NotNull Condition<?> condition : conditions) {
             if (index > 0) builder.append(" && ");
-            builder.append("WHERE `").append(condition.getVariable().getId()).append("` = ?");
+            builder.append("`").append(condition.getVariable().getId()).append("` = ?");
             index++;
         }
 

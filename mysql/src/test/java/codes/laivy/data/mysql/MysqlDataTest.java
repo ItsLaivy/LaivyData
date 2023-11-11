@@ -316,15 +316,19 @@ public class MysqlDataTest {
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
 
-        @NotNull String expected = "Just a cool test :)";
-        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
+        @NotNull String expected1 = "Just a cool test :)";
+        @NotNull String expected2 = "Another cool test :)";
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var1", table, new MysqlTextType(), expected1);
         variable.start().get(2, TimeUnit.SECONDS);
+        @NotNull MysqlVariable<String> variable2 = new MysqlVariable<>("test_var2", table, new MysqlTextType(), expected2);
+        variable2.start().get(2, TimeUnit.SECONDS);
 
         // Creating 4 datas
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.save().get(2, TimeUnit.SECONDS);
         // Verifying if exists the 4 datas
-        Assert.assertEquals((Integer) 1, MysqlData.exists(table, Condition.of(variable, expected)).get(2, TimeUnit.SECONDS));
+        Assert.assertEquals((Integer) 1, MysqlData.exists(table, Condition.of(variable, expected1), Condition.of(variable2, expected2)).get(2, TimeUnit.SECONDS));
         //
 
         database.delete().get(2, TimeUnit.SECONDS);

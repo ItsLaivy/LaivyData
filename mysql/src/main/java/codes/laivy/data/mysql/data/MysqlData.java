@@ -52,20 +52,20 @@ public final class MysqlData extends Data {
     }
     public static @NotNull CompletableFuture<Integer> exists(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
 
-        if (conditions.length == 0) {
+        if (finalConditions.length == 0) {
             throw new IllegalStateException("The conditions array cannot be empty");
         } else if (connection == null) {
             throw new IllegalStateException("The table's authentication aren't connected");
         } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
             throw new IllegalStateException("This table or database aren't loaded");
-        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
             throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
-        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
 
-        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
         final @NotNull CompletableFuture<Integer> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
@@ -141,20 +141,20 @@ public final class MysqlData extends Data {
     }
     public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
 
-        if (conditions.length == 0) {
+        if (finalConditions.length == 0) {
             throw new IllegalStateException("The conditions array cannot be empty");
         } else if (connection == null) {
             throw new IllegalStateException("The table's authentication aren't connected");
         } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
             throw new IllegalStateException("This table or database aren't loaded");
-        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
             throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
-        } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         }
 
-        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
         final @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
