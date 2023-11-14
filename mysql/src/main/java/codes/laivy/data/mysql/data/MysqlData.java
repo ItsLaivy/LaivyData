@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class MysqlData extends Data {
@@ -139,6 +140,47 @@ public final class MysqlData extends Data {
         table.getDatas().add(data);
         return data;
     }
+    public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<MysqlData[]> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (!table.exists().join()) {
+                    throw new IllegalStateException("This table doesn't exists");
+                }
+
+                @NotNull Set<MysqlData> datas = new HashSet<>();
+
+                for (MysqlData data : table.getDatas()) {
+                    if (data.isLoaded()) {
+                        datas.add(data);
+                    }
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE " + SqlUtils.rowNotIn(datas.stream().map(MysqlData::getRow).collect(Collectors.toSet())))) {
+                    @NotNull ResultSet set = statement.executeQuery();
+                    while (set.next()) {
+                        long row = set.getInt("row");
+                        @NotNull MysqlData data = new MysqlData(table, row);
+                        datas.add(data);
+                    }
+                }
+
+                future.complete(datas.toArray(new MysqlData[0]));
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
+
     public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
         final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
