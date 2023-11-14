@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MysqlCacheDataTest {
@@ -64,6 +65,38 @@ public class MysqlCacheDataTest {
 
         cache = MysqlDataCache.retrieve(table, Condition.of(variable2, "test_id")).get(2, TimeUnit.SECONDS)[0];
         Assert.assertEquals(expect, cache.get(variable));
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testGlobalRetrieve() throws Exception {
+        @NotNull Random random = new Random();
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        // Creating 4 datas
+        int amount = random.nextInt(100);
+        for (int row = 0; row < amount; row++) {
+            @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+            data.save().get(2, TimeUnit.SECONDS);
+
+            if (random.nextBoolean()) {
+                data.start().get(2, TimeUnit.SECONDS);
+            }
+        }
+
+        // Verifying if exists the 4 datas
+        Assert.assertEquals((Integer) amount, (Integer) MysqlDataCache.retrieve(table).get(2, TimeUnit.SECONDS).length);
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
