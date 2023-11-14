@@ -176,12 +176,16 @@ public final class MysqlDatabase extends Database {
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getAuthentication().getConnection().prepareStatement("DROP DATABASE " + getId())) {
-                if (isLoaded()) {
-                    stop().join();
-                }
+            try {
+                if (exists().join()) {
+                    try (PreparedStatement statement = getAuthentication().getConnection().prepareStatement("DROP DATABASE " + getId())) {
+                        if (isLoaded()) {
+                            stop().join();
+                        }
 
-                statement.execute();
+                        statement.execute();
+                    }
+                }
 
                 future.complete(null);
             } catch (Throwable throwable) {
