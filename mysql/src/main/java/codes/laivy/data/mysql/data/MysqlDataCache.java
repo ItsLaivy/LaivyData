@@ -114,6 +114,59 @@ public final class MysqlDataCache {
             return future;
         }
     }
+    public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        } else {
+            final @NotNull CompletableFuture<MysqlDataCache[]> future = new CompletableFuture<>();
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    @NotNull Map<Long, Map<String, Object>> datas = new HashMap<>();
+
+                    for (MysqlData data : table.getDatas()) {
+                        if (data.isLoaded()) {
+                            datas.put(data.getRow(), data.getCache());
+                        }
+                    }
+
+                    // Retrieving on database
+
+                    try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE " + SqlUtils.rowNotIn(datas.keySet()))) {
+                        @NotNull ResultSet set = statement.executeQuery();
+                        while (set.next()) {
+                            long row = set.getInt("row");
+
+                            if (!datas.containsKey(row)) {
+                                datas.put(row, new HashMap<>());
+
+                                for (int columnRow = 2; columnRow <= set.getMetaData().getColumnCount(); columnRow++) {
+                                    @NotNull String columnName = set.getMetaData().getColumnName(columnRow);
+                                    @Nullable Object object = set.getObject(columnRow);
+
+                                    datas.get(row).put(columnName.toLowerCase(), object);
+                                }
+                            }
+                        }
+                    }
+
+                    @NotNull Set<MysqlDataCache> caches = new HashSet<>();
+                    for (Map.Entry<Long, Map<String, Object>> entry : datas.entrySet()) {
+                        caches.add(new MysqlDataCache(table, entry.getKey(), entry.getValue()));
+                    }
+                    future.complete(caches.toArray(new MysqlDataCache[0]));
+                } catch (@NotNull Throwable throwable) {
+                    future.completeExceptionally(throwable);
+                }
+            }, Main.getExecutor(MysqlData.class));
+
+            return future;
+        }
+    }
 
     // Object
 
