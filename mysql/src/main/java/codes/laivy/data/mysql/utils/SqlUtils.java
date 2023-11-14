@@ -21,6 +21,30 @@ public final class SqlUtils {
         return -1;
     }
 
+    public static @NotNull String rowNotIn(@NotNull Set<Long> excluded) {
+        @NotNull StringBuilder builder = new StringBuilder();
+
+        if (!excluded.isEmpty()) {
+            builder.append("`row` NOT IN (");
+
+            int index = 0;
+            for (@NotNull Long row : excluded) {
+                builder.append(row);
+
+                if (index + 1 < excluded.size()) {
+                    builder.append(",");
+                }
+
+                index++;
+            }
+            builder.append(")");
+        } else {
+            builder.append("`row` NOT IN (-999)");
+        }
+
+        return builder.toString();
+    }
+
     @ApiStatus.Internal
     public static @NotNull String buildWhereCondition(@NotNull Set<Long> excluded, @NotNull Condition<?> @NotNull ... conditions) {
         @NotNull StringBuilder builder = new StringBuilder("WHERE");
@@ -33,19 +57,7 @@ public final class SqlUtils {
         }
 
         if (!excluded.isEmpty()) {
-            builder.append(" && `row` NOT IN (");
-
-            index = 0;
-            for (@NotNull Long row : excluded) {
-                builder.append(row);
-
-                if (index + 1 < excluded.size()) {
-                    builder.append(",");
-                }
-
-                index++;
-            }
-            builder.append(")");
+            builder.append(" && ").append(rowNotIn(excluded));
         }
 
         return builder.toString();
