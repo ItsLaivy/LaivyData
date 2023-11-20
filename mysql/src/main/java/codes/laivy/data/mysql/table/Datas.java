@@ -51,7 +51,7 @@ public final class Datas extends Content.SetProvider<MysqlData> {
         }
 
         synchronized (this) {
-            return stream().anyMatch(d -> d.matches(conditions) );
+            return stream().anyMatch(d -> d.isLoaded() && d.matches(conditions));
         }
     }
 
