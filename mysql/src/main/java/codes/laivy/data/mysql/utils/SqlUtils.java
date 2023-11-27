@@ -52,7 +52,7 @@ public final class SqlUtils {
         int index = 0;
         for (@NotNull Condition<?> condition : conditions) {
             if (index > 0) builder.append(" && ");
-            builder.append("`").append(condition.getVariable().getId()).append("` = ?");
+            builder.append(" `").append(condition.getVariable().getId()).append("` = ?");
             index++;
         }
 
