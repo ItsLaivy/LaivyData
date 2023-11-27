@@ -88,14 +88,14 @@ public class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
+                for (@NotNull MysqlData data : new HashSet<>(getDatas().toCollection())) {
+                    if (data.isLoaded()) {
+                        data.stop(true).join();
+                    }
+                }
                 for (MysqlVariable<?> variable : new HashSet<>(getVariables().toCollection())) {
                     if (variable.isLoaded()) {
                         variable.stop().join();
-                    }
-                }
-                for (@NotNull MysqlData data : getDatas()) {
-                    if (data.isLoaded()) {
-                        data.stop(true).join();
                     }
                 }
 
