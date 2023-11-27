@@ -31,7 +31,7 @@ public class MysqlCacheDataTest {
     }
 
     @Test
-    public void testLoadAndUnload() throws Exception {
+    public void testLoadAndUnload() throws Throwable {
         @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
         authentication.connect().get(5, TimeUnit.SECONDS);
         @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
@@ -44,10 +44,14 @@ public class MysqlCacheDataTest {
 
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
+
         @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expect);
         variable.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(variable.isNew());
+
         @NotNull MysqlVariable<String> variable2 = new MysqlVariable<>("id", table, new MysqlTextType(), null);
         variable2.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(variable2.isNew());
 
         // Data code
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
@@ -60,9 +64,11 @@ public class MysqlCacheDataTest {
         data.stop(false).get(2, TimeUnit.SECONDS);
         // Test id
         data.start().get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(data.isNew());
         data.set(variable2, "test_id");
-        data.stop(true);
-
+        data.stop(true).get(2, TimeUnit.SECONDS);
+        Assert.assertTrue(data.exists().get(2, TimeUnit.SECONDS));
+        
         cache = MysqlDataCache.retrieve(table, Condition.of(variable2, "test_id")).get(2, TimeUnit.SECONDS)[0];
         Assert.assertEquals(expect, cache.get(variable));
         //

@@ -26,4 +26,11 @@ public final class Condition<T> {
         return value;
     }
 
+    @Override
+    public @NotNull String toString() {
+        return "Condition{" +
+                "variable=" + variable +
+                ", value=" + value +
+                '}';
+    }
 }

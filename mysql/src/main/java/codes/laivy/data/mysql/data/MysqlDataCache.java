@@ -95,7 +95,7 @@ public final class MysqlDataCache {
                                     @NotNull String columnName = set.getMetaData().getColumnName(columnRow);
                                     @Nullable Object object = set.getObject(columnRow);
 
-                                    datas.get(row).put(columnName.toLowerCase(), object);
+                                    datas.get(row).put(columnName, object);
                                 }
                             }
                         }
