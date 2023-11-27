@@ -1,6 +1,7 @@
 package codes.laivy.data.mysql.variable;
 
 import codes.laivy.data.Main;
+import codes.laivy.data.data.Data;
 import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
@@ -15,8 +16,12 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class MysqlVariable<T> extends Variable<T> {
 
@@ -71,8 +76,12 @@ public class MysqlVariable<T> extends Variable<T> {
 
     @Override
     public @NotNull CompletableFuture<Void> start() {
+        @Nullable Connection connection = getDatabase().getAuthentication().getConnection();
+
         if (isLoaded()) {
             throw new IllegalStateException("The variable '" + getId() + "' is already loaded");
+        } else if (connection == null) {
+            throw new IllegalStateException("The variable's authentication aren't connected");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
@@ -88,7 +97,8 @@ public class MysqlVariable<T> extends Variable<T> {
                 getTable().getVariables().add(this);
 
                 // Sync with cache data for the receptors
-                for (MysqlData data : getTable().getDatas()) {
+                @NotNull List<MysqlData> datas = getTable().getDatas().stream().filter(Data::isLoaded).collect(Collectors.toList());
+                for (MysqlData data : datas) {
                     if (isNew) {
                         data.getData().put(this, getDefaultValue());
                     } else {
@@ -103,6 +113,11 @@ public class MysqlVariable<T> extends Variable<T> {
                             data.getData().put(this, getDefaultValue());
                         }
                     }
+                }
+
+                try (@NotNull PreparedStatement statement = connection.prepareStatement("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET `" + getId() + "` = ? WHERE " + SqlUtils.rowNotIn(datas.stream().map(MysqlData::getRow).collect(Collectors.toSet())))) {
+                    getType().set(Parameter.of(statement, getType().isNullSupported(), 0), getDefaultValue());
+                    statement.execute();
                 }
 
                 loaded = true;
@@ -194,5 +209,19 @@ public class MysqlVariable<T> extends Variable<T> {
         }, Main.getExecutor(getClass()));
 
         return future;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof MysqlVariable)) return false;
+        if (!super.equals(object)) return false;
+        MysqlVariable<?> variable = (MysqlVariable<?>) object;
+        return Objects.equals(getTable(), variable.getTable());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTable());
     }
 }
