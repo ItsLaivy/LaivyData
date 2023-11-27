@@ -402,8 +402,8 @@ public final class MysqlData extends Data {
                 }
 
                 for (MysqlVariable<?> variable : getTable().getVariables()) {
-                    if (!data.containsKey(variable)) {
-                        data.put(variable, variable.getDefaultValue());
+                    if (!getData().containsKey(variable)) {
+                        getData().put(variable, variable.getDefaultValue());
                     }
                 }
 
@@ -429,13 +429,14 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                loaded = false;
+
                 if (save) save().join();
                 changed.clear();
 
                 getData().clear();
                 getCache().clear();
 
-                loaded = false;
                 future.complete(null);
             } catch (Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -460,11 +461,10 @@ public final class MysqlData extends Data {
                     throw new IllegalStateException("The table of this data aren't loaded or created");
                 }
 
-                @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
-
                 if (!exists().join()) {
                     create().join();
                 } else {
+                    @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
                     variables.removeIf(variable -> changed.stream().noneMatch(id -> id.equalsIgnoreCase(variable.getId())));
 
                     if (!variables.isEmpty()) {
@@ -525,8 +525,15 @@ public final class MysqlData extends Data {
                     int row = 0;
                     //noinspection rawtypes
                     for (MysqlVariable variable : variables) {
+                        @NotNull Object object = variable.getDefaultValue();
+                        if (getData().containsKey(variable)) {
+                            object = getData().get(variable);
+                        } else if (getCache().keySet().stream().anyMatch(v -> v.equalsIgnoreCase(variable.getId()))) {
+                            object = getCache().get(getCache().keySet().stream().filter(v -> v.equalsIgnoreCase(variable.getId())).findFirst().orElseThrow(NullPointerException::new));
+                        }
+
                         //noinspection unchecked
-                        variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), isLoaded() ? get(variable) : variable.getDefaultValue());
+                        variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), object);
 
                         row++;
                     }
