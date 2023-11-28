@@ -487,6 +487,8 @@ public final class MysqlData extends Data {
                             row++;
                         }
 
+                        builder.append(" WHERE `row` = ").append(getRow());
+
                         try (@NotNull PreparedStatement statement = connection.prepareStatement(builder.toString())) {
                             row = 0;
                             //noinspection rawtypes

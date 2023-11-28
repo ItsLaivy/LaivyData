@@ -469,4 +469,42 @@ public class MysqlDataTest {
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
+
+    @Test
+    public void testMultiples() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected = "Just a cool test :)";
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var1", table, new MysqlTextType(), null);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        int total = 0;
+        for (int row = 0; row < 100; row++) {
+            @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+            data.start().get(2, TimeUnit.SECONDS);
+
+            if (new Random().nextBoolean()) {
+                data.set(variable, expected);
+                total++;
+            }
+
+            data.stop(true).get(2, TimeUnit.SECONDS);
+            table.getDatas().remove(data);
+        }
+
+        Assert.assertEquals(total, MysqlData.retrieve(table, Condition.of(variable, expected)).join().length);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
 }
