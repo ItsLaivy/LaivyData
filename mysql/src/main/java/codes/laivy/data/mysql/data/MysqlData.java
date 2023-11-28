@@ -293,14 +293,17 @@ public final class MysqlData extends Data {
 
         @NotNull Optional<MysqlVariable<?>> optional = getTable().getVariables().getById(id);
 
-        if (!optional.isPresent() || !data.containsKey(optional.get())) {
+        if (!optional.isPresent() || !getData().containsKey(optional.get())) {
             throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
-        return data.get(optional.get());
+        @NotNull MysqlVariable<?> variable = optional.get();
+        return getData().get(variable);
     }
     public <T> @UnknownNullability T get(@NotNull MysqlVariable<T> variable) {
-        if (!data.containsKey(variable)) {
+        if (!isLoaded()) {
+            throw new IllegalStateException("This data aren't loaded");
+        } else if (!getData().containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
@@ -316,7 +319,7 @@ public final class MysqlData extends Data {
 
         @Nullable MysqlVariable<?> variable = getTable().getVariables().getById(id).orElse(null);
 
-        if (variable == null || !data.containsKey(variable)) {
+        if (variable == null || !getData().containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + id + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         } else if (object == null && !variable.isNullable()) {
             throw new IllegalStateException("The variable value of '" + variable.getId() + "' is null, but variable doesn't supports null values");
@@ -324,15 +327,18 @@ public final class MysqlData extends Data {
 
         synchronized (this) {
             if (Objects.equals(get(variable), object)) {
+                if (!hasChanges()) setChanges(variable, true);
                 return;
             }
 
-            data.put(variable, object);
-            changed.add(id.toLowerCase());
+            getData().put(variable, variable.getType().get(object));
+            setChanges(variable, true);
         }
     }
     public <T> void set(@NotNull MysqlVariable<T> variable, @UnknownNullability T object) {
-        if (!data.containsKey(variable)) {
+        if (!isLoaded()) {
+            throw new IllegalStateException("This data aren't loaded");
+        } else if (!getData().containsKey(variable)) {
             throw new IllegalStateException("There's no variable with id '" + variable.getId() + "' at data '" + getRow() + "' from table '" + getTable().getId() + "'");
         }
 
@@ -345,12 +351,10 @@ public final class MysqlData extends Data {
     public void setChanges(@NotNull MysqlVariable<?> variable, boolean flag) {
         if (!getTable().getVariables().contains(variable)) {
             throw new IllegalStateException("The table of that data doesn't contains that variable");
+        } else if (flag) {
+            changed.add(variable.getId().toLowerCase());
         } else {
-            if (flag) {
-                changed.add(variable.getId().toLowerCase());
-            } else {
-                changed.removeIf(variableId -> variableId.equalsIgnoreCase(variable.getId()));
-            }
+            changed.remove(variable.getId().toLowerCase());
         }
     }
 
@@ -382,12 +386,16 @@ public final class MysqlData extends Data {
                             @NotNull String columnName = set.getMetaData().getColumnName(row);
                             @Nullable Object object = set.getObject(row);
 
+                            if (columnName.equalsIgnoreCase("row")) {
+                                continue;
+                            }
+
                             @NotNull Optional<MysqlVariable<?>> variableOptional = getTable().getVariables().getById(columnName);
                             if (variableOptional.isPresent()) {
                                 @NotNull MysqlVariable<?> variable = variableOptional.get();
-                                getData().put(variableOptional.get(), variable.getType().get(object));
+                                getData().put(variable, variable.getType().get(object));
                             } else {
-                                getCache().put(columnName, object);
+                                getCache().put(columnName.toLowerCase(), object);
                             }
                         }
 
@@ -402,8 +410,10 @@ public final class MysqlData extends Data {
                 }
 
                 for (MysqlVariable<?> variable : getTable().getVariables()) {
-                    if (!getData().containsKey(variable)) {
-                        getData().put(variable, variable.getDefaultValue());
+                    if (variable.isLoaded()) {
+                        if (!getData().containsKey(variable)) {
+                            getData().put(variable, variable.getDefaultValue());
+                        }
                     }
                 }
 
@@ -464,8 +474,8 @@ public final class MysqlData extends Data {
                 if (!exists().join()) {
                     create().join();
                 } else {
-                    @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getTable().getVariables().toCollection());
-                    variables.removeIf(variable -> changed.stream().noneMatch(id -> id.equalsIgnoreCase(variable.getId())));
+                    @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getData().keySet());
+                    variables.removeIf(variable -> !changed.contains(variable.getId()) || !variable.exists().join());
 
                     if (!variables.isEmpty()) {
                         @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
@@ -482,7 +492,7 @@ public final class MysqlData extends Data {
                             //noinspection rawtypes
                             for (MysqlVariable variable : variables) {
                                 //noinspection unchecked
-                                variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), get(variable));
+                                variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), row), getData().get(variable));
                                 row++;
                             }
 
@@ -526,10 +536,11 @@ public final class MysqlData extends Data {
                     //noinspection rawtypes
                     for (MysqlVariable variable : variables) {
                         @NotNull Object object = variable.getDefaultValue();
+
                         if (getData().containsKey(variable)) {
                             object = getData().get(variable);
-                        } else if (getCache().keySet().stream().anyMatch(v -> v.equalsIgnoreCase(variable.getId()))) {
-                            object = getCache().get(getCache().keySet().stream().filter(v -> v.equalsIgnoreCase(variable.getId())).findFirst().orElseThrow(NullPointerException::new));
+                        } else if (getCache().containsKey(variable.getId().toLowerCase())) {
+                            object = getCache().get(variable.getId().toLowerCase());
                         }
 
                         //noinspection unchecked
@@ -541,6 +552,7 @@ public final class MysqlData extends Data {
                     statement.execute();
                 }
 
+                changed.clear();
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -591,7 +603,7 @@ public final class MysqlData extends Data {
         } else if (Arrays.stream(conditions).anyMatch(c -> !c.getVariable().isLoaded())) {
             throw new IllegalStateException("There's conditions with variables that hasn't loaded");
         } else for (@NotNull Condition<?> condition : conditions) {
-            if (!Objects.equals(get(condition.getVariable().getId()), condition.getValue())) {
+            if (!Objects.equals(get(condition.getVariable()), condition.getValue())) {
                 return false;
             }
         }
