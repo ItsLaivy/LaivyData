@@ -431,4 +431,42 @@ public class MysqlDataTest {
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
+
+    @Test
+    public void testCaching() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected1 = "Just a cool test :)";
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var1", table, new MysqlTextType(), expected1);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+        data.start().get(2, TimeUnit.SECONDS);
+        data.set(variable, "ata");
+
+        data.stop(true).get(2, TimeUnit.SECONDS);
+        table.getDatas().remove(data);
+
+        variable.stop().get(2, TimeUnit.SECONDS);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        data = MysqlData.retrieve(table, Condition.of(variable, "ata")).get(2, TimeUnit.SECONDS)[0];
+        data.start().get(2, TimeUnit.SECONDS);
+
+        Assert.assertEquals(data.get(variable), "ata");
+        Assert.assertTrue(data.matches(Condition.of(variable, "ata")));
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
 }
