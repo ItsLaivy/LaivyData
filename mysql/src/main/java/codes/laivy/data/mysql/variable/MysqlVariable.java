@@ -16,7 +16,6 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +46,8 @@ public class MysqlVariable<T> extends Variable<T> {
             throw new IllegalStateException("This variable id '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
         } else if (getDefaultValue() == null && !isNullable()) {
             throw new IllegalStateException("This variable id '" + id + "' have a nullable default value, but it doesn't supports");
+        } else if (id.equalsIgnoreCase("row")) {
+            throw new IllegalStateException("Illegal variable id '" + id + "'");
         }
     }
 
@@ -101,23 +102,21 @@ public class MysqlVariable<T> extends Variable<T> {
                 for (MysqlData data : datas) {
                     if (isNew) {
                         data.getData().put(this, getDefaultValue());
+                    } else if (data.getCache().containsKey(getId().toLowerCase())) {
+                        @Nullable Object o = data.getCache().get(getId().toLowerCase());
+                        data.getCache().remove(getId().toLowerCase());
+
+                        data.getData().put(this, getType().get(o));
                     } else {
-                        @NotNull Optional<String> optional = data.getCache().keySet().stream().filter(name -> name.equalsIgnoreCase(getId())).findFirst();
-
-                        if (optional.isPresent()) {
-                            @Nullable Object o = data.getCache().get(optional.get());
-                            data.getCache().keySet().removeIf(name -> name.equalsIgnoreCase(getId()));
-
-                            data.getData().put(this, o);
-                        } else {
-                            data.getData().put(this, getDefaultValue());
-                        }
+                        data.getData().put(this, getDefaultValue());
                     }
                 }
 
-                try (@NotNull PreparedStatement statement = connection.prepareStatement("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET `" + getId() + "` = ? WHERE " + SqlUtils.rowNotIn(datas.stream().map(MysqlData::getRow).collect(Collectors.toSet())))) {
-                    getType().set(Parameter.of(statement, getType().isNullSupported(), 0), getDefaultValue());
-                    statement.execute();
+                if (isNew) {
+                    try (@NotNull PreparedStatement statement = connection.prepareStatement("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET `" + getId() + "` = ? WHERE " + SqlUtils.rowNotIn(datas.stream().map(MysqlData::getRow).collect(Collectors.toSet())))) {
+                        getType().set(Parameter.of(statement, getType().isNullSupported(), 0), getDefaultValue());
+                        statement.execute();
+                    }
                 }
 
                 loaded = true;
