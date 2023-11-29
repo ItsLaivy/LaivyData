@@ -327,7 +327,10 @@ public final class MysqlData extends Data {
 
         synchronized (this) {
             if (Objects.equals(get(variable), object)) {
-                if (!hasChanges()) setChanges(variable, true);
+                if (!changed.contains(variable.getId().toLowerCase())) {
+                    setChanges(variable, true);
+                }
+
                 return;
             }
 
