@@ -6,6 +6,7 @@ import codes.laivy.data.mysql.data.MysqlData;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
+import codes.laivy.data.mysql.variable.type.provider.MysqlIntType;
 import codes.laivy.data.mysql.variable.type.provider.MysqlTextType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
@@ -503,6 +504,43 @@ public class MysqlDataTest {
         }
 
         Assert.assertEquals(total, MysqlData.retrieve(table, Condition.of(variable, expected)).join().length);
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testStaticSetter() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected = "Just a cool test :)";
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var1", table, new MysqlTextType(), null);
+        variable.start().get(2, TimeUnit.SECONDS);
+        @NotNull MysqlVariable<Integer> variable2 = new MysqlVariable<>("test_var2", table, new MysqlIntType(), 0);
+        variable2.start().get(2, TimeUnit.SECONDS);
+
+        // First test, with data started
+        @NotNull MysqlData data = MysqlData.create(table).join();
+        data.start().join();
+        MysqlData.set(variable, expected, Condition.of(variable2, 0)).join();
+        Assert.assertEquals(data.get(variable), expected);
+        data.delete().join();
+        data.create().join();
+        // Second test, with data stopped
+        MysqlData.set(variable, expected, Condition.of(variable2, 0)).join();
+        data.start().join();
+        Assert.assertEquals(data.get(variable), expected);
+        // Finished
 
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);

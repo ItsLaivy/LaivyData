@@ -247,6 +247,56 @@ public final class MysqlData extends Data {
         return future;
     }
 
+    public static <T> @NotNull CompletableFuture<Void> set(@NotNull MysqlVariable<T> variable, @UnknownNullability T value, final @NotNull Condition<?> @NotNull ... conditions) {
+        @NotNull MysqlTable table = variable.getTable();
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+
+        if (finalConditions.length == 0) {
+            throw new IllegalStateException("The conditions array cannot be empty");
+        } else if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
+            throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().isLoaded())) {
+            throw new IllegalStateException("There's conditions with variables that hasn't loaded");
+        }
+
+        final @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.matches(conditions)).collect(Collectors.toList())) {
+                    data.set(variable, value);
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("UPDATE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` SET `" + variable.getId() + "` = ? " + SqlUtils.buildWhereCondition(new LinkedHashSet<>(), finalConditions))) {
+                    variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), 0), value);
+
+                    int index = 1;
+                    for (@NotNull Condition<?> condition : finalConditions) {
+                        //noinspection rawtypes
+                        @NotNull Type type = condition.getVariable().getType();
+                        //noinspection unchecked
+                        type.set(Parameter.of(statement, type.isNullSupported(), index), condition.getValue());
+                        index++;
+                    }
+
+                    statement.execute();
+                }
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        }, Main.getExecutor(MysqlData.class));
+
+        return future;
+    }
+
     // Object
 
     private final @NotNull Map<@NotNull MysqlVariable<?>, @Nullable Object> data = new HashMap<>();
@@ -366,7 +416,7 @@ public final class MysqlData extends Data {
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
         } else if (isLoaded()) {
-            throw new IllegalStateException("You cannot start the data because it's already start");
+            throw new IllegalStateException("You cannot start the data because it's already started");
         }
 
         @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
