@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public final class MysqlIntType extends AbstractType<Integer> {
+public class MysqlIntType extends AbstractType<Integer> {
 
     public MysqlIntType() {
         super("INT");

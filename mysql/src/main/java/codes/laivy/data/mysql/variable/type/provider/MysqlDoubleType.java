@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public final class MysqlDoubleType extends AbstractType<Double> {
+public class MysqlDoubleType extends AbstractType<Double> {
 
     public MysqlDoubleType() {
         super("DOUBLE");

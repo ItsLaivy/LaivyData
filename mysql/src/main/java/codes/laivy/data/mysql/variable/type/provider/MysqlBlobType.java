@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public final class MysqlBlobType extends AbstractType<byte[]> {
+public class MysqlBlobType extends AbstractType<byte[]> {
 
     private final @NotNull Size size;
 
