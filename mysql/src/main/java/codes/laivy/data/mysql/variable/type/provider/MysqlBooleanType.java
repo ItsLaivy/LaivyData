@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlBooleanType extends AbstractType<Boolean> {
+public final class MysqlBooleanType extends AbstractType<Boolean> {
     public MysqlBooleanType() {
         super("BOOL");
     }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlTextType extends AbstractType<String> {
+public final class MysqlTextType extends AbstractType<String> {
 
     private final @NotNull Size size;
 

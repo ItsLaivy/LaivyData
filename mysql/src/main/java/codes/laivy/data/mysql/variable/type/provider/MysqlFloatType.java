@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 
-public class MysqlFloatType extends AbstractType<Float> {
+public final class MysqlFloatType extends AbstractType<Float> {
 
     public MysqlFloatType() {
         super("FLOAT");
