@@ -12,12 +12,12 @@ import java.util.concurrent.CompletableFuture;
 
 public interface AutoIncrement {
 
-    default @NotNull CompletableFuture<Long> getAndIncrement(long increment) {
-        @NotNull CompletableFuture<Long> future = new CompletableFuture<>();
+    default @NotNull CompletableFuture<Integer> getAndIncrement(int increment) {
+        @NotNull CompletableFuture<Integer> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
             try {
-                long value = getAmount().join();
+                int value = getAmount().join();
                 setAmount(value + increment).join();
 
                 future.complete(value);
@@ -29,7 +29,7 @@ public interface AutoIncrement {
         return future;
     }
 
-    @NotNull CompletableFuture<Long> getAmount();
+    @NotNull CompletableFuture<Integer> getAmount();
 
     @NotNull CompletableFuture<Void> setAmount(long value);
 
@@ -39,13 +39,13 @@ public interface AutoIncrement {
     static @NotNull AutoIncrement of(@NotNull MysqlTable table) {
         return new AutoIncrement() {
             @Override
-            public @NotNull CompletableFuture<Long> getAmount() {
+            public @NotNull CompletableFuture<Integer> getAmount() {
                 @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
                 if (connection == null) {
                     throw new IllegalStateException("The database's authentication aren't connected");
                 }
 
-                @NotNull CompletableFuture<Long> future = new CompletableFuture<>();
+                @NotNull CompletableFuture<Integer> future = new CompletableFuture<>();
 
                 CompletableFuture.runAsync(() -> {
                     try {
@@ -53,7 +53,7 @@ public interface AutoIncrement {
                             @NotNull ResultSet set = statement.executeQuery();
                             set.next();
 
-                            future.complete(set.getLong("auto_increment"));
+                            future.complete(set.getInt("auto_increment"));
                         }
                     } catch (@NotNull Throwable throwable) {
                         future.completeExceptionally(throwable);

@@ -39,7 +39,7 @@ public class MysqlTableTest {
         Assert.assertTrue(table.isNew());
 
         table.getAutoIncrement().setAmount(100).get(2, TimeUnit.SECONDS);
-        Assert.assertEquals((Long) 100L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
+        Assert.assertEquals(100, (int) table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
 
         table.stop().get(2, TimeUnit.SECONDS);
         Assert.assertFalse(table.isLoaded());
@@ -92,13 +92,13 @@ public class MysqlTableTest {
         // Table code
         MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
-        Assert.assertEquals((Long) 1L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
+        Assert.assertEquals(1, (int) table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
 
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
         data.stop(true).get(2, TimeUnit.SECONDS);
 
-        Assert.assertEquals((Long) 2L, table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
+        Assert.assertEquals(2, (int) table.getAutoIncrement().getAmount().get(2, TimeUnit.SECONDS));
         //
 
         database.delete().get(2, TimeUnit.SECONDS);
