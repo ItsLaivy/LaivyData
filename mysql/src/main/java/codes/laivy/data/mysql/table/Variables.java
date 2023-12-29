@@ -13,11 +13,25 @@ import java.util.Optional;
 
 public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
 
+    private final @NotNull Content<MysqlVariable<?>> defaultVariables = new Content.SetProvider<MysqlVariable<?>>(new HashSet<>()) {
+        @Override
+        public boolean add(@NotNull MysqlVariable<?> object) {
+            if (!object.getTable().equals(getTable())) {
+                throw new IllegalStateException("Illegal default variable table");
+            }
+            return super.add(object);
+        }
+    };
+
     private final @NotNull MysqlTable table;
 
     public Variables(@NotNull MysqlTable table) {
         super(new HashSet<>());
         this.table = table;
+    }
+
+    public @NotNull Content<MysqlVariable<?>> getDefault() {
+        return defaultVariables;
     }
 
     @Contract(pure = true)

@@ -71,6 +71,11 @@ public class MysqlTable {
                 getDatabase().getTables().add(this);
 
                 loaded = true;
+
+                for (MysqlVariable<?> variable : getVariables().getDefault()) {
+                    variable.start().join();
+                }
+
                 future.complete(null);
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);

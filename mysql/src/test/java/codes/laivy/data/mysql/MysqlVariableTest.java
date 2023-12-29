@@ -112,4 +112,24 @@ public class MysqlVariableTest {
         authentication.disconnect().get(5, TimeUnit.SECONDS);
     }
 
+    @Test
+    public void testDefault() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), null, true);
+        table.getVariables().getDefault().add(variable);
+
+        table.start().get(2, TimeUnit.SECONDS);
+
+        Assert.assertTrue(variable.isLoaded());
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        Assert.assertFalse(variable.isLoaded());
+
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
 }
