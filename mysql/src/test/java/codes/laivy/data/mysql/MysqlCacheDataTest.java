@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -103,6 +104,39 @@ public class MysqlCacheDataTest {
 
         // Verifying if exists the 4 datas
         Assert.assertEquals((Integer) amount, (Integer) MysqlDataCache.retrieve(table).get(2, TimeUnit.SECONDS).length);
+        //
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testCacheRetrieving() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test", table, new MysqlTextType(), null, true);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        // Creating 4 datas
+        int amount = 10;
+        for (int row = 1; row <= amount; row++) {
+            @NotNull MysqlData data = MysqlData.create(table).join();
+            data.start().join();
+            data.set(variable, String.valueOf(row));
+            data.stop(true).join();
+        }
+
+        int random = new Random().nextInt(10) + 1;
+        @NotNull MysqlDataCache cache = Objects.requireNonNull(MysqlDataCache.retrieve(table, random).join());
+        Assert.assertEquals(String.valueOf(random), cache.get(variable));
         //
 
         database.delete().get(2, TimeUnit.SECONDS);

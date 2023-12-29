@@ -38,10 +38,42 @@ public final class MysqlDataCache {
 
     // TODO: 08/11/2023 Add a retrieve method that limits the columns
 
-    // todo: this
-//    public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, int row) {
-//
-//    }
+    public static @NotNull CompletableFuture<@Nullable MysqlDataCache> retrieve(@NotNull MysqlTable table, int row) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        @NotNull CompletableFuture<MysqlDataCache> future = new CompletableFuture<>();
+
+        if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE `row` = " + row)) {
+                    @NotNull Map<String, Object> datas = new HashMap<>();
+                    @NotNull ResultSet set = statement.executeQuery();
+
+                    if (set.next()) {
+                        for (int columnRow = 2; columnRow <= set.getMetaData().getColumnCount(); columnRow++) {
+                            @NotNull String columnName = set.getMetaData().getColumnName(columnRow);
+                            @Nullable Object object = set.getObject(columnRow);
+
+                            datas.put(columnName, object);
+                        }
+
+                        future.complete(new MysqlDataCache(table, row, datas));
+                    } else {
+                        future.complete(null);
+                    }
+                }
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
     public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
         final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
@@ -182,7 +214,11 @@ public final class MysqlDataCache {
     MysqlDataCache(@NotNull MysqlTable table, int row, @NotNull Map<@NotNull String, @Nullable Object> data) {
         this.table = table;
         this.row = row;
-        this.data = new HashMap<>(data);
+        this.data = new HashMap<>();
+
+        for (Map.Entry<@NotNull String, @Nullable Object> entry : data.entrySet()) {
+            this.data.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
     }
 
     public @NotNull MysqlTable getTable() {
