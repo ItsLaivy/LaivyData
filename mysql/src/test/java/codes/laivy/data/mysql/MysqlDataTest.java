@@ -177,7 +177,7 @@ public class MysqlDataTest {
         // Data code
         @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
         data.start().get(2, TimeUnit.SECONDS);
-        long row = data.getRow();
+        int row = data.getRow();
 
         Assert.assertTrue(data.isNew());
         Assert.assertEquals(expected, data.get(variable));

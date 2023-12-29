@@ -38,6 +38,10 @@ public final class MysqlDataCache {
 
     // TODO: 08/11/2023 Add a retrieve method that limits the columns
 
+    // todo: this
+//    public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, int row) {
+//
+//    }
     public static @NotNull CompletableFuture<MysqlDataCache[]> retrieve(@NotNull MysqlTable table, @NotNull Condition<?> @NotNull ... conditions) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
         final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
@@ -57,8 +61,8 @@ public final class MysqlDataCache {
 
             CompletableFuture.runAsync(() -> {
                 try {
-                    @NotNull Set<Long> excluded = new HashSet<>();
-                    @NotNull Map<Long, Map<String, Object>> datas = new HashMap<>();
+                    @NotNull Set<Integer> excluded = new HashSet<>();
+                    @NotNull Map<Integer, Map<String, Object>> datas = new HashMap<>();
 
                     for (MysqlData data : table.getDatas()) {
                         if (data.isLoaded()) {
@@ -86,7 +90,7 @@ public final class MysqlDataCache {
 
                         @NotNull ResultSet set = statement.executeQuery();
                         while (set.next()) {
-                            long row = set.getInt("row");
+                            int row = set.getInt("row");
 
                             if (!datas.containsKey(row)) {
                                 datas.put(row, new HashMap<>());
@@ -102,7 +106,7 @@ public final class MysqlDataCache {
                     }
 
                     @NotNull Set<MysqlDataCache> caches = new HashSet<>();
-                    for (Map.Entry<Long, Map<String, Object>> entry : datas.entrySet()) {
+                    for (Map.Entry<Integer, Map<String, Object>> entry : datas.entrySet()) {
                         caches.add(new MysqlDataCache(table, entry.getKey(), entry.getValue()));
                     }
                     future.complete(caches.toArray(new MysqlDataCache[0]));
@@ -126,7 +130,7 @@ public final class MysqlDataCache {
 
             CompletableFuture.runAsync(() -> {
                 try {
-                    @NotNull Map<Long, Map<String, Object>> datas = new HashMap<>();
+                    @NotNull Map<Integer, Map<String, Object>> datas = new HashMap<>();
 
                     for (MysqlData data : table.getDatas()) {
                         if (data.isLoaded()) {
@@ -139,7 +143,7 @@ public final class MysqlDataCache {
                     try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE " + SqlUtils.rowNotIn(datas.keySet()))) {
                         @NotNull ResultSet set = statement.executeQuery();
                         while (set.next()) {
-                            long row = set.getInt("row");
+                            int row = set.getInt("row");
 
                             if (!datas.containsKey(row)) {
                                 datas.put(row, new HashMap<>());
@@ -155,7 +159,7 @@ public final class MysqlDataCache {
                     }
 
                     @NotNull Set<MysqlDataCache> caches = new HashSet<>();
-                    for (Map.Entry<Long, Map<String, Object>> entry : datas.entrySet()) {
+                    for (Map.Entry<Integer, Map<String, Object>> entry : datas.entrySet()) {
                         caches.add(new MysqlDataCache(table, entry.getKey(), entry.getValue()));
                     }
                     future.complete(caches.toArray(new MysqlDataCache[0]));
@@ -171,11 +175,11 @@ public final class MysqlDataCache {
     // Object
 
     private final @NotNull MysqlTable table;
-    private final long row;
+    private final int row;
 
     private final @NotNull Map<@NotNull String, @Nullable Object> data;
 
-    MysqlDataCache(@NotNull MysqlTable table, long row, @NotNull Map<@NotNull String, @Nullable Object> data) {
+    MysqlDataCache(@NotNull MysqlTable table, int row, @NotNull Map<@NotNull String, @Nullable Object> data) {
         this.table = table;
         this.row = row;
         this.data = new HashMap<>(data);
@@ -185,7 +189,7 @@ public final class MysqlDataCache {
         return table;
     }
 
-    public long getRow() {
+    public int getRow() {
         return row;
     }
 

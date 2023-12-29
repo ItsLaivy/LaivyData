@@ -36,7 +36,7 @@ public final class Datas extends Content.SetProvider<MysqlData> {
         }
     }
 
-    public boolean contains(long row) {
+    public boolean contains(int row) {
         if (!getTable().isLoaded()) {
             throw new IllegalStateException("The table aren't loaded");
         }

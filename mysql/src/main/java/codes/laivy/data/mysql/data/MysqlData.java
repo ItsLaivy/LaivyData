@@ -23,7 +23,7 @@ public final class MysqlData extends Data {
 
     // Static methods
 
-    public static @NotNull CompletableFuture<Boolean> exists(@NotNull MysqlTable table, final long row) {
+    public static @NotNull CompletableFuture<Boolean> exists(@NotNull MysqlTable table, final int row) {
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
         if (connection == null) {
             throw new IllegalStateException("The database's authentication aren't connected");
@@ -78,7 +78,7 @@ public final class MysqlData extends Data {
 
                 int amount = 0;
 
-                @NotNull Set<Long> excluded = new HashSet<>();
+                @NotNull Set<Integer> excluded = new HashSet<>();
 
                 for (MysqlData data : table.getDatas()) {
                     if (data.isLoaded()) {
@@ -120,7 +120,7 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                long increment = table.getAutoIncrement().getAndIncrement(1).join();
+                int increment = table.getAutoIncrement().getAndIncrement(1).join();
                 future.complete(retrieve(table, increment));
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
@@ -129,7 +129,7 @@ public final class MysqlData extends Data {
 
         return future;
     }
-    public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, final long row) {
+    public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, final int row) {
         @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
 
         if (optional.isPresent()) {
@@ -166,7 +166,7 @@ public final class MysqlData extends Data {
                 try (PreparedStatement statement = connection.prepareStatement("SELECT `row` FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE " + SqlUtils.rowNotIn(datas.stream().map(MysqlData::getRow).collect(Collectors.toSet())))) {
                     @NotNull ResultSet set = statement.executeQuery();
                     while (set.next()) {
-                        long row = set.getInt("row");
+                        int row = set.getInt("row");
                         @NotNull MysqlData data = new MysqlData(table, row);
                         datas.add(data);
                     }
@@ -201,8 +201,8 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                @NotNull Set<Long> excluded = new HashSet<>();
-                @NotNull Map<Long, MysqlData> datas = new TreeMap<>(Long::compare);
+                @NotNull Set<Integer> excluded = new HashSet<>();
+                @NotNull Map<Integer, MysqlData> datas = new TreeMap<>(Integer::compare);
 
                 for (MysqlData data : table.getDatas()) {
                     if (data.isLoaded()) {
@@ -228,7 +228,7 @@ public final class MysqlData extends Data {
 
                     @NotNull ResultSet set = statement.executeQuery();
                     while (set.next()) {
-                        long row = set.getInt("row");
+                        int row = set.getInt("row");
                         @NotNull MysqlData data = new MysqlData(table, row);
                         table.getDatas().add(data);
 
@@ -305,9 +305,9 @@ public final class MysqlData extends Data {
     private final @NotNull Set<@NotNull String> changed = new HashSet<>();
 
     private final @NotNull MysqlTable table;
-    private final long row;
+    private final int row;
 
-    private MysqlData(@NotNull MysqlTable table, long row) {
+    private MysqlData(@NotNull MysqlTable table, int row) {
         this.table = table;
         this.row = row;
     }
@@ -321,7 +321,7 @@ public final class MysqlData extends Data {
         return cache;
     }
 
-    public long getRow() {
+    public int getRow() {
         return row;
     }
 
