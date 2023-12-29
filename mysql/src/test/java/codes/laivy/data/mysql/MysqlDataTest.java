@@ -540,6 +540,12 @@ public class MysqlDataTest {
         MysqlData.set(variable, expected, Condition.of(variable2, 0)).join();
         data.start().join();
         Assert.assertEquals(data.get(variable), expected);
+        data.stop(false).join();
+        // Second test with row
+        expected = "Just another cool test :)";
+        MysqlData.set(variable, expected, data.getRow());
+        data.start().join();
+        Assert.assertEquals(data.get(variable), expected);
         // Finished
 
         database.delete().get(2, TimeUnit.SECONDS);

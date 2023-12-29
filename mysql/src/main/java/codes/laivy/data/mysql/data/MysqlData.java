@@ -247,6 +247,37 @@ public final class MysqlData extends Data {
         return future;
     }
 
+    public static <T> @NotNull CompletableFuture<Void> set(@NotNull MysqlVariable<T> variable, @UnknownNullability T value, final int row) {
+        @NotNull MysqlTable table = variable.getTable();
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        }
+
+        final @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
+                    data.set(variable, value);
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("UPDATE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` SET `" + variable.getId() + "` = ? WHERE row = " + row)) {
+                    variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), 0), value);
+                    statement.execute();
+                }
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        }, Main.getExecutor(MysqlData.class));
+
+        return future;
+    }
     public static <T> @NotNull CompletableFuture<Void> set(@NotNull MysqlVariable<T> variable, @UnknownNullability T value, final @NotNull Condition<?> @NotNull ... conditions) {
         @NotNull MysqlTable table = variable.getTable();
         @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
