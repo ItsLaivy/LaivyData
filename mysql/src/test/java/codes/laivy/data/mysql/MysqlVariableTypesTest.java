@@ -155,5 +155,24 @@ public class MysqlVariableTypesTest {
             }
         }));
     }
+    @Test
+    public void testLongType() throws Exception {
+        generate((table -> {
+            try {
+                long expected = Long.MAX_VALUE;
+
+                @NotNull MysqlVariable<Long> variable = new MysqlVariable<>("test_var", table, new MysqlLongType(), expected);
+                variable.start().get(2, TimeUnit.SECONDS);
+
+                @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
+                data.start().get(2, TimeUnit.SECONDS);
+                data.save().get(2, TimeUnit.SECONDS);
+
+                Assert.assertEquals((Long) expected, data.get(variable));
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        }));
+    }
 
 }
