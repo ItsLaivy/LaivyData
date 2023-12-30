@@ -559,7 +559,7 @@ public final class MysqlData extends Data {
                     create().join();
                 } else {
                     @NotNull Set<MysqlVariable<?>> variables = new LinkedHashSet<>(getData().keySet());
-                    variables.removeIf(variable -> !changed.contains(variable.getId()) || !variable.exists().join());
+                    variables.removeIf(variable -> !changed.contains(variable.getId().toLowerCase()) || !variable.exists().join());
 
                     if (!variables.isEmpty()) {
                         @NotNull StringBuilder builder = new StringBuilder("UPDATE `" + getDatabase().getId() + "`.`" + getTable().getId() + "` SET ");
