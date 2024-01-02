@@ -284,4 +284,8 @@ public final class MysqlDataCache {
             return variable.getType().get(getData().get(variable.getId().toLowerCase()));
         }
     }
+    public <T> @NotNull CompletableFuture<Void> set(@NotNull MysqlVariable<T> variable, @UnknownNullability T value) {
+        return MysqlData.set(variable, value, getRow());
+    }
+
 }
