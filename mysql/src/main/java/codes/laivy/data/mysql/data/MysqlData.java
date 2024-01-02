@@ -261,6 +261,10 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                if (!variable.exists().join()) {
+                    throw new IllegalStateException("This variable doesn't exists");
+                }
+
                 for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
                     data.set(variable, value);
                 }

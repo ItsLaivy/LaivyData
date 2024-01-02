@@ -16,11 +16,52 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class MysqlDataCache {
 
     // Static initializers
+
+    public static <T> @UnknownNullability CompletableFuture<T> get(@NotNull MysqlVariable<T> variable, int row) {
+        @NotNull MysqlTable table = variable.getTable();
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+
+        if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        }
+
+        @NotNull CompletableFuture<T> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (!variable.exists().join()) {
+                    throw new IllegalStateException("This variable doesn't exists");
+                }
+
+                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
+                    future.complete(data.get(variable));
+                    return;
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `" + variable.getId() + "` FROM `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` WHERE row = " + row)) {
+                    @NotNull ResultSet set = statement.executeQuery();
+
+                    if (set.next()) {
+                        future.complete(variable.getType().get(set.getObject(1)));
+                    } else {
+                        throw new IllegalStateException("There's no data with row '" + row + "' to retrieve");
+                    }
+                }
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+
+        return future;
+    }
 
     public static @NotNull MysqlDataCache copy(@NotNull MysqlData data) {
         if (!data.isLoaded()) {

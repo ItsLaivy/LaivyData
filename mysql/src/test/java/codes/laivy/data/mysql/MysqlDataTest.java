@@ -3,6 +3,7 @@ package codes.laivy.data.mysql;
 import codes.laivy.data.mysql.authentication.MysqlAuthentication;
 import codes.laivy.data.mysql.data.Condition;
 import codes.laivy.data.mysql.data.MysqlData;
+import codes.laivy.data.mysql.data.MysqlDataCache;
 import codes.laivy.data.mysql.database.MysqlDatabase;
 import codes.laivy.data.mysql.table.MysqlTable;
 import codes.laivy.data.mysql.variable.MysqlVariable;
@@ -546,6 +547,34 @@ public class MysqlDataTest {
         MysqlData.set(variable, expected, data.getRow());
         data.start().join();
         Assert.assertEquals(data.get(variable), expected);
+        // Finished
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+    @Test
+    public void testStaticGetter() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull String expected = "Just a cool test :)";
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("test_var", table, new MysqlTextType(), expected);
+        variable.start().get(2, TimeUnit.SECONDS);
+
+        // First test, with data started
+        @NotNull MysqlData data = MysqlData.create(table).join();
+        data.create().join();
+
+        Assert.assertEquals(MysqlDataCache.get(variable, data.getRow()).join(), expected);
         // Finished
 
         database.delete().get(2, TimeUnit.SECONDS);
