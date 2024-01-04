@@ -666,7 +666,9 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                stop(false).join();
+                if (isLoaded()) {
+                    stop(false).join();
+                }
 
                 if (getTable().exists().join()) {
                     try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + getDatabase().getId() + "`.`" + getTable().getId() + "` WHERE `row` = " + getRow())) {

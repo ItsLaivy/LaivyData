@@ -39,8 +39,8 @@ public abstract class Data {
             try {
                 if (isLoaded()) {
                     stop(save).get(10, TimeUnit.SECONDS);
-                    start().get(10, TimeUnit.SECONDS);
                 }
+                start().get(10, TimeUnit.SECONDS);
 
                 future.complete(null);
             } catch (Throwable throwable) {
