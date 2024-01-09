@@ -112,7 +112,7 @@ public final class MysqlDatabase extends Database {
             try {
                 unload().join();
 
-                for (MysqlTable table : getTables()) {
+                for (MysqlTable table : getTables().toCollection()) {
                     if (table.isLoaded()) {
                         table.stop().join();
                     }
