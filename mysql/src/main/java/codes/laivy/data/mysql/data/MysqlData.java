@@ -115,6 +115,82 @@ public final class MysqlData extends Data {
         return future;
     }
 
+    public static @NotNull CompletableFuture<Void> delete(@NotNull MysqlTable table, final @NotNull Condition<?> @NotNull ... conditions) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        final @NotNull Condition<?>[] finalConditions = Stream.of(conditions).distinct().toArray(Condition[]::new);
+
+        if (finalConditions.length == 0) {
+            throw new IllegalStateException("The conditions array cannot be empty");
+        } else if (connection == null) {
+            throw new IllegalStateException("The table's authentication aren't connected");
+        } else if (!table.isLoaded() || !table.getDatabase().isLoaded()) {
+            throw new IllegalStateException("This table or database aren't loaded");
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().getTable().equals(table))) {
+            throw new IllegalStateException("There's conditions with variables that aren't from the table '" + table.getId() + "'");
+        } else if (Arrays.stream(finalConditions).anyMatch(c -> !c.getVariable().isLoaded())) {
+            throw new IllegalStateException("There's conditions with variables that hasn't loaded");
+        }
+
+        final @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                @NotNull Set<Integer> excluded = new HashSet<>();
+                for (MysqlData data : table.getDatas()) {
+                    if (!data.matches(finalConditions)) {
+                        excluded.add(data.row);
+                    } else {
+                        data.stop(false).join();
+                    }
+                }
+
+                // Retrieving on database
+
+                try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` " + SqlUtils.buildWhereCondition(excluded, finalConditions))) {
+                    int index = 0;
+                    for (@NotNull Condition<?> condition : finalConditions) {
+                        //noinspection rawtypes
+                        @NotNull Type type = condition.getVariable().getType();
+                        //noinspection unchecked
+                        type.set(Parameter.of(statement, type.isNullSupported(), index), condition.getValue());
+                        index++;
+                    }
+
+                    statement.execute();
+                }
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        }, Main.getExecutor(MysqlData.class));
+
+        return future;
+    }
+    public static @NotNull CompletableFuture<Void> delete(@NotNull MysqlTable table, int row) {
+        @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
+        if (connection == null) {
+            throw new IllegalStateException("The database's authentication aren't connected");
+        }
+
+        @NotNull CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (table.exists().join()) {
+                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE `row` = " + row)) {
+                        statement.execute();
+                    }
+                }
+
+                future.complete(null);
+            } catch (@NotNull Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        }, Main.getExecutor(MysqlData.class));
+
+        return future;
+    }
     public static @NotNull CompletableFuture<MysqlData> create(@NotNull MysqlTable table) {
         @NotNull CompletableFuture<MysqlData> future = new CompletableFuture<>();
 

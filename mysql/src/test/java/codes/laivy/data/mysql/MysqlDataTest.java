@@ -14,6 +14,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -576,6 +578,74 @@ public class MysqlDataTest {
 
         Assert.assertEquals(MysqlDataCache.get(variable, data.getRow()).join(), expected);
         // Finished
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+    @Test
+    public void testStaticDelete() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlData data = MysqlData.create(table).join();
+        data.start().join();
+        data.stop(true).join();
+        MysqlData.delete(data.getTable(), data.getRow());
+
+        Assert.assertFalse(data.exists().join());
+
+        database.delete().get(2, TimeUnit.SECONDS);
+        authentication.disconnect().get(5, TimeUnit.SECONDS);
+    }
+    @Test
+    public void testStaticDeleteCondition() throws Exception {
+        @NotNull MysqlAuthentication authentication = new MysqlAuthentication(USERNAME, PASSWORD, ADDRESS, PORT);
+        authentication.connect().get(5, TimeUnit.SECONDS);
+        @NotNull MysqlDatabase database = MysqlDatabase.getOrCreate(authentication, "test");
+
+        database.start().get(2, TimeUnit.SECONDS);
+        database.delete().get(2, TimeUnit.SECONDS);
+        database.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlTable table = new MysqlTable("test_table", database);
+        table.start().get(2, TimeUnit.SECONDS);
+
+        @NotNull MysqlVariable<String> variable = new MysqlVariable<>("variable", table, new MysqlTextType(MysqlTextType.Size.TINYTEXT), "test");
+        variable.start().join();
+
+        List<MysqlData> datas = new LinkedList<>();
+        List<MysqlData> contains = new LinkedList<>();
+        for (int row = 0; row < 15; row++) {
+            @NotNull MysqlData data = MysqlData.create(table).join();
+            data.create().join();
+            data.start().join();
+
+            datas.add(data);
+            if (Math.random() > 0.5D) {
+                data.set(variable, null);
+                contains.add(data);
+            }
+        }
+
+        MysqlData.delete(table, Condition.of(variable, variable.getDefaultValue())).join();
+
+        for (MysqlData data : datas) {
+            if (contains.contains(data)) {
+                Assert.assertTrue(data.isLoaded());
+                Assert.assertTrue(data.exists().join());
+            } else {
+                Assert.assertFalse(data.isLoaded());
+                Assert.assertFalse(data.exists().join());
+            }
+        }
 
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);

@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -112,7 +113,7 @@ public final class MysqlDatabase extends Database {
             try {
                 unload().join();
 
-                for (MysqlTable table : getTables().toCollection()) {
+                for (MysqlTable table : new HashSet<>(getTables().toCollection())) {
                     if (table.isLoaded()) {
                         table.stop().join();
                     }
