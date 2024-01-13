@@ -6,23 +6,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 
 public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
 
-    private final @NotNull Content<MysqlVariable<?>> defaultVariables = new Content.SetProvider<MysqlVariable<?>>(new HashSet<>()) {
-        @Override
-        public boolean add(@NotNull MysqlVariable<?> object) {
-            if (!object.getTable().equals(getTable())) {
-                throw new IllegalStateException("Illegal default variable table");
-            }
-            return super.add(object);
-        }
-    };
-
+    private final @NotNull Default defaultVariables = new Default();
     private final @NotNull MysqlTable table;
 
     public Variables(@NotNull MysqlTable table) {
@@ -30,7 +18,7 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
         this.table = table;
     }
 
-    public @NotNull Content<MysqlVariable<?>> getDefault() {
+    public @NotNull Default getDefault() {
         return defaultVariables;
     }
 
@@ -92,4 +80,36 @@ public final class Variables extends Content.SetProvider<MysqlVariable<?>> {
             return super.toCollection();
         }
     }
+
+    // Classes
+
+    public final class Default implements Iterable<MysqlVariable<?>> {
+
+        private final @NotNull Set<MysqlVariable<?>> variables = new HashSet<>();
+
+        public void addAll(@NotNull MysqlVariable<?>... variables) {
+            for (MysqlVariable<?> variable : variables) {
+                if (!variable.getTable().equals(getTable())) {
+                    throw new IllegalStateException("Illegal default variable table");
+                }
+                this.variables.add(variable);
+            }
+        }
+        public boolean add(@NotNull MysqlVariable<?> object) {
+            if (!object.getTable().equals(getTable())) {
+                throw new IllegalStateException("Illegal default variable table");
+            }
+            return variables.add(object);
+        }
+        public boolean remove(@NotNull MysqlVariable<?> object) {
+            return variables.remove(object);
+        }
+
+        @NotNull
+        @Override
+        public Iterator<MysqlVariable<?>> iterator() {
+            return variables.iterator();
+        }
+    }
+
 }
