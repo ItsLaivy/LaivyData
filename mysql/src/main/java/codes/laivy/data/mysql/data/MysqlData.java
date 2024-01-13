@@ -11,6 +11,7 @@ import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.mysql.variable.type.Type;
 import org.jetbrains.annotations.*;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -799,4 +800,15 @@ public final class MysqlData extends Data {
                 "is new=" + isNew +
                 '}';
     }
+
+    @Override
+    @Blocking
+    public void flush() {
+        if (isLoaded()) {
+            stop(true);
+        }
+
+        getTable().getDatas().remove(this);
+    }
+
 }
