@@ -205,7 +205,7 @@ public final class MysqlData extends Data {
             try {
                 int row = table.getAutoIncrement().getAndIncrement(1).join();
 
-                if (table.getDatas().stream().anyMatch(data -> data.getRow() == row)) {
+                if (table.getDatas().stream().anyMatch(data -> data.getRow() == row && !data.exists().join())) {
                     throw new IllegalStateException("cannot create date because this table was illegally modified");
                 }
 
