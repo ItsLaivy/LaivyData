@@ -598,9 +598,12 @@ public class MysqlDataTest {
         @NotNull MysqlData data = MysqlData.create(table).join();
         data.start().join();
         data.stop(true).join();
-        MysqlData.delete(data.getTable(), data.getRow());
+        data.start().join();
 
+        Assert.assertTrue(data.exists().join());
+        MysqlData.delete(data.getTable(), data.getRow()).join();
         Assert.assertFalse(data.exists().join());
+        Assert.assertFalse(data.isLoaded());
 
         database.delete().get(2, TimeUnit.SECONDS);
         authentication.disconnect().get(5, TimeUnit.SECONDS);

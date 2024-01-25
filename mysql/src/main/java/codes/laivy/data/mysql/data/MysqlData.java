@@ -11,7 +11,6 @@ import codes.laivy.data.mysql.variable.Parameter;
 import codes.laivy.data.mysql.variable.type.Type;
 import org.jetbrains.annotations.*;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -178,6 +177,13 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
+                @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
+                optional.ifPresent(data -> {
+                    if (data.isLoaded()) {
+                        data.stop(false).join();
+                    }
+                });
+
                 if (table.exists().join()) {
                     try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + table.getDatabase().getId() + "`.`" + table.getId() + "` WHERE `row` = " + row)) {
                         statement.execute();
@@ -197,8 +203,13 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                int increment = table.getAutoIncrement().getAndIncrement(1).join();
-                future.complete(retrieve(table, increment));
+                int row = table.getAutoIncrement().getAndIncrement(1).join();
+
+                if (table.getDatas().stream().anyMatch(data -> data.getRow() == row)) {
+                    throw new IllegalStateException("cannot create date because this table was illegally modified");
+                }
+
+                future.complete(retrieve(table, row));
             } catch (@NotNull Throwable throwable) {
                 future.completeExceptionally(throwable);
             }
