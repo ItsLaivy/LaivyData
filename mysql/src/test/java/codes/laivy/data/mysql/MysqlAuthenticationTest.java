@@ -35,8 +35,8 @@ public class MysqlAuthenticationTest {
         Assert.assertFalse("Cannot validate authentication", authentication.getConnection().isClosed());
 
         @NotNull MysqlVersion version = authentication.getVersion();
-        if (version.getMajor() < 5 || version.getMinor() < 1) {
-            throw new IllegalStateException("The LaivyData-Java/Mysql has only compatible with MySQL 5.1 or higher");
+        if (version.getMajor() < 5 || (version.getMajor() == 5 && version.getMinor() < 1)) {
+            throw new IllegalStateException("The LaivyData-Java/Mysql is only compatible with MySQL 5.1 or higher");
         }
 
         authentication.disconnect().get(5, TimeUnit.SECONDS);

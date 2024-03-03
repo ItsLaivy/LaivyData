@@ -11,11 +11,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public final class Datas extends Content.SetProvider<MysqlData> {
+public final class DataContent extends Content.SetProvider<MysqlData> {
 
     private final @NotNull MysqlTable table;
 
-    public Datas(@NotNull MysqlTable table) {
+    public DataContent(@NotNull MysqlTable table) {
         super(new HashSet<>());
         this.table = table;
     }

@@ -80,7 +80,7 @@ public final class MysqlData extends Data {
 
                 @NotNull Set<Integer> excluded = new HashSet<>();
 
-                for (MysqlData data : table.getDatas()) {
+                for (MysqlData data : table.getDataContent()) {
                     if (data.isLoaded()) {
                         excluded.add(data.getRow());
 
@@ -136,7 +136,7 @@ public final class MysqlData extends Data {
         CompletableFuture.runAsync(() -> {
             try {
                 @NotNull Set<Integer> excluded = new HashSet<>();
-                for (MysqlData data : table.getDatas()) {
+                for (MysqlData data : table.getDataContent()) {
                     if (!data.matches(finalConditions)) {
                         excluded.add(data.row);
                     } else {
@@ -177,7 +177,7 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
+                @NotNull Optional<MysqlData> optional = table.getDataContent().stream().filter(data -> data.getRow() == row).findFirst();
                 optional.ifPresent(data -> {
                     if (data.isLoaded()) {
                         data.stop(false).join();
@@ -205,7 +205,7 @@ public final class MysqlData extends Data {
             try {
                 int row = table.getAutoIncrement().getAndIncrement(1).join();
 
-                if (table.getDatas().stream().anyMatch(data -> data.getRow() == row && !data.exists().join())) {
+                if (table.getDataContent().stream().anyMatch(data -> data.getRow() == row && !data.exists().join())) {
                     throw new IllegalStateException("cannot create date because this table was illegally modified");
                 }
 
@@ -218,14 +218,14 @@ public final class MysqlData extends Data {
         return future;
     }
     public static @NotNull MysqlData retrieve(@NotNull MysqlTable table, final int row) {
-        @NotNull Optional<MysqlData> optional = table.getDatas().stream().filter(data -> data.getRow() == row).findFirst();
+        @NotNull Optional<MysqlData> optional = table.getDataContent().stream().filter(data -> data.getRow() == row).findFirst();
 
         if (optional.isPresent()) {
             return optional.get();
         }
 
         @NotNull MysqlData data = new MysqlData(table, row);
-        table.getDatas().add(data);
+        table.getDataContent().add(data);
         return data;
     }
     public static @NotNull CompletableFuture<MysqlData[]> retrieve(@NotNull MysqlTable table) {
@@ -245,7 +245,7 @@ public final class MysqlData extends Data {
 
                 @NotNull Set<MysqlData> datas = new HashSet<>();
 
-                for (MysqlData data : table.getDatas()) {
+                for (MysqlData data : table.getDataContent()) {
                     if (data.isLoaded()) {
                         datas.add(data);
                     }
@@ -292,7 +292,7 @@ public final class MysqlData extends Data {
                 @NotNull Set<Integer> excluded = new HashSet<>();
                 @NotNull Map<Integer, MysqlData> datas = new TreeMap<>(Integer::compare);
 
-                for (MysqlData data : table.getDatas()) {
+                for (MysqlData data : table.getDataContent()) {
                     if (data.isLoaded()) {
                         excluded.add(data.getRow());
 
@@ -318,7 +318,7 @@ public final class MysqlData extends Data {
                     while (set.next()) {
                         int row = set.getInt("row");
                         @NotNull MysqlData data = new MysqlData(table, row);
-                        table.getDatas().add(data);
+                        table.getDataContent().add(data);
 
                         if (!datas.containsKey(row)) {
                             datas.put(row, data);
@@ -353,11 +353,11 @@ public final class MysqlData extends Data {
                     throw new IllegalStateException("This variable doesn't exists");
                 }
 
-                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
+                for (MysqlData data : variable.getTable().getDataContent().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
                     data.set(variable, value);
                 }
 
-                try (PreparedStatement statement = connection.prepareStatement("UPDATE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` SET `" + variable.getId() + "` = ? WHERE row = " + row)) {
+                try (PreparedStatement statement = connection.prepareStatement("UPDATE `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` SET `" + variable.getId() + "` = ? WHERE `row` = " + row)) {
                     variable.getType().set(Parameter.of(statement, variable.getType().isNullSupported(), 0), value);
                     statement.execute();
                 }
@@ -392,7 +392,7 @@ public final class MysqlData extends Data {
 
         CompletableFuture.runAsync(() -> {
             try {
-                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.matches(conditions)).collect(Collectors.toList())) {
+                for (MysqlData data : variable.getTable().getDataContent().stream().filter(data -> data.isLoaded() && data.matches(conditions)).collect(Collectors.toList())) {
                     data.set(variable, value);
                 }
 
@@ -811,7 +811,7 @@ public final class MysqlData extends Data {
             stop(true);
         }
 
-        getTable().getDatas().remove(this);
+        getTable().getDataContent().remove(this);
     }
 
 }

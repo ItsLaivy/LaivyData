@@ -31,7 +31,7 @@ public interface AutoIncrement {
 
     @NotNull CompletableFuture<Integer> getAmount();
 
-    @NotNull CompletableFuture<Void> setAmount(long value);
+    @NotNull CompletableFuture<Void> setAmount(int value);
 
     // Static initializers
 
@@ -51,7 +51,10 @@ public interface AutoIncrement {
                     try {
                         try (@NotNull PreparedStatement statement = connection.prepareStatement("SHOW TABLE STATUS FROM `" + table.getDatabase().getId() + "` LIKE '" + table.getId() + "'")) {
                             @NotNull ResultSet set = statement.executeQuery();
-                            set.next();
+
+                            if (!set.next()) {
+                                throw new IllegalStateException("the table '" + table.getId() + "' doesn't exists");
+                            }
 
                             future.complete(set.getInt("auto_increment"));
                         }
@@ -64,7 +67,7 @@ public interface AutoIncrement {
             }
 
             @Override
-            public @NotNull CompletableFuture<Void> setAmount(long value) {
+            public @NotNull CompletableFuture<Void> setAmount(int value) {
                 @Nullable Connection connection = table.getDatabase().getAuthentication().getConnection();
                 if (connection == null) {
                     throw new IllegalStateException("The database's authentication aren't connected");
@@ -74,7 +77,8 @@ public interface AutoIncrement {
 
                 CompletableFuture.runAsync(() -> {
                     try {
-                        try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + table.getDatabase().getId() + "`.`" + table.getId() + "` AUTO_INCREMENT = " + value + ";")) {
+                        try (@NotNull PreparedStatement statement = connection.prepareStatement("ALTER TABLE `" + table.getDatabase().getId() + "`.`" + table.getId() + "` AUTO_INCREMENT = ?;")) {
+                            statement.setInt(1, value);
                             statement.execute();
                         }
 

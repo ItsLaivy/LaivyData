@@ -385,7 +385,7 @@ public class MysqlDataTest {
         @NotNull MysqlTable table = new MysqlTable("test_table", database);
         table.start().get(2, TimeUnit.SECONDS);
 
-        // Creating 4 datas
+        // Creating some data
         int amount = random.nextInt(100);
         for (int row = 0; row < amount; row++) {
             @NotNull MysqlData data = MysqlData.create(table).get(2, TimeUnit.SECONDS);
@@ -396,7 +396,7 @@ public class MysqlDataTest {
             }
         }
 
-        // Verifying if exists the 4 datas
+        // Verifying if exists all the data
         Assert.assertEquals((Integer) amount, (Integer) MysqlData.retrieve(table).get(2, TimeUnit.SECONDS).length);
         //
 
@@ -459,7 +459,7 @@ public class MysqlDataTest {
         data.set(variable, "ata");
 
         data.stop(true).get(2, TimeUnit.SECONDS);
-        table.getDatas().remove(data);
+        table.getDataContent().remove(data);
 
         variable.stop().get(2, TimeUnit.SECONDS);
         variable.start().get(2, TimeUnit.SECONDS);
@@ -503,7 +503,7 @@ public class MysqlDataTest {
             }
 
             data.stop(true).get(2, TimeUnit.SECONDS);
-            table.getDatas().remove(data);
+            table.getDataContent().remove(data);
         }
 
         Assert.assertEquals(total, MysqlData.retrieve(table, Condition.of(variable, expected)).join().length);
@@ -546,7 +546,7 @@ public class MysqlDataTest {
         data.stop(false).join();
         // Second test with row
         expected = "Just another cool test :)";
-        MysqlData.set(variable, expected, data.getRow());
+        MysqlData.set(variable, expected, data.getRow()).join();
         data.start().join();
         Assert.assertEquals(data.get(variable), expected);
         // Finished

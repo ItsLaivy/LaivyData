@@ -18,7 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -98,7 +97,7 @@ public class MysqlVariable<T> extends Variable<T> {
                 getTable().getVariables().add(this);
 
                 // Sync with cache data for the receptors
-                @NotNull List<MysqlData> datas = getTable().getDatas().stream().filter(Data::isLoaded).collect(Collectors.toList());
+                @NotNull List<MysqlData> datas = getTable().getDataContent().stream().filter(Data::isLoaded).collect(Collectors.toList());
                 for (MysqlData data : datas) {
                     if (isNew) {
                         data.getData().put(this, getDefaultValue());

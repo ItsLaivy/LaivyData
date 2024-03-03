@@ -41,12 +41,12 @@ public final class MysqlDataCache {
                     throw new IllegalStateException("This variable doesn't exists");
                 }
 
-                for (MysqlData data : variable.getTable().getDatas().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
+                for (MysqlData data : variable.getTable().getDataContent().stream().filter(data -> data.isLoaded() && data.getRow() == row).collect(Collectors.toList())) {
                     future.complete(data.get(variable));
                     return;
                 }
 
-                try (PreparedStatement statement = connection.prepareStatement("SELECT `" + variable.getId() + "` FROM `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` WHERE row = " + row)) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT `" + variable.getId() + "` FROM `" + variable.getDatabase().getId() + "`.`" + variable.getTable().getId() + "` WHERE `row` = " + row)) {
                     @NotNull ResultSet set = statement.executeQuery();
 
                     if (set.next()) {
@@ -137,7 +137,7 @@ public final class MysqlDataCache {
                     @NotNull Set<Integer> excluded = new HashSet<>();
                     @NotNull Map<Integer, Map<String, Object>> datas = new HashMap<>();
 
-                    for (MysqlData data : table.getDatas()) {
+                    for (MysqlData data : table.getDataContent()) {
                         if (data.isLoaded()) {
                             excluded.add(data.getRow());
 
@@ -205,7 +205,7 @@ public final class MysqlDataCache {
                 try {
                     @NotNull Map<Integer, Map<String, Object>> datas = new HashMap<>();
 
-                    for (MysqlData data : table.getDatas()) {
+                    for (MysqlData data : table.getDataContent()) {
                         if (data.isLoaded()) {
                             datas.put(data.getRow(), data.getCache());
                         }

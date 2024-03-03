@@ -23,7 +23,7 @@ public class MysqlTable {
     private final @NotNull MysqlDatabase database;
 
     private final @NotNull Variables variables;
-    private final @NotNull Datas datas;
+    private final @NotNull DataContent dataContent;
 
     private final @NotNull AutoIncrement autoIncrement;
 
@@ -32,19 +32,23 @@ public class MysqlTable {
     @ApiStatus.Internal
     protected boolean loaded = false;
 
-    protected MysqlTable(@NotNull String id, @NotNull MysqlDatabase database, @NotNull Variables variables, @NotNull Datas datas, @NotNull AutoIncrement autoIncrement) {
+    protected MysqlTable(@NotNull String id, @NotNull MysqlDatabase database, @NotNull Variables variables, @NotNull DataContent dataContent, @NotNull AutoIncrement autoIncrement) {
         this.id = id;
         this.database = database;
         this.variables = variables;
-        this.datas = datas;
+        this.dataContent = dataContent;
         this.autoIncrement = autoIncrement;
+
+        if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
+            throw new IllegalStateException("This table name '" + id + "' doesn't follows the regex '^[a-zA-Z0-9_]{0,63}$'");
+        }
     }
     public MysqlTable(@NotNull String id, @NotNull MysqlDatabase database) {
         this.id = id;
         this.database = database;
 
         this.variables = new Variables(this);
-        this.datas = new Datas(this);
+        this.dataContent = new DataContent(this);
         this.autoIncrement = AutoIncrement.of(this);
 
         if (!id.matches("^[a-zA-Z0-9_]{0,63}$")) {
@@ -93,7 +97,7 @@ public class MysqlTable {
 
         CompletableFuture.runAsync(() -> {
             try {
-                for (@NotNull MysqlData data : new HashSet<>(getDatas().toCollection())) {
+                for (@NotNull MysqlData data : new HashSet<>(getDataContent().toCollection())) {
                     if (data.isLoaded()) {
                         data.stop(true).join();
                     }
@@ -104,7 +108,7 @@ public class MysqlTable {
                     }
                 }
 
-                getDatas().clear();
+                getDataContent().clear();
                 getVariables().clear();
 
                 getDatabase().getTables().remove(this);
@@ -128,8 +132,9 @@ public class MysqlTable {
         @NotNull CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         CompletableFuture.runAsync(() -> {
-            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS `" + getDatabase().getId() + "`.`" + getId() + "` (`row` INT AUTO_INCREMENT PRIMARY KEY);")) {
+            try (PreparedStatement statement = getDatabase().getAuthentication().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS `" + getDatabase().getId() + "`.`" + getId() + "` (`row` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY);")) {
                 statement.execute();
+
                 future.complete(true);
             } catch (@NotNull Throwable throwable) {
                 if (SqlUtils.getErrorCode(throwable) == 1051) {
@@ -216,8 +221,8 @@ public class MysqlTable {
     public final @NotNull Variables getVariables() {
         return variables;
     }
-    public final @NotNull Datas getDatas() {
-        return datas;
+    public final @NotNull DataContent getDataContent() {
+        return dataContent;
     }
 
     public @NotNull CompletableFuture<Long> getRows() {

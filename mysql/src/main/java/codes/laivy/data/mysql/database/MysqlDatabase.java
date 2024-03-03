@@ -204,7 +204,7 @@ public final class MysqlDatabase extends Database {
         CompletableFuture.runAsync(() -> {
             for (MysqlTable table : getTables()) {
                 if (table.isLoaded()) {
-                    for (MysqlData data : table.getDatas()) {
+                    for (MysqlData data : table.getDataContent()) {
                         data.save().join();
                     }
                 }
