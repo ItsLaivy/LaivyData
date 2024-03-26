@@ -125,7 +125,7 @@ public abstract class Database {
      */
     @ApiStatus.OverrideOnly
     @ApiStatus.Internal
-    protected abstract @NotNull CompletableFuture<Void> load();
+    protected abstract @NotNull CompletableFuture<Void> load() throws Throwable;
 
     /**
      * Unloads the database, releasing resources.
@@ -135,7 +135,7 @@ public abstract class Database {
      */
     @ApiStatus.OverrideOnly
     @ApiStatus.Internal
-    protected abstract @NotNull CompletableFuture<Void> unload();
+    protected abstract @NotNull CompletableFuture<Void> unload() throws Throwable;
 
     /**
      * Deletes the database and its contents.
